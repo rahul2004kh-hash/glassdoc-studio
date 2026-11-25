@@ -22,7 +22,6 @@ function copyDir(src, dest) {
 }
 
 function prepareWebAssets() {
-  // Always sync root index.html to www/index.html if root index.html exists
   if (fs.existsSync('index.html')) {
     copyFile('index.html', 'www/index.html');
   } else if (!fs.existsSync('www/index.html')) {
@@ -65,11 +64,10 @@ function patchAndroidNative() {
     throw new Error('Android package path not found: ' + pkgPath);
   }
 
-  // 1. Write NativeStorageBridge.java for instant auto-PDF detection & saving
+  // 1. NativeStorageBridge.java (PDF Auto-Scanner + True Immersive Fullscreen Control)
   const nativeBridgeJava = `package org.glassdoc.student;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -97,10 +95,20 @@ import java.util.Locale;
 import java.util.Set;
 
 public class NativeStorageBridge {
-    private final Activity activity;
+    private final MainActivity activity;
 
-    public NativeStorageBridge(Activity activity) {
+    public NativeStorageBridge(MainActivity activity) {
         this.activity = activity;
+    }
+
+    @JavascriptInterface
+    public void setFullscreen(final boolean enable) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activity.applyImmersiveFullscreen(enable);
+            }
+        });
     }
 
     @JavascriptInterface
@@ -147,7 +155,6 @@ public class NativeStorageBridge {
         List<File> found = new ArrayList<>();
         Set<String> seen = new HashSet<>();
 
-        // 1. Direct scan of external storage (finds all PDFs/DOCX immediately when permitted)
         try {
             File root = Environment.getExternalStorageDirectory();
             if (root != null && root.exists() && root.canRead()) {
@@ -155,7 +162,6 @@ public class NativeStorageBridge {
             }
         } catch (Exception ignored) {}
 
-        // 2. Also query MediaStore.Files as backup
         try {
             Uri uri = MediaStore.Files.getContentUri("external");
             String[] projection = new String[]{ MediaStore.Files.FileColumns.DATA };
@@ -181,7 +187,6 @@ public class NativeStorageBridge {
             }
         } catch (Exception ignored) {}
 
-        // Sort newest first
         Collections.sort(found, new Comparator<File>() {
             @Override
             public int compare(File a, File b) {
@@ -215,7 +220,6 @@ public class NativeStorageBridge {
         if (depth > 5 || out.size() >= 400) return;
         String dirName = dir.getName();
         if (depth > 0 && (dirName.startsWith(".") || dirName.equalsIgnoreCase("Android") || dirName.equalsIgnoreCase("MIUI"))) {
-            // Still allow WhatsApp/Telegram inside Android/media if encountered specifically
             if (!dirName.equalsIgnoreCase("Android")) return;
             File waMedia = new File(dir, "media");
             if (waMedia.exists() && waMedia.isDirectory()) {
@@ -285,17 +289,25 @@ public class NativeStorageBridge {
   fs.writeFileSync(path.join(pkgPath, 'NativeStorageBridge.java'), nativeBridgeJava, 'utf8');
   console.log('Created NativeStorageBridge.java');
 
-  // 2. Patch MainActivity.java
+  // 2. MainActivity.java with True Immersive Sticky Fullscreen (Hides Status Bar + Bottom Nav Bar)
   const mainActivityJava = `package org.glassdoc.student;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
+    private boolean immersiveActive = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -303,6 +315,11 @@ public class MainActivity extends BridgeActivity {
             Window window = getWindow();
             window.setStatusBarColor(Color.parseColor("#050812"));
             window.setNavigationBarColor(Color.parseColor("#050812"));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                WindowManager.LayoutParams lp = window.getAttributes();
+                lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+                window.setAttributes(lp);
+            }
         } catch (Exception ignored) {}
 
         if (this.getBridge() != null && this.getBridge().getWebView() != null) {
@@ -313,10 +330,50 @@ public class MainActivity extends BridgeActivity {
             settings.setAllowContentAccess(true);
         }
     }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && immersiveActive) {
+            applyImmersiveFullscreen(true);
+        }
+    }
+
+    public void applyImmersiveFullscreen(boolean enable) {
+        immersiveActive = enable;
+        try {
+            Window window = getWindow();
+            View decorView = window.getDecorView();
+            WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(window, decorView);
+            if (enable) {
+                WindowCompat.setDecorFitsSystemWindows(window, false);
+                if (controller != null) {
+                    controller.setSystemBarsBehavior(
+                        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    );
+                    controller.hide(WindowInsetsCompat.Type.systemBars());
+                }
+                decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                );
+            } else {
+                WindowCompat.setDecorFitsSystemWindows(window, true);
+                if (controller != null) {
+                    controller.show(WindowInsetsCompat.Type.systemBars());
+                }
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            }
+        } catch (Exception ignored) {}
+    }
 }
 `;
   fs.writeFileSync(path.join(pkgPath, 'MainActivity.java'), mainActivityJava, 'utf8');
-  console.log('Patched MainActivity.java');
+  console.log('Patched MainActivity.java with Immersive Fullscreen');
 
   // 3. Patch AndroidManifest.xml with storage permissions
   const manifestPath = 'android/app/src/main/AndroidManifest.xml';
@@ -342,12 +399,10 @@ public class MainActivity extends BridgeActivity {
   const gradlePath = 'android/app/build.gradle';
   let gradle = fs.readFileSync(gradlePath, 'utf8');
   if (!gradle.includes('glassdoc-release.keystore')) {
-    // First add signingConfig inside existing buildTypes -> release block
     gradle = gradle.replace(
       /buildTypes\s*\{\s*release\s*\{/,
       'buildTypes {\n        release {\n            signingConfig signingConfigs.release'
     );
-    // Then add signingConfigs & lint right before buildTypes
     const signingBlock = `
     signingConfigs {
         release {
