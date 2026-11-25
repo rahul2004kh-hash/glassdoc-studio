@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#050812" />
-  <title>GlassDoc Studio v2.2 — শিক্ষার্থী এডিশন</title>
+  <title>AetherX PDF Reader</title>
 
   <!-- 100% Offline Bundled Bengali Fonts -->
   <link rel="stylesheet" href="./fonts/noto-sans-bengali/400.css" />
@@ -17,7 +17,7 @@
       --font-bn: 'Noto Sans Bengali', 'Hind Siliguri', system-ui, -apple-system, sans-serif;
       --bg-base: #050812;
       --glass-surface: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
-      --glass-surface-strong: rgba(10, 17, 32, 0.78);
+      --glass-surface-strong: rgba(10, 17, 32, 0.80);
       --glass-pill: rgba(255, 255, 255, 0.085);
       --glass-border: rgba(255, 255, 255, 0.18);
       --glass-border-soft: rgba(255, 255, 255, 0.10);
@@ -41,7 +41,7 @@
     [data-theme="light"] {
       --bg-base: #e7eef9;
       --glass-surface: linear-gradient(145deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.46) 100%);
-      --glass-surface-strong: rgba(248, 251, 255, 0.82);
+      --glass-surface-strong: rgba(248, 251, 255, 0.84);
       --glass-pill: rgba(15, 23, 42, 0.055);
       --glass-border: rgba(255, 255, 255, 0.88);
       --glass-border-soft: rgba(15, 23, 42, 0.09);
@@ -69,48 +69,26 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Ambient Liquid Aurora Orbs */
+    /* BATTERY-OPTIMIZED Static Liquid Aurora Orbs (0% idle GPU drain!) */
     .ambient-bg {
       position: fixed;
       inset: 0;
       z-index: 0;
       overflow: hidden;
       pointer-events: none;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(14, 165, 233, 0.28), transparent 44%),
+        radial-gradient(circle at 90% 34%, rgba(139, 92, 246, 0.25), transparent 46%),
+        radial-gradient(circle at 24% 94%, rgba(16, 185, 129, 0.20), transparent 48%);
+    }
+    [data-theme="light"] .ambient-bg {
+      background:
+        radial-gradient(circle at 12% 8%, rgba(14, 165, 233, 0.22), transparent 44%),
+        radial-gradient(circle at 90% 34%, rgba(139, 92, 246, 0.18), transparent 46%),
+        radial-gradient(circle at 24% 94%, rgba(16, 185, 129, 0.16), transparent 48%);
     }
 
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(74px);
-      opacity: 0.50;
-      will-change: transform;
-    }
-    [data-theme="light"] .orb { opacity: 0.40; filter: blur(66px); }
-
-    .orb-1 {
-      width: 330px; height: 330px;
-      top: -85px; left: -90px;
-      background: radial-gradient(circle, #0ea5e9 0%, #2563eb 60%, transparent 100%);
-      animation: floatOrb1 16s ease-in-out infinite alternate;
-    }
-    .orb-2 {
-      width: 350px; height: 350px;
-      top: 30%; right: -125px;
-      background: radial-gradient(circle, #a855f7 0%, #6366f1 60%, transparent 100%);
-      animation: floatOrb2 20s ease-in-out infinite alternate;
-    }
-    .orb-3 {
-      width: 310px; height: 310px;
-      bottom: -85px; left: 8%;
-      background: radial-gradient(circle, #10b981 0%, #06b6d4 65%, transparent 100%);
-      animation: floatOrb3 18s ease-in-out infinite alternate;
-    }
-
-    @keyframes floatOrb1 { from { transform: translate(0, 0) scale(1); } to { transform: translate(45px, 55px) scale(1.12); } }
-    @keyframes floatOrb2 { from { transform: translate(0, 0) scale(1); } to { transform: translate(-50px, -40px) scale(1.15); } }
-    @keyframes floatOrb3 { from { transform: translate(0, 0) scale(1); } to { transform: translate(40px, -45px) scale(1.1); } }
-
-    /* ==================== STARTUP OVERLAYS (SIMPLE LOADER & ONE-TIME OWNERSHIP CEREMONY) ==================== */
+    /* ==================== STARTUP OVERLAYS (SPLASH, OWNERSHIP CEREMONY, BLANK PERMISSION GATE) ==================== */
     .startup-screen {
       position: fixed;
       inset: 0;
@@ -122,10 +100,68 @@
       justify-content: center;
       padding: 22px;
       overflow: hidden;
-      transition: opacity 0.48s cubic-bezier(0.22, 1, 0.36, 1), transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: opacity 0.44s cubic-bezier(0.22, 1, 0.36, 1), transform 0.44s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .startup-screen.show { display: flex; }
-    .startup-screen.fade-out { opacity: 0; transform: scale(1.04); pointer-events: none; }
+    .startup-screen.fade-out { opacity: 0; transform: scale(1.03); pointer-events: none; }
+
+    /* Blank / Minimal Permission Gate Screen (blocks file screen until user grants storage permission) */
+    #permissionGate {
+      z-index: 860;
+      background: #050812;
+    }
+
+    .perm-gate-card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 380px;
+      border-radius: 28px;
+      padding: 32px 24px 26px;
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.11) 0%, rgba(15, 23, 42, 0.78) 100%);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      text-align: center;
+      color: #f8fafc;
+      animation: certAppear 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .perm-shield-ico {
+      width: 68px; height: 68px;
+      margin: 0 auto 16px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.28), rgba(99, 102, 241, 0.28));
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #7dd3fc;
+      display: grid; place-items: center;
+      box-shadow: 0 10px 28px rgba(14, 165, 233, 0.26);
+    }
+
+    .perm-gate-card h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .perm-gate-card p {
+      margin: 0 0 22px;
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    .perm-skip-link {
+      margin-top: 14px;
+      background: none;
+      border: none;
+      color: #64748b;
+      font-family: var(--font-bn);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 6px 10px;
+    }
 
     /* Simple Splash (Every launch after first) */
     .simple-splash-box {
@@ -136,92 +172,63 @@
       align-items: center;
       text-align: center;
       gap: 14px;
-      animation: fadeUpSoft 0.4s ease;
+      animation: fadeUpSoft 0.36s ease;
     }
     .splash-emblem {
-      width: 72px; height: 72px;
+      width: 78px; height: 78px;
       border-radius: 24px;
+      overflow: hidden;
       background: linear-gradient(135deg, #0ea5e9, #6366f1);
       display: grid; place-items: center;
       color: #fff;
-      box-shadow: 0 14px 40px rgba(56, 189, 248, 0.42), inset 0 1.5px 1px rgba(255, 255, 255, 0.5);
-      animation: emblemPulse 1.5s ease-in-out infinite alternate;
+      box-shadow: 0 14px 40px rgba(56, 189, 248, 0.40), inset 0 1.5px 1px rgba(255, 255, 255, 0.45);
     }
-    @keyframes emblemPulse {
-      from { transform: scale(1); box-shadow: 0 12px 32px rgba(56, 189, 248, 0.35); }
-      to { transform: scale(1.05); box-shadow: 0 18px 46px rgba(99, 102, 241, 0.55); }
-    }
-    .splash-owner-name {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      color: #f8fafc;
-    }
-    .splash-sub {
-      font-size: 12px;
-      color: #94a3b8;
-      margin-top: -8px;
-    }
-    .splash-bar-track {
-      width: 170px;
-      height: 4px;
-      border-radius: 99px;
-      background: rgba(255, 255, 255, 0.12);
-      overflow: hidden;
-      margin-top: 6px;
-    }
-    .splash-bar-fill {
-      width: 0%;
-      height: 100%;
-      border-radius: 99px;
-      background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399);
-      animation: simpleLoadFill 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
+    .splash-emblem img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .splash-owner-name { font-size: 20px; font-weight: 700; letter-spacing: 0.3px; color: #f8fafc; }
+    .splash-sub { font-size: 12px; color: #94a3b8; margin-top: -8px; }
+    .splash-bar-track { width: 170px; height: 4px; border-radius: 99px; background: rgba(255, 255, 255, 0.12); overflow: hidden; margin-top: 4px; }
+    .splash-bar-fill { width: 0%; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399); animation: simpleLoadFill 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
     @keyframes simpleLoadFill { from { width: 0%; } to { width: 100%; } }
 
-    /* One-Time Ownership Transfer Ceremony */
+    /* One-Time App Ownership Transfer Ceremony */
     .ceremony-stage {
       position: relative;
       z-index: 2;
       width: 100%;
-      max-width: 390px;
+      max-width: 396px;
       display: none;
       flex-direction: column;
       align-items: center;
     }
     .ceremony-stage.active {
       display: flex;
-      animation: certAppear 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      animation: certAppear 0.55s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     @keyframes certAppear {
-      from { opacity: 0; transform: translateY(24px) scale(0.94); }
+      from { opacity: 0; transform: translateY(22px) scale(0.95); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
     @keyframes fadeUpSoft {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Modern Holographic Glass Certificate Card */
     .cert-card {
       position: relative;
       width: 100%;
       border-radius: 26px;
-      padding: 26px 22px 24px;
-      background: linear-gradient(155deg, rgba(255, 255, 255, 0.13) 0%, rgba(15, 23, 42, 0.72) 55%, rgba(56, 189, 248, 0.10) 100%);
-      backdrop-filter: blur(30px) saturate(190%);
-      -webkit-backdrop-filter: blur(30px) saturate(190%);
+      padding: 28px 22px 26px;
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.13) 0%, rgba(15, 23, 42, 0.74) 55%, rgba(56, 189, 248, 0.10) 100%);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
       border: 1.5px solid rgba(255, 255, 255, 0.22);
       box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 40px rgba(56, 189, 248, 0.16);
       overflow: hidden;
       text-align: center;
       color: #f8fafc;
     }
-
-    .cert-card.impact-shake {
-      animation: certThump 0.34s cubic-bezier(0.36, 0.07, 0.19, 0.97);
-    }
+    .cert-card.impact-shake { animation: certThump 0.34s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
     @keyframes certThump {
       0% { transform: scale(1); }
       30% { transform: scale(0.975) translateY(3px); }
@@ -229,37 +236,20 @@
       100% { transform: scale(1); }
     }
 
-    /* Decorative Inner Gold/Cyan Foil Frame */
-    .cert-inner-frame {
-      position: absolute;
-      inset: 10px;
-      border-radius: 18px;
-      border: 1px solid rgba(251, 191, 36, 0.28);
-      pointer-events: none;
-    }
-
-    /* Holographic Scanning Shimmer Sweep */
+    .cert-inner-frame { position: absolute; inset: 10px; border-radius: 18px; border: 1px solid rgba(251, 191, 36, 0.28); pointer-events: none; }
     .cert-shimmer {
-      position: absolute;
-      top: -60%;
-      left: -80%;
-      width: 60%;
-      height: 220%;
+      position: absolute; top: -60%; left: -80%; width: 60%; height: 220%;
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), rgba(56, 189, 248, 0.18), transparent);
-      transform: rotate(24deg);
-      pointer-events: none;
-      animation: certSweep 2.8s ease-in-out infinite;
+      transform: rotate(24deg); pointer-events: none;
+      animation: certSweep 2.6s ease-in-out 2;
     }
-    @keyframes certSweep {
-      0% { left: -80%; }
-      55%, 100% { left: 145%; }
-    }
+    @keyframes certSweep { 0% { left: -80%; } 60%, 100% { left: 145%; } }
 
     .cert-crest {
       width: 56px; height: 56px;
-      margin: 0 auto 12px;
+      margin: 0 auto 14px;
       border-radius: 18px;
-      background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(56, 189, 248, 0.25));
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.24), rgba(56, 189, 248, 0.24));
       border: 1px solid rgba(251, 191, 36, 0.45);
       display: grid; place-items: center;
       color: #fde68a;
@@ -267,280 +257,134 @@
     }
 
     .cert-kicker {
-      font-size: 10px;
+      font-size: 10.5px;
       font-weight: 800;
       letter-spacing: 2.2px;
       text-transform: uppercase;
       color: #38bdf8;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
     }
 
     .cert-heading {
       font-size: 19px;
       font-weight: 700;
-      margin: 0 0 6px;
+      margin: 0 0 18px;
       background: linear-gradient(135deg, #ffffff 10%, #bae6fd 60%, #fde68a 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .cert-desc {
-      font-size: 12.5px;
-      color: #cbd5e1;
-      line-height: 1.55;
-      margin: 0 0 16px;
-    }
+    .cert-desc { font-size: 12.5px; color: #cbd5e1; line-height: 1.55; margin: -8px 0 16px; }
 
-    /* Animated Progress Lines in Stage 1 */
     .cert-scan-lines {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin: 14px 0 18px;
-      text-align: left;
-      padding: 12px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      font-size: 11.5px;
-      color: #cbd5e1;
+      display: flex; flex-direction: column; gap: 8px;
+      margin: 12px 0 18px; text-align: left; padding: 12px;
+      border-radius: 14px; background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1); font-size: 11.5px; color: #cbd5e1;
     }
-    .scan-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      opacity: 0;
-      transform: translateX(-8px);
-      animation: scanRowIn 0.45s ease forwards;
-    }
-    .scan-row:nth-child(1) { animation-delay: 0.25s; }
-    .scan-row:nth-child(2) { animation-delay: 0.95s; }
-    .scan-row:nth-child(3) { animation-delay: 1.65s; }
+    .scan-row { display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateX(-8px); animation: scanRowIn 0.45s ease forwards; }
+    .scan-row:nth-child(1) { animation-delay: 0.2s; }
+    .scan-row:nth-child(2) { animation-delay: 0.9s; }
+    .scan-row:nth-child(3) { animation-delay: 1.6s; }
     @keyframes scanRowIn { to { opacity: 1; transform: translateX(0); } }
+    .scan-dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px #34d399; flex-shrink: 0; }
 
-    .scan-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #34d399;
-      box-shadow: 0 0 10px #34d399;
-      flex-shrink: 0;
-    }
-
-    .cert-progress-track {
-      width: 100%;
-      height: 5px;
-      border-radius: 99px;
-      background: rgba(255, 255, 255, 0.10);
-      overflow: hidden;
-    }
-    .cert-progress-fill {
-      width: 0%;
-      height: 100%;
-      border-radius: 99px;
-      background: linear-gradient(90deg, #38bdf8, #818cf8, #fbbf24);
-      animation: certIntroBar 2.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
+    .cert-progress-track { width: 100%; height: 5px; border-radius: 99px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+    .cert-progress-fill { width: 0%; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #38bdf8, #818cf8, #fbbf24); animation: certIntroBar 2.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
     @keyframes certIntroBar { from { width: 0%; } to { width: 100%; } }
 
-    /* Stage 2: English Name Input */
     .owner-name-input {
       width: 100%;
       padding: 14px 16px;
       border-radius: 16px;
-      border: 1.5px solid rgba(56, 189, 248, 0.45);
+      border: 1.5px solid rgba(56, 189, 248, 0.48);
       background: rgba(5, 10, 22, 0.72);
       color: #ffffff;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 0.6px;
-      text-align: center;
-      outline: none;
-      margin-bottom: 8px;
+      font-size: 16px; font-weight: 700; letter-spacing: 0.6px;
+      text-align: center; outline: none; margin-bottom: 8px;
     }
-    .owner-name-input:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.2);
-    }
-    .owner-error {
-      font-size: 11.5px;
-      color: #fb7185;
-      min-height: 18px;
-      margin-bottom: 10px;
-    }
+    .owner-name-input:focus { border-color: #38bdf8; box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.2); }
+    .owner-error { font-size: 11.5px; color: #fb7185; min-height: 18px; margin-bottom: 10px; }
 
-    /* Stage 3: Final Certificate & Slamming Verified Seal */
     .cert-name-stage {
       position: relative;
-      margin: 14px 0 16px;
-      padding: 18px 12px;
+      margin: 12px 0 16px;
+      padding: 20px 12px;
       border-radius: 16px;
       background: rgba(255, 255, 255, 0.055);
       border: 1px dashed rgba(251, 191, 36, 0.42);
     }
-    .cert-transfer-label {
-      font-size: 10px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: #94a3b8;
-      margin-bottom: 6px;
-    }
-    .cert-owner-display {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: 0.8px;
-      color: #ffffff;
-      text-shadow: 0 4px 18px rgba(56, 189, 248, 0.45);
-      word-break: break-word;
-    }
+    .cert-transfer-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; }
+    .cert-owner-display { font-size: 24px; font-weight: 800; letter-spacing: 0.8px; color: #ffffff; text-shadow: 0 4px 18px rgba(56, 189, 248, 0.45); word-break: break-word; }
 
-    .cert-meta-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 12px;
-      font-size: 11px;
-      text-align: left;
-    }
-    .cert-meta-cell {
-      padding: 8px 10px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
+    .cert-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; font-size: 11px; text-align: left; }
+    .cert-meta-cell { padding: 8px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); }
     .cert-meta-cell span { display: block; color: #94a3b8; font-size: 10px; }
     .cert-meta-cell b { color: #f8fafc; font-weight: 700; }
 
-    /* Official Metallic Stamp Seal slamming onto the name */
     .official-seal {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      width: 92px;
-      height: 92px;
-      border-radius: 50%;
+      position: absolute; right: 12px; top: 50%;
+      width: 92px; height: 92px; border-radius: 50%;
       border: 3px double #fbbf24;
       background: radial-gradient(circle, rgba(251, 191, 36, 0.24) 0%, rgba(15, 23, 42, 0.72) 72%);
       box-shadow: 0 0 28px rgba(251, 191, 36, 0.45), inset 0 0 14px rgba(251, 191, 36, 0.35);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #fde68a;
-      pointer-events: none;
-      opacity: 0;
-      transform: translateY(-50%) scale(2.8) rotate(-28deg);
-      z-index: 10;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: #fde68a; pointer-events: none; opacity: 0;
+      transform: translateY(-50%) scale(2.8) rotate(-28deg); z-index: 10;
     }
-    .official-seal.stamped {
-      animation: stampSlam 0.46s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
+    .official-seal.stamped { animation: stampSlam 0.46s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
     @keyframes stampSlam {
       0%   { opacity: 0; transform: translateY(-50%) scale(2.9) rotate(-30deg); }
       65%  { opacity: 1; transform: translateY(-50%) scale(0.92) rotate(-10deg); }
       85%  { opacity: 1; transform: translateY(-50%) scale(1.04) rotate(-14deg); }
       100% { opacity: 0.96; transform: translateY(-50%) scale(1.0) rotate(-12deg); }
     }
-    .seal-ring-inner {
-      width: 76px; height: 76px;
-      border-radius: 50%;
-      border: 1px dashed rgba(253, 230, 138, 0.75);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      line-height: 1.1;
-    }
+    .seal-ring-inner { width: 76px; height: 76px; border-radius: 50%; border: 1px dashed rgba(253, 230, 138, 0.75); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
     .seal-top { font-size: 7.5px; font-weight: 800; letter-spacing: 1px; }
     .seal-mid { font-size: 10.5px; font-weight: 900; letter-spacing: 0.7px; color: #34d399; margin: 2px 0; text-shadow: 0 0 8px rgba(52, 211, 153, 0.5); }
     .seal-bot { font-size: 7px; font-weight: 700; letter-spacing: 0.8px; opacity: 0.9; }
 
     .seal-ripple {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      width: 92px;
-      height: 92px;
-      border-radius: 50%;
-      border: 2px solid rgba(251, 191, 36, 0.8);
-      transform: translateY(-50%) scale(0.8);
-      opacity: 0;
-      pointer-events: none;
+      position: absolute; right: 12px; top: 50%; width: 92px; height: 92px; border-radius: 50%;
+      border: 2px solid rgba(251, 191, 36, 0.8); transform: translateY(-50%) scale(0.8); opacity: 0; pointer-events: none;
     }
-    .seal-ripple.burst {
-      animation: rippleOut 0.7s ease-out forwards;
-    }
-    @keyframes rippleOut {
-      0% { opacity: 0.9; transform: translateY(-50%) scale(0.9); }
-      100% { opacity: 0; transform: translateY(-50%) scale(2.1); }
-    }
+    .seal-ripple.burst { animation: rippleOut 0.7s ease-out forwards; }
+    @keyframes rippleOut { 0% { opacity: 0.9; transform: translateY(-50%) scale(0.9); } 100% { opacity: 0; transform: translateY(-50%) scale(2.1); } }
 
-    /* ==================== MAIN APP SHELL ==================== */
+    /* ==================== MAIN APP SHELL (PHONE + TABLET RESPONSIVE) ==================== */
     .app-shell { position: relative; z-index: 1; min-height: 100vh; }
 
-    /* Top Frosted Glass AppBar */
     .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 40;
+      position: sticky; top: 0; z-index: 40;
       padding: calc(10px + var(--safe-top)) 14px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
       background: var(--glass-surface-strong);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
       border-bottom: 1px solid var(--glass-border-soft);
     }
 
     .brand { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; }
-
     .brand-logo {
-      width: 38px; height: 38px;
-      border-radius: 14px;
+      width: 38px; height: 38px; border-radius: 12px; overflow: hidden;
       background: linear-gradient(135deg, #38bdf8, #6366f1);
-      display: grid; place-items: center;
-      color: #fff;
-      flex-shrink: 0;
-      box-shadow: 0 6px 20px var(--accent-glow), inset 0 1px 1px rgba(255,255,255,0.45);
+      display: grid; place-items: center; color: #fff; flex-shrink: 0;
+      box-shadow: 0 5px 16px var(--accent-glow);
     }
+    .brand-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .brand-text { min-width: 0; flex: 1; }
-    .brand-title-row {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .brand h1 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.1px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .owner-verified-icon {
-      display: none;
-      color: #fbbf24;
-      flex-shrink: 0;
-      filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.55));
-    }
+    .brand-title-row { display: flex; align-items: center; gap: 5px; }
+    .brand h1 { margin: 0; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .owner-verified-icon { display: none; color: #fbbf24; flex-shrink: 0; filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.55)); }
     .owner-verified-icon.show { display: inline-flex; }
     .brand small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .icon-btn {
-      width: 38px; height: 38px;
-      border-radius: 13px;
-      border: 1px solid var(--glass-border);
-      background: var(--glass-surface);
-      box-shadow: var(--glass-specular);
-      color: var(--text-main);
-      display: grid; place-items: center;
-      cursor: pointer;
-      flex-shrink: 0;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      width: 38px; height: 38px; border-radius: 13px;
+      border: 1px solid var(--glass-border); background: var(--glass-surface);
+      box-shadow: var(--glass-specular); color: var(--text-main);
+      display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
       transition: transform 0.14s ease;
     }
     .icon-btn:active { transform: scale(0.92); }
@@ -550,24 +394,19 @@
     svg.ic-lg { width: 21px; height: 21px; }
 
     main {
-      max-width: 860px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 14px 13px calc(106px + var(--safe-bottom));
     }
 
     .view { display: none; animation: viewIn 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
     .view.active { display: block; }
+    @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    @keyframes viewIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Frosted Liquid Glass Card */
     .glass-card {
       background: var(--glass-surface);
-      backdrop-filter: blur(26px) saturate(185%);
-      -webkit-backdrop-filter: blur(26px) saturate(185%);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
       padding: 16px;
@@ -575,422 +414,201 @@
       margin-bottom: 14px;
     }
 
-    .section-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .section-title { margin: 0; font-size: 15.5px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .subtitle { margin: 0 0 12px; font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+    .badge { padding: 3px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 700; background: rgba(52, 211, 153, 0.16); color: var(--success); border: 1px solid rgba(52, 211, 153, 0.34); }
 
-    .section-title {
-      margin: 0;
-      font-size: 15.5px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .subtitle {
-      margin: 0 0 12px;
-      font-size: 12.5px;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    .badge {
-      padding: 3px 9px;
-      border-radius: 999px;
-      font-size: 10.5px;
-      font-weight: 700;
-      background: rgba(52, 211, 153, 0.16);
-      color: var(--success);
-      border: 1px solid rgba(52, 211, 153, 0.34);
-    }
-
-    /* Search & Filter Bar */
     .search-wrap { position: relative; display: flex; align-items: center; margin-bottom: 10px; }
     .search-wrap svg { position: absolute; left: 13px; color: var(--text-muted); pointer-events: none; }
     .search-input {
-      width: 100%;
-      padding: 11px 14px 11px 40px;
-      border-radius: 15px;
-      border: 1px solid var(--glass-border);
-      background: var(--glass-pill);
-      color: var(--text-main);
-      font-family: var(--font-bn);
-      font-size: 13.5px;
-      outline: none;
+      width: 100%; padding: 11px 14px 11px 40px; border-radius: 15px;
+      border: 1px solid var(--glass-border); background: var(--glass-pill);
+      color: var(--text-main); font-family: var(--font-bn); font-size: 13.5px; outline: none;
     }
     .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16); }
 
     .chips-row { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
     .chips-row::-webkit-scrollbar { display: none; }
-
     .chip {
-      border: 1px solid var(--glass-border-soft);
-      background: var(--glass-pill);
-      color: var(--text-muted);
-      border-radius: 999px;
-      padding: 6px 13px;
-      font-family: var(--font-bn);
-      font-size: 12px;
-      font-weight: 600;
-      white-space: nowrap;
-      cursor: pointer;
+      border: 1px solid var(--glass-border-soft); background: var(--glass-pill); color: var(--text-muted);
+      border-radius: 999px; padding: 6px 13px; font-family: var(--font-bn); font-size: 12px; font-weight: 600;
+      white-space: nowrap; cursor: pointer;
     }
-    .chip.active {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      border-color: transparent;
-      color: #fff;
-      box-shadow: 0 4px 14px var(--accent-glow);
-    }
+    .chip.active { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; color: #fff; box-shadow: 0 4px 14px var(--accent-glow); }
 
-    /* Buttons */
     .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-
     .btn {
-      border: 1px solid var(--glass-border);
-      background: var(--glass-pill);
-      box-shadow: var(--glass-specular);
-      color: var(--text-main);
-      border-radius: 14px;
-      padding: 10px 15px;
-      font-family: var(--font-bn);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
+      border: 1px solid var(--glass-border); background: var(--glass-pill); box-shadow: var(--glass-specular);
+      color: var(--text-main); border-radius: 14px; padding: 10px 15px;
+      font-family: var(--font-bn); font-size: 13px; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
       transition: transform 0.13s ease;
     }
     .btn:active { transform: scale(0.95); }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #0ea5e9, #6366f1);
-      border-color: rgba(255,255,255,0.22);
-      color: #fff;
-      box-shadow: 0 8px 22px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.35);
-    }
-    .btn-success {
-      background: linear-gradient(135deg, #10b981, #059669);
-      border-color: rgba(255,255,255,0.22);
-      color: #fff;
-    }
-    .btn-danger {
-      background: rgba(244, 63, 94, 0.15);
-      border-color: rgba(244, 63, 94, 0.36);
-      color: var(--danger);
-    }
+    .btn-primary { background: linear-gradient(135deg, #0ea5e9, #6366f1); border-color: rgba(255,255,255,0.22); color: #fff; box-shadow: 0 8px 22px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.35); }
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); border-color: rgba(255,255,255,0.22); color: #fff; }
+    .btn-danger { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.36); color: var(--danger); }
     .btn-sm { padding: 7px 11px; font-size: 12px; border-radius: 11px; }
 
     .upload-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      width: 100%;
-      padding: 20px 14px;
-      border-radius: 18px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+      width: 100%; padding: 20px 14px; border-radius: 18px;
       border: 1.5px dashed rgba(56, 189, 248, 0.55);
       background: linear-gradient(145deg, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.06));
-      text-align: center;
-      cursor: pointer;
+      text-align: center; cursor: pointer;
     }
-    .upload-box:active { transform: scale(0.985); }
-    .upload-box .up-ico {
-      width: 40px; height: 40px;
-      border-radius: 13px;
-      background: rgba(56, 189, 248, 0.18);
-      color: var(--accent);
-      display: grid; place-items: center;
-    }
+    .upload-box .up-ico { width: 40px; height: 40px; border-radius: 13px; background: rgba(56, 189, 248, 0.18); color: var(--accent); display: grid; place-items: center; }
     .upload-box strong { font-size: 13.5px; color: var(--text-main); }
     .upload-box span { font-size: 11.5px; color: var(--text-muted); }
 
     input[type="file"] { display: none; }
 
-    /* ==================== PREMIUM SCROLL-REVEAL FILE LIBRARY ==================== */
-    .file-list { display: flex; flex-direction: column; gap: 9px; margin-top: 10px; }
+    /* Responsive File Library Grid (1-col Phone, 2-col Small Tablet, 3-col Large Tablet) */
+    .file-list { display: grid; grid-template-columns: 1fr; gap: 9px; margin-top: 10px; }
+
+    @media (min-width: 660px) {
+      main { max-width: 1080px; padding: 18px 22px calc(112px + var(--safe-bottom)); }
+      .file-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+    }
+    @media (min-width: 1000px) {
+      main { max-width: 1220px; }
+      .file-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    }
 
     .file-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 12px;
-      border-radius: 16px;
-      background: var(--glass-pill);
-      border: 1px solid var(--glass-border-soft);
-      cursor: pointer;
-      /* Smooth Premium Scroll Entrance */
-      opacity: 0;
-      transform: translate3d(0, 26px, 0) scale(0.95);
-      transition:
-        opacity 0.44s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.52s cubic-bezier(0.22, 1, 0.36, 1),
-        background 0.18s ease,
-        border-color 0.2s ease;
-      will-change: transform, opacity;
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 12px; border-radius: 16px;
+      background: var(--glass-pill); border: 1px solid var(--glass-border-soft);
+      cursor: pointer; min-width: 0;
+      opacity: 0; transform: translate3d(0, 24px, 0) scale(0.96);
+      transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.50s cubic-bezier(0.22, 1, 0.36, 1), background 0.18s ease, border-color 0.2s ease;
     }
-    .file-row.in-view {
-      opacity: 1;
-      transform: translate3d(0, 0, 0) scale(1);
-    }
-    .file-row.in-view:active {
-      transform: translate3d(0, 0, 0) scale(0.975);
-      background: rgba(56, 189, 248, 0.16);
-      border-color: rgba(56, 189, 248, 0.35);
-    }
+    .file-row.in-view { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    .file-row.in-view:active { transform: translate3d(0, 0, 0) scale(0.975); background: rgba(56, 189, 248, 0.16); border-color: rgba(56, 189, 248, 0.35); }
 
     .file-badge {
-      width: 42px; height: 46px;
-      border-radius: 13px;
+      width: 42px; height: 46px; border-radius: 13px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 10px; font-weight: 800; letter-spacing: 0.4px;
-      flex-shrink: 0;
+      font-size: 9.5px; font-weight: 800; letter-spacing: 0.4px; flex-shrink: 0;
     }
-    .file-badge.pdf {
-      background: linear-gradient(145deg, rgba(244, 63, 94, 0.28), rgba(225, 29, 72, 0.14));
-      border: 1px solid rgba(251, 113, 133, 0.4);
-      color: #fda4af;
-    }
+    .file-badge.pdf { background: linear-gradient(145deg, rgba(244, 63, 94, 0.28), rgba(225, 29, 72, 0.14)); border: 1px solid rgba(251, 113, 133, 0.4); color: #fda4af; }
     [data-theme="light"] .file-badge.pdf { color: #be123c; }
-    .file-badge.docx {
-      background: linear-gradient(145deg, rgba(56, 189, 248, 0.28), rgba(37, 99, 235, 0.14));
-      border: 1px solid rgba(56, 189, 248, 0.42);
-      color: #7dd3fc;
-    }
+    .file-badge.docx { background: linear-gradient(145deg, rgba(56, 189, 248, 0.28), rgba(37, 99, 235, 0.14)); border: 1px solid rgba(56, 189, 248, 0.42); color: #7dd3fc; }
     [data-theme="light"] .file-badge.docx { color: #0369a1; }
-    .file-badge.txt {
-      background: linear-gradient(145deg, rgba(52, 211, 153, 0.26), rgba(5, 150, 105, 0.14));
-      border: 1px solid rgba(52, 211, 153, 0.4);
-      color: #6ee7b7;
-    }
+    .file-badge.txt { background: linear-gradient(145deg, rgba(52, 211, 153, 0.26), rgba(5, 150, 105, 0.14)); border: 1px solid rgba(52, 211, 153, 0.4); color: #6ee7b7; }
     [data-theme="light"] .file-badge.txt { color: #047857; }
+    .file-badge.other { background: linear-gradient(145deg, rgba(251, 191, 36, 0.26), rgba(217, 119, 6, 0.14)); border: 1px solid rgba(251, 191, 36, 0.4); color: #fde68a; }
+    [data-theme="light"] .file-badge.other { color: #b45309; }
 
     .file-meta { flex: 1; min-width: 0; }
     .file-name { font-size: 13.5px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .file-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .perm-banner {
-      display: none;
-      padding: 14px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(99, 102, 241, 0.15));
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      margin-bottom: 12px;
-    }
-    .perm-banner h4 { margin: 0 0 4px; font-size: 14px; }
-    .perm-banner p { margin: 0 0 10px; font-size: 12px; color: var(--text-muted); line-height: 1.45; }
-
-    /* ==================== EDITOR & FULL ANDROID IME COMPATIBILITY ==================== */
+    /* Editor & Forms */
     .input, select, textarea {
-      width: 100%;
-      padding: 11px 13px;
-      border-radius: 14px;
-      border: 1px solid var(--glass-border);
-      background: var(--glass-pill);
-      color: var(--text-main);
-      font-family: var(--font-bn);
-      font-size: 14px;
-      outline: none;
-      user-select: text;
-      -webkit-user-select: text;
+      width: 100%; padding: 11px 13px; border-radius: 14px;
+      border: 1px solid var(--glass-border); background: var(--glass-pill);
+      color: var(--text-main); font-family: var(--font-bn); font-size: 14px; outline: none;
+      user-select: text; -webkit-user-select: text;
     }
     textarea { resize: vertical; min-height: 115px; line-height: 1.65; }
 
-    .editor-toolbar {
-      display: flex; flex-wrap: wrap; gap: 6px;
-      padding: 8px; border-radius: 14px;
-      background: var(--glass-pill);
-      border: 1px solid var(--glass-border-soft);
-      margin-bottom: 10px;
-    }
-    .tool-btn {
-      border: 1px solid var(--glass-border-soft);
-      background: var(--glass-surface);
-      color: var(--text-main);
-      border-radius: 9px;
-      padding: 6px 10px;
-      font-size: 12.5px; font-weight: 700;
-      font-family: var(--font-bn);
-      cursor: pointer;
-    }
+    .editor-toolbar { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-radius: 14px; background: var(--glass-pill); border: 1px solid var(--glass-border-soft); margin-bottom: 10px; }
+    .tool-btn { border: 1px solid var(--glass-border-soft); background: var(--glass-surface); color: var(--text-main); border-radius: 9px; padding: 6px 10px; font-size: 12.5px; font-weight: 700; font-family: var(--font-bn); cursor: pointer; }
     .tool-btn:active { background: var(--accent); color: #fff; }
 
     .editor-paper {
-      background: var(--paper-bg);
-      color: var(--paper-text);
-      min-height: 280px;
-      padding: 20px 16px;
-      border-radius: 16px;
-      font-family: var(--font-bn);
-      font-size: 15px;
-      line-height: 1.75;
-      outline: none;
-      word-break: break-word;
-      overflow-x: auto;
-      user-select: text !important;
-      -webkit-user-select: text !important;
-      -webkit-touch-callout: default;
+      background: var(--paper-bg); color: var(--paper-text); min-height: 280px;
+      padding: 20px 16px; border-radius: 16px; font-family: var(--font-bn); font-size: 15px;
+      line-height: 1.75; outline: none; word-break: break-word; overflow-x: auto;
+      user-select: text !important; -webkit-user-select: text !important; -webkit-touch-callout: default;
     }
-    .editor-paper * {
-      user-select: text !important;
-      -webkit-user-select: text !important;
-    }
+    .editor-paper * { user-select: text !important; -webkit-user-select: text !important; }
     .editor-paper img { max-width: 100%; border-radius: 10px; margin: 8px 0; }
     .editor-paper table { width: 100%; border-collapse: collapse; margin: 10px 0; table-layout: fixed; }
-    .editor-paper td, .editor-paper th {
-      border: 1px solid #94a3b8;
-      padding: 8px 9px;
-      min-width: 60px;
-      min-height: 36px;
-      vertical-align: top;
-      word-wrap: break-word;
-    }
-    .editor-paper td:focus-within, .editor-paper td:focus {
-      background: rgba(56, 189, 248, 0.08);
-    }
+    .editor-paper td, .editor-paper th { border: 1px solid #94a3b8; padding: 8px 9px; min-width: 60px; min-height: 36px; vertical-align: top; word-wrap: break-word; }
 
     .item-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-    .list-item {
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
-      padding: 10px 12px; border-radius: 14px;
-      background: var(--glass-pill);
-      border: 1px solid var(--glass-border-soft);
-      font-size: 13px;
-    }
+    .list-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 14px; background: var(--glass-pill); border: 1px solid var(--glass-border-soft); font-size: 13px; }
     .list-item-info { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .list-item-info small { display: block; color: var(--text-muted); font-size: 11px; }
 
-    .thumb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(82px, 1fr)); gap: 8px; margin-top: 10px; }
+    .thumb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; margin-top: 10px; }
     .thumb-card { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); aspect-ratio: 3/4; background: #000; }
     .thumb-card img { width: 100%; height: 100%; object-fit: cover; }
     .thumb-del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(225, 29, 72, 0.92); color: #fff; font-weight: 700; cursor: pointer; }
 
-    /* Floating Glass Bottom Dock (Auto-hides cleanly when typing!) */
     .bottom-dock-wrap {
-      position: fixed;
-      bottom: calc(10px + var(--safe-bottom));
-      left: 12px; right: 12px;
-      z-index: 50;
-      max-width: 520px;
-      margin: 0 auto;
+      position: fixed; bottom: calc(10px + var(--safe-bottom)); left: 12px; right: 12px;
+      z-index: 50; max-width: 520px; margin: 0 auto;
       transition: transform 0.22s ease, opacity 0.22s ease;
     }
-    .bottom-dock-wrap.kb-hidden {
-      transform: translateY(150%);
-      opacity: 0;
-      pointer-events: none;
-    }
+    .bottom-dock-wrap.kb-hidden { transform: translateY(150%); opacity: 0; pointer-events: none; }
     .bottom-nav {
-      padding: 6px;
-      border-radius: 24px;
-      background: var(--glass-surface-strong);
-      backdrop-filter: blur(30px) saturate(200%);
-      -webkit-backdrop-filter: blur(30px) saturate(200%);
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), var(--glass-specular);
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
+      padding: 6px; border-radius: 24px;
+      background: var(--glass-surface-strong); backdrop-filter: blur(26px) saturate(200%); -webkit-backdrop-filter: blur(26px) saturate(200%);
+      border: 1px solid var(--glass-border); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), var(--glass-specular);
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
     }
     .nav-btn {
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      border-radius: 18px;
-      padding: 8px 4px;
-      font-family: var(--font-bn);
-      font-size: 11px; font-weight: 600;
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
-      cursor: pointer;
+      border: none; background: transparent; color: var(--text-muted); border-radius: 18px;
+      padding: 8px 4px; font-family: var(--font-bn); font-size: 11px; font-weight: 600;
+      display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer;
     }
-    .nav-btn.active {
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.26), rgba(99, 102, 241, 0.24));
-      color: var(--accent);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    }
+    .nav-btn.active { background: linear-gradient(135deg, rgba(56, 189, 248, 0.26), rgba(99, 102, 241, 0.24)); color: var(--accent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25); }
 
-    /* ==================== TRUE EDGE-TO-EDGE FULLSCREEN READER OVERLAY ==================== */
+    /* ==================== TRUE EDGE-TO-EDGE ULTRA-SHARP FULLSCREEN READER ==================== */
     .fs-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      background: #060913;
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      user-select: none;
-      -webkit-user-select: none;
+      position: fixed; inset: 0; z-index: 200; background: #060913;
+      display: none; flex-direction: column; overflow: hidden;
+      user-select: none; -webkit-user-select: none;
     }
     .fs-overlay.open { display: flex; }
 
     .fs-top-hud {
-      position: absolute;
-      top: 10px; left: 10px; right: 10px;
-      z-index: 230;
+      position: absolute; top: 10px; left: 10px; right: 10px; z-index: 230;
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
-      padding: 7px 10px;
-      border-radius: 18px;
-      background: rgba(11, 18, 34, 0.78);
-      backdrop-filter: blur(26px) saturate(190%);
-      -webkit-backdrop-filter: blur(26px) saturate(190%);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-      color: #f8fafc;
-      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+      padding: 7px 10px; border-radius: 18px;
+      background: rgba(11, 18, 34, 0.80); backdrop-filter: blur(24px) saturate(190%); -webkit-backdrop-filter: blur(24px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      color: #f8fafc; transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
     }
     .fs-overlay.hud-hidden .fs-top-hud { transform: translateY(-140%); opacity: 0; pointer-events: none; }
-
     .fs-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .hud-btn {
-      width: 34px; height: 34px;
-      border-radius: 11px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.08);
-      color: #f8fafc;
-      display: grid; place-items: center;
-      cursor: pointer; flex-shrink: 0;
+      width: 34px; height: 34px; border-radius: 11px;
+      border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.08);
+      color: #f8fafc; display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
     }
     .hud-btn.active { background: var(--accent); color: #050812; border-color: transparent; }
 
     .fs-viewport {
-      position: relative;
-      flex: 1;
-      width: 100%; height: 100%;
-      overflow: hidden;
-      touch-action: none;
-      background: #0b101d;
+      position: relative; flex: 1; width: 100%; height: 100%;
+      overflow: hidden; touch-action: none; background: #0b101d;
     }
-    .fs-viewport.doc-scroll-mode {
-      overflow: auto;
-      touch-action: pan-x pan-y;
-      -webkit-overflow-scrolling: touch;
-      padding: 62px 10px 76px;
-    }
+    .fs-viewport.doc-scroll-mode { overflow: auto; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; padding: 62px 10px 76px; }
 
     .pdf-page-box {
-      position: absolute;
-      top: 0; left: 0;
-      background: #ffffff;
+      position: absolute; top: 0; left: 0; background: #ffffff;
       box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65);
-      transform-origin: 0 0;
-      will-change: transform;
+      transform-origin: 0 0; will-change: transform;
     }
     .pdf-page-box.night-invert { filter: invert(0.92) hue-rotate(180deg); }
 
     #pdfCanvas { display: block; width: 100%; height: 100%; }
-    #drawCanvas {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      mix-blend-mode: multiply;
+
+    /* ULTRA-SHARP VISIBLE-VIEWPORT DETAIL LAYER (Razor-sharp text even at 600% zoom!) */
+    #detailCanvas {
+      position: absolute;
+      display: none;
       pointer-events: none;
+    }
+
+    #drawCanvas {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      mix-blend-mode: multiply; pointer-events: none;
     }
     #drawCanvas.active { pointer-events: auto; touch-action: none; }
 
@@ -998,41 +616,26 @@
     #notesLayer.placing { pointer-events: auto; cursor: copy; }
 
     .note-pin {
-      position: absolute;
-      transform: translate(-50%, -50%);
-      width: 26px; height: 26px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      color: #0f172a;
-      border: 2px solid #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-      display: grid; place-items: center;
-      pointer-events: auto; cursor: pointer; z-index: 15;
+      position: absolute; transform: translate(-50%, -50%);
+      width: 26px; height: 26px; border-radius: 50%;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a;
+      border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+      display: grid; place-items: center; pointer-events: auto; cursor: pointer; z-index: 15;
     }
 
     .fs-doc-box {
-      width: 100%; max-width: 780px;
-      background: #ffffff; color: #0f172a;
-      border-radius: 16px; padding: 20px 18px;
-      font-size: 15.5px; line-height: 1.8;
-      margin: 0 auto; word-break: break-word;
-      user-select: text; -webkit-user-select: text;
+      width: 100%; max-width: 860px; background: #ffffff; color: #0f172a;
+      border-radius: 16px; padding: 22px 20px; font-size: 15.5px; line-height: 1.8;
+      margin: 0 auto; word-break: break-word; user-select: text; -webkit-user-select: text;
     }
     .fs-doc-box.night-invert { background: #111827; color: #e2e8f0; }
 
-    .side-fab-wrap {
-      position: absolute;
-      right: 10px; bottom: 72px;
-      z-index: 240;
-      display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
-    }
+    .side-fab-wrap { position: absolute; right: 10px; bottom: 72px; z-index: 240; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
     .side-fab {
-      width: 44px; height: 44px;
-      border-radius: 15px;
+      width: 44px; height: 44px; border-radius: 15px;
       border: 1px solid rgba(255, 255, 255, 0.28);
       background: linear-gradient(135deg, rgba(14, 165, 233, 0.78), rgba(99, 102, 241, 0.78));
-      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-      color: #ffffff;
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); color: #ffffff;
       display: grid; place-items: center;
       box-shadow: 0 10px 26px rgba(14, 165, 233, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.4);
       cursor: pointer; opacity: 0.86;
@@ -1040,47 +643,23 @@
     .side-fab:active { transform: scale(0.92); opacity: 1; }
 
     .side-dock {
-      display: none;
-      flex-direction: column; gap: 9px;
-      padding: 12px 10px;
-      border-radius: 22px;
-      background: rgba(11, 18, 34, 0.88);
-      backdrop-filter: blur(28px) saturate(200%);
-      -webkit-backdrop-filter: blur(28px) saturate(200%);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      width: 176px;
-      animation: dockPop 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-      color: #f8fafc;
+      display: none; flex-direction: column; gap: 9px; padding: 12px 10px; border-radius: 22px;
+      background: rgba(11, 18, 34, 0.90); backdrop-filter: blur(26px) saturate(200%); -webkit-backdrop-filter: blur(26px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6);
+      width: 178px; animation: dockPop 0.2s cubic-bezier(0.22, 1, 0.36, 1); color: #f8fafc;
     }
     .side-dock.open { display: flex; }
-
-    @keyframes dockPop {
-      from { opacity: 0; transform: translateY(12px) scale(0.94); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    @keyframes dockPop { from { opacity: 0; transform: translateY(12px) scale(0.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
     .dock-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
     .dock-item {
-      height: 40px; border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.11);
-      background: rgba(255, 255, 255, 0.07);
-      color: #f8fafc;
-      display: flex; align-items: center; justify-content: center; gap: 5px;
+      height: 40px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.11); background: rgba(255, 255, 255, 0.07);
+      color: #f8fafc; display: flex; align-items: center; justify-content: center; gap: 5px;
       font-size: 11px; font-family: var(--font-bn); font-weight: 600; cursor: pointer;
     }
-    .dock-item.active {
-      background: linear-gradient(135deg, #0ea5e9, #6366f1);
-      color: #fff; border-color: rgba(255,255,255,0.28);
-      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
-    }
+    .dock-item.active { background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; border-color: rgba(255,255,255,0.28); }
 
-    .brush-panel {
-      padding: 8px; border-radius: 14px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      display: flex; flex-direction: column; gap: 8px;
-    }
+    .brush-panel { padding: 8px; border-radius: 14px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.09); display: flex; flex-direction: column; gap: 8px; }
     .color-row { display: flex; align-items: center; justify-content: space-between; padding: 0 2px; }
     .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.22); cursor: pointer; }
     .color-dot.selected { border-color: #ffffff; transform: scale(1.16); box-shadow: 0 0 10px rgba(255,255,255,0.45); }
@@ -1091,47 +670,30 @@
     .size-dot { border-radius: 50%; background: #fde047; }
     .size-slider { flex: 1; width: 100%; accent-color: #38bdf8; cursor: pointer; }
     .size-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-    .preset-btn {
-      border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06);
-      color: #cbd5e1; border-radius: 8px; padding: 4px 0;
-      font-size: 10.5px; font-family: var(--font-bn); font-weight: 700; cursor: pointer;
-    }
+    .preset-btn { border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color: #cbd5e1; border-radius: 8px; padding: 4px 0; font-size: 10.5px; font-family: var(--font-bn); font-weight: 700; cursor: pointer; }
     .preset-btn.active { background: rgba(56, 189, 248, 0.28); color: #fff; border-color: #38bdf8; }
 
     .fs-bottom-hud {
       position: absolute; bottom: 10px; left: 10px; right: 10px; z-index: 230;
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       padding: 7px 10px; border-radius: 18px;
-      background: rgba(11, 18, 34, 0.78);
-      backdrop-filter: blur(26px) saturate(190%); -webkit-backdrop-filter: blur(26px) saturate(190%);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-      color: #f8fafc;
-      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+      background: rgba(11, 18, 34, 0.80); backdrop-filter: blur(24px) saturate(190%); -webkit-backdrop-filter: blur(24px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      color: #f8fafc; transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
     }
     .fs-overlay.hud-hidden .fs-bottom-hud { transform: translateY(150%); opacity: 0; pointer-events: none; }
 
     .zoom-pill { display: flex; align-items: center; gap: 3px; background: rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 2px 4px; }
     .zoom-pill button { width: 28px; height: 28px; border: none; border-radius: 9px; background: transparent; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
-    .zoom-pill span { font-size: 11px; font-weight: 700; min-width: 36px; text-align: center; cursor: pointer; }
+    .zoom-pill span { font-size: 11px; font-weight: 700; min-width: 38px; text-align: center; cursor: pointer; }
 
     .page-nav-pill { display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; }
-    .page-nav-pill input[type="range"] { flex: 1; max-width: 120px; accent-color: #38bdf8; }
+    .page-nav-pill input[type="range"] { flex: 1; max-width: 180px; accent-color: #38bdf8; }
     .page-badge { font-size: 11.5px; font-weight: 700; white-space: nowrap; }
 
-    .modal-backdrop {
-      position: fixed; inset: 0; z-index: 300;
-      background: rgba(3, 6, 15, 0.70); backdrop-filter: blur(8px);
-      display: none; align-items: center; justify-content: center; padding: 16px;
-    }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 300; background: rgba(3, 6, 15, 0.70); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 16px; }
     .modal-backdrop.open { display: flex; }
-    .modal-card {
-      width: 100%; max-width: 380px;
-      background: rgba(15, 23, 42, 0.94);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 22px; padding: 18px; color: #f8fafc;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-    }
+    .modal-card { width: 100%; max-width: 380px; background: rgba(15, 23, 42, 0.94); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 22px; padding: 18px; color: #f8fafc; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); }
     .modal-card h3 { margin: 0 0 10px; font-size: 15px; }
 
     #toast {
@@ -1139,9 +701,8 @@
       transform: translateX(-50%) translateY(18px);
       background: rgba(11, 18, 34, 0.92); backdrop-filter: blur(16px);
       color: #fff; border: 1px solid rgba(56, 189, 248, 0.45);
-      padding: 10px 18px; border-radius: 999px;
-      font-size: 12.5px; font-weight: 600;
-      opacity: 0; pointer-events: none; z-index: 950;
+      padding: 10px 18px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+      opacity: 0; pointer-events: none; z-index: 960;
       transition: all 0.24s ease; max-width: 90vw; text-align: center;
       box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
     }
@@ -1149,30 +710,26 @@
   </style>
 </head>
 <body>
-  <div class="ambient-bg">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-  </div>
+  <div class="ambient-bg"></div>
 
-  <!-- ==================== 1. SIMPLE SPLASH (EVERY SUBSEQUENT LAUNCH) ==================== -->
+  <!-- ==================== 1. SIMPLE SPLASH (EVERY LAUNCH AFTER FIRST) ==================== -->
   <div id="simpleSplash" class="startup-screen">
-    <div class="ambient-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+    <div class="ambient-bg"></div>
     <div class="simple-splash-box">
       <div class="splash-emblem">
-        <svg class="ic" style="width:34px;height:34px;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <img src="./app-icon.png" alt="AetherX" onerror="this.style.display='none'" />
       </div>
-      <div class="splash-owner-name" id="splashOwnerLabel">GlassDoc Studio</div>
+      <div class="splash-owner-name" id="splashOwnerLabel">AetherX PDF Reader</div>
       <div class="splash-sub">অফলাইন ও বিজ্ঞাপনমুক্ত • লোড হচ্ছে...</div>
       <div class="splash-bar-track"><div class="splash-bar-fill"></div></div>
     </div>
   </div>
 
-  <!-- ==================== 2. ONE-TIME FIRST-INSTALL OWNERSHIP TRANSFER CEREMONY ==================== -->
+  <!-- ==================== 2. ONE-TIME APP OWNERSHIP TRANSFER CEREMONY ==================== -->
   <div id="ownershipScreen" class="startup-screen">
-    <div class="ambient-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+    <div class="ambient-bg"></div>
 
-    <!-- Stage 1: Modern Certificate Intro Animation -->
+    <!-- Stage 1: Modern Certificate Intro -->
     <div id="ceremonyStage1" class="ceremony-stage">
       <div class="cert-card">
         <div class="cert-inner-frame"></div>
@@ -1180,30 +737,28 @@
         <div class="cert-crest">
           <svg class="ic" style="width:28px;height:28px;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
         </div>
-        <div class="cert-kicker">OWNERSHIP TRANSFER PROTOCOL</div>
+        <div class="cert-kicker">APP OWNERSHIP TRANSFER</div>
         <h2 class="cert-heading">মালিকানা হস্তান্তর সনদ প্রস্তুত হচ্ছে</h2>
-        <p class="cert-desc">এই ডিভাইসে প্রথমবারের মতো অ্যাপটি চালু হয়েছে। আপনার নামে একক মালিকানা হস্তান্তরের ডিজিটাল সার্টিফিকেট তৈরি করা হচ্ছে...</p>
 
         <div class="cert-scan-lines">
-          <div class="scan-row"><span class="scan-dot"></span><span>ডিভাইস সিকিউরিটি ও অফলাইন ইঞ্জিন যাচাই সম্পন্ন</span></div>
-          <div class="scan-row"><span class="scan-dot"></span><span>বিজ্ঞাপনমুক্ত প্রিমিয়াম লাইসেন্স আনলক সম্পন্ন</span></div>
-          <div class="scan-row"><span class="scan-dot"></span><span>মালিকানা হস্তান্তর সার্টিফিকেট সক্রিয় হচ্ছে...</span></div>
+          <div class="scan-row"><span class="scan-dot"></span><span>AetherX অফলাইন ইঞ্জিন যাচাই সম্পন্ন</span></div>
+          <div class="scan-row"><span class="scan-dot"></span><span>বিজ্ঞাপনমুক্ত প্রিমিয়াম লাইসেন্স সক্রিয়</span></div>
+          <div class="scan-row"><span class="scan-dot"></span><span>অ্যাপ মালিকানা সার্টিফিকেট চালু হচ্ছে...</span></div>
         </div>
 
         <div class="cert-progress-track"><div class="cert-progress-fill"></div></div>
       </div>
     </div>
 
-    <!-- Stage 2: English Name Entry -->
+    <!-- Stage 2: Clean English Name Entry (APP OWNERSHIP TRANSFER, no extra caption!) -->
     <div id="ceremonyStage2" class="ceremony-stage">
       <div class="cert-card">
         <div class="cert-inner-frame"></div>
         <div class="cert-crest">
           <svg class="ic" style="width:26px;height:26px;" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
-        <div class="cert-kicker">DEVICE OWNER REGISTRATION</div>
+        <div class="cert-kicker">APP OWNERSHIP TRANSFER</div>
         <h2 class="cert-heading">আপনার নাম ইংরেজিতে লিখুন</h2>
-        <p class="cert-desc">এই মোবাইলে অ্যাপটির মালিকানা আপনার নামে চূড়ান্তভাবে হস্তান্তর করা হবে এবং অ্যাপের শিরোনামে আপনার নাম দেখাবে।</p>
 
         <input type="text" id="ownerNameInput" class="owner-name-input" placeholder="Enter Name in English" maxlength="28" autocomplete="off" />
         <div id="ownerNameError" class="owner-error"></div>
@@ -1215,7 +770,7 @@
       </div>
     </div>
 
-    <!-- Stage 3: Official Ownership Certificate + Slamming Verified Seal -->
+    <!-- Stage 3: Final Certificate & Official Slamming Seal -->
     <div id="ceremonyStage3" class="ceremony-stage">
       <div class="cert-card" id="finalCertCard">
         <div class="cert-inner-frame"></div>
@@ -1223,32 +778,31 @@
         <div class="cert-crest">
           <svg class="ic" style="width:28px;height:28px;" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
         </div>
-        <div class="cert-kicker">CERTIFICATE OF OWNERSHIP</div>
+        <div class="cert-kicker">APP OWNERSHIP TRANSFER</div>
         <h2 class="cert-heading">মালিকানা হস্তান্তর সম্পন্ন</h2>
 
         <div class="cert-name-stage">
           <div class="cert-transfer-label">OFFICIALLY TRANSFERRED TO</div>
           <div class="cert-owner-display" id="certOwnerDisplay">OWNER NAME</div>
 
-          <!-- Official Seal & Impact Ripple -->
           <div id="sealRipple" class="seal-ripple"></div>
           <div id="officialSeal" class="official-seal">
             <div class="seal-ring-inner">
               <span class="seal-top">★ OFFICIAL ★</span>
               <span class="seal-mid">VERIFIED</span>
-              <span class="seal-bot">OWNER SEAL</span>
+              <span class="seal-bot">APP OWNER</span>
             </div>
           </div>
         </div>
 
         <div class="cert-meta-grid">
           <div class="cert-meta-cell">
-            <span>ডিভাইস</span>
-            <b id="certDeviceVal">Android Device</b>
+            <span>অ্যাপ</span>
+            <b>AetherX PDF Reader</b>
           </div>
           <div class="cert-meta-cell">
             <span>সনদ নম্বর</span>
-            <b id="certSerialVal">GD-2026-001</b>
+            <b id="certSerialVal">AX-2026-001</b>
           </div>
         </div>
 
@@ -1257,20 +811,38 @@
     </div>
   </div>
 
+  <!-- ==================== 3. BLANK DEVICE STORAGE PERMISSION GATE ==================== -->
+  <div id="permissionGate" class="startup-screen">
+    <div class="ambient-bg"></div>
+    <div class="perm-gate-card">
+      <div class="perm-shield-ico">
+        <svg class="ic" style="width:32px;height:32px;" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <h2>স্টোরেজ পারমিশন প্রয়োজন</h2>
+      <p>আপনার ডিভাইসের সকল PDF, DOCX ও ডকুমেন্ট ফাইল অটোমেটিক দেখাতে স্টোরেজ অ্যাক্সেস অনুমতি দিন। আপনার কোনো ফাইল ইন্টারনেটে যায় না।</p>
+      <button class="btn btn-primary" id="gateGrantBtn" style="width:100%; padding:13px;">
+        <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        অনুমতি দিন (Allow Access)
+      </button>
+      <button class="perm-skip-link" id="gateManualSkipBtn">পরে দেব • ম্যানুয়ালি ফাইল বাছুন</button>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN APP SHELL ==================== -->
   <div class="app-shell">
     <header class="topbar">
       <div class="brand">
         <div class="brand-logo">
-          <svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <img src="./app-icon.png" alt="AX" onerror="this.style.display='none'" />
         </div>
         <div class="brand-text">
           <div class="brand-title-row">
-            <h1 id="brandTitle">GlassDoc Studio</h1>
+            <h1 id="brandTitle">AetherX PDF Reader</h1>
             <span id="ownerVerifiedBadge" class="owner-verified-icon" title="Verified Owner">
               <svg class="ic ic-sm" style="fill:rgba(251,191,36,0.22);" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             </span>
           </div>
-          <small id="brandSubtitle">শিক্ষার্থী সংস্করণ • অফলাইন ও বিজ্ঞাপনমুক্ত</small>
+          <small id="brandSubtitle">অফলাইন ও বিজ্ঞাপনমুক্ত • শিক্ষার্থী সংস্করণ</small>
         </div>
       </div>
       <div style="display:flex; gap:8px;">
@@ -1286,15 +858,6 @@
     <main>
       <!-- ==================== TAB 1: AUTO LIBRARY ==================== -->
       <section id="view-reader" class="view active">
-        <div class="perm-banner" id="permBanner">
-          <h4>ফোনের সব PDF অটো-শনাক্ত করুন</h4>
-          <p>অ্যাপ ওপেন হলেই ডাউনলোড, ডকুমেন্ট ও হোয়াটসঅ্যাপের সব PDF তালিকা দেখাতে স্টোরেজ অনুমতি দিন। কোনো ফাইল ইন্টারনেটে যায় না।</p>
-          <button class="btn btn-primary btn-sm" id="grantPermBtn">
-            <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            স্টোরেজ অনুমতি দিন
-          </button>
-        </div>
-
         <div class="glass-card">
           <div class="section-head">
             <h2 class="section-title">
@@ -1305,23 +868,23 @@
               <svg class="ic ic-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               ফাইল বাছুন
             </label>
-            <input type="file" id="readerFileInput" accept=".pdf,.docx,.txt,.md,.html,.htm,image/*" />
+            <input type="file" id="readerFileInput" accept=".pdf,.docx,.doc,.txt,.md,.html,.htm,.csv,image/*" />
           </div>
 
           <div class="search-wrap">
             <svg class="ic ic-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="librarySearch" class="search-input" placeholder="PDF বা ডকুমেন্টের নাম দিয়ে খুঁজুন..." />
+            <input type="text" id="librarySearch" class="search-input" placeholder="PDF, DOCX বা যেকোনো ফাইলের নাম খুঁজুন..." />
           </div>
 
           <div class="chips-row" id="filterChips">
             <button class="chip active" data-filter="all">সব ফাইল (<span id="countAll">0</span>)</button>
             <button class="chip" data-filter="pdf">PDF</button>
-            <button class="chip" data-filter="docx">DOCX</button>
-            <button class="chip" data-filter="txt">TXT</button>
+            <button class="chip" data-filter="docx">DOCX / DOC</button>
+            <button class="chip" data-filter="txt">TXT / অন্যান্য</button>
           </div>
 
           <div id="autoFileList" class="file-list">
-            <div style="text-align:center; padding:26px 10px; color:var(--text-muted); font-size:13px;">ফাইল খোঁজা হচ্ছে...</div>
+            <div style="grid-column:1/-1; text-align:center; padding:28px 10px; color:var(--text-muted); font-size:13px;">ফাইল খোঁজা হচ্ছে...</div>
           </div>
         </div>
       </section>
@@ -1456,7 +1019,7 @@
             <h3 class="section-title">অ্যাপ স্টোরেজ (হালকা ও নিরাপদ)</h3>
             <span class="badge" id="storageUsedBadge">0 KB</span>
           </div>
-          <p class="subtitle">কোনো বিজ্ঞাপন বা গোপন ক্যাশ নেই। আপনার ড্রাফট ও PDF নোটগুলো শুধু আপনার ফোনেই সংরক্ষিত থাকে।</p>
+          <p class="subtitle">কোনো বিজ্ঞাপন বা গোপন ক্যাশ নেই। আপনার ড্রাফট ও PDF নোটগুলো শুধু আপনার ডিভাইসেই সংরক্ষিত থাকে।</p>
           <button class="btn btn-danger btn-sm" id="clearAllStorageBtn">সব ড্রাফট ও নোট পরিষ্কার করুন</button>
         </div>
       </section>
@@ -1513,13 +1076,16 @@
     </div>
   </div>
 
-  <!-- ==================== TRUE IMMERSIVE FULL-SCREEN READER OVERLAY ==================== -->
+  <!-- ==================== TRUE IMMERSIVE ULTRA-SHARP FULL-SCREEN READER ==================== -->
   <div id="fsOverlay" class="fs-overlay">
     <div class="fs-top-hud">
       <button class="hud-btn" id="fsBackBtn" title="ফিরে যান">
         <svg class="ic" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </button>
       <div class="fs-title" id="fsFileTitle">ডকুমেন্ট</div>
+      <button class="hud-btn" id="fsFitToggleBtn" style="display:none;" title="ফিট পেজ / ফিট প্রস্থ">
+        <svg class="ic ic-sm" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+      </button>
       <button class="hud-btn" id="fsEditDocBtn" style="display:none;" title="এডিটরে নিন">
         <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
       </button>
@@ -1532,6 +1098,7 @@
     <div id="fsViewport" class="fs-viewport">
       <div id="pdfPageBox" class="pdf-page-box" style="display:none;">
         <canvas id="pdfCanvas"></canvas>
+        <canvas id="detailCanvas"></canvas>
         <canvas id="drawCanvas"></canvas>
         <div id="notesLayer"></div>
       </div>
@@ -1687,7 +1254,10 @@
       } catch (e) {}
     }
 
-    // ==================== ONE-TIME OWNERSHIP CEREMONY & SUBSEQUENT SIMPLE LOADER ====================
+    // ==================== STARTUP FLOW: OWNERSHIP CEREMONY -> BLANK PERMISSION GATE -> ALL FILES ====================
+    let startupCompleted = false;
+    let permSkippedManually = false;
+
     function getStoredOwner() {
       let nativeName = '';
       try {
@@ -1695,9 +1265,9 @@
           nativeName = (window.GlassNative.getOwnerName() || '').trim();
         }
       } catch (e) {}
-      const localName = (localStorage.getItem('gd_owner_name') || '').trim();
+      const localName = (localStorage.getItem('ax_owner_name') || '').trim();
       const finalName = nativeName || localName;
-      if (finalName && !localName) localStorage.setItem('gd_owner_name', finalName);
+      if (finalName && !localName) localStorage.setItem('ax_owner_name', finalName);
       if (finalName && !nativeName && window.GlassNative && typeof window.GlassNative.saveOwnerName === 'function') {
         try { window.GlassNative.saveOwnerName(finalName); } catch (e) {}
       }
@@ -1706,7 +1276,7 @@
 
     function persistOwner(name) {
       const clean = name.trim();
-      localStorage.setItem('gd_owner_name', clean);
+      localStorage.setItem('ax_owner_name', clean);
       try {
         if (window.GlassNative && typeof window.GlassNative.saveOwnerName === 'function') {
           window.GlassNative.saveOwnerName(clean);
@@ -1717,27 +1287,64 @@
     function applyOwnerBranding(ownerName) {
       if (!ownerName) return;
       $('brandTitle').textContent = ownerName;
-      $('brandSubtitle').textContent = 'GlassDoc Studio • Official Owner';
+      $('brandSubtitle').textContent = 'AetherX PDF Reader • Official Owner';
       $('ownerVerifiedBadge').classList.add('show');
     }
+
+    function checkPermissionGateAndLoad() {
+      startupCompleted = true;
+      const gate = $('permissionGate');
+      if (window.GlassNative && typeof window.GlassNative.hasStoragePermission === 'function') {
+        const hasPerm = window.GlassNative.hasStoragePermission();
+        if (!hasPerm && !permSkippedManually) {
+          gate.classList.add('show');
+          return;
+        }
+        if (gate.classList.contains('show')) {
+          gate.classList.add('fade-out');
+          setTimeout(() => gate.classList.remove('show', 'fade-out'), 420);
+        }
+        scanDeviceDocuments();
+      } else {
+        gate.classList.remove('show');
+        scanDeviceDocuments();
+      }
+    }
+
+    $('gateGrantBtn').addEventListener('click', () => {
+      if (window.GlassNative && typeof window.GlassNative.requestStoragePermission === 'function') {
+        window.GlassNative.requestStoragePermission();
+        showToast('অনুমতি চালু করে অ্যাপে ফিরে আসুন');
+      }
+    });
+
+    $('gateManualSkipBtn').addEventListener('click', () => {
+      permSkippedManually = true;
+      const gate = $('permissionGate');
+      gate.classList.add('fade-out');
+      setTimeout(() => gate.classList.remove('show', 'fade-out'), 380);
+      scanDeviceDocuments();
+    });
 
     function initStartupFlow() {
       const existingOwner = getStoredOwner();
 
       if (existingOwner) {
-        // SUBSEQUENT LAUNCHES: Simple, clean loading animation ONLY!
         applyOwnerBranding(existingOwner);
         $('splashOwnerLabel').textContent = existingOwner;
         const splash = $('simpleSplash');
         splash.classList.add('show');
         setTimeout(() => {
           splash.classList.add('fade-out');
-          setTimeout(() => { splash.classList.remove('show', 'fade-out'); }, 480);
-        }, 1050);
+          setTimeout(() => {
+            splash.classList.remove('show', 'fade-out');
+            checkPermissionGateAndLoad();
+          }, 420);
+        }, 920);
         return;
       }
 
-      // FIRST-TIME INSTALL LAUNCH ONLY: Ownership Transfer Ceremony
+      // First-time launch ONLY: App Ownership Transfer Ceremony
       const screen = $('ownershipScreen');
       const s1 = $('ceremonyStage1');
       const s2 = $('ceremonyStage2');
@@ -1746,17 +1353,13 @@
       screen.classList.add('show');
       s1.classList.add('active');
 
-      // Stage 1 runs for 2.8 seconds, then opens English name input
       setTimeout(() => {
         s1.classList.remove('active');
         s2.classList.add('active');
-        setTimeout(() => $('ownerNameInput').focus(), 220);
-      }, 2800);
+        setTimeout(() => $('ownerNameInput').focus(), 200);
+      }, 2700);
 
-      // Filter & validate English name input
-      $('ownerNameInput').addEventListener('input', () => {
-        $('ownerNameError').textContent = '';
-      });
+      $('ownerNameInput').addEventListener('input', () => { $('ownerNameError').textContent = ''; });
 
       function completeOwnershipTransfer() {
         const raw = ($('ownerNameInput').value || '').trim();
@@ -1769,7 +1372,6 @@
           return;
         }
 
-        // Format nicely (Title Case if all lowercase)
         const formatted = raw === raw.toLowerCase()
           ? raw.replace(/\b\w/g, ch => ch.toUpperCase())
           : raw;
@@ -1778,38 +1380,28 @@
         persistOwner(formatted);
         applyOwnerBranding(formatted);
 
-        // Populate Stage 3 Certificate
         $('certOwnerDisplay').textContent = formatted;
-        let deviceName = 'Verified Mobile';
-        try {
-          if (window.GlassNative && typeof window.GlassNative.getDeviceModel === 'function') {
-            deviceName = window.GlassNative.getDeviceModel() || 'Verified Mobile';
-          }
-        } catch (e) {}
-        $('certDeviceVal').textContent = deviceName;
-        const serial = 'GD-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
-        $('certSerialVal').textContent = serial;
+        $('certSerialVal').textContent = 'AX-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
 
         s2.classList.remove('active');
         s3.classList.add('active');
 
-        // Slam the official verified seal onto the name after 650ms!
         setTimeout(() => {
           $('officialSeal').classList.add('stamped');
           $('sealRipple').classList.add('burst');
           $('finalCertCard').classList.add('impact-shake');
           $('certStatusLine').textContent = '✓ মালিকানা সিল অনুমোদিত! অ্যাপ চালু হচ্ছে...';
           try { if (navigator.vibrate) navigator.vibrate([35, 30, 55]); } catch (e) {}
-        }, 650);
+        }, 620);
 
-        // Smoothly enter the app after displaying stamped certificate
         setTimeout(() => {
           screen.classList.add('fade-out');
           setTimeout(() => {
             screen.classList.remove('show', 'fade-out');
             s3.classList.remove('active');
-          }, 500);
-        }, 3100);
+            checkPermissionGateAndLoad();
+          }, 460);
+        }, 3000);
       }
 
       $('claimOwnershipBtn').addEventListener('click', completeOwnershipTransfer);
@@ -1819,6 +1411,18 @@
     }
 
     window.addEventListener('DOMContentLoaded', initStartupFlow);
+
+    // Re-check permission automatically when user returns from Android Settings
+    function onAppResume() {
+      if (!startupCompleted) return;
+      if ($('permissionGate').classList.contains('show')) {
+        checkPermissionGateAndLoad();
+      } else {
+        scanDeviceDocuments();
+      }
+    }
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) onAppResume(); });
+    window.addEventListener('focus', onAppResume);
 
     // ==================== AUTO-HIDE BOTTOM DOCK WHEN KEYBOARD OPENS ====================
     const bottomDockWrap = $('bottomDockWrap');
@@ -1840,9 +1444,7 @@
 
     document.addEventListener('focusin', updateKeyboardState);
     document.addEventListener('focusout', () => setTimeout(updateKeyboardState, 120));
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', updateKeyboardState);
-    }
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', updateKeyboardState);
 
     // ==================== NATIVE FILE SAVE ====================
     async function saveOutputFile(blob, filename) {
@@ -1851,7 +1453,7 @@
         if (window.GlassNative && typeof window.GlassNative.saveBase64ToDocuments === 'function') {
           const savedPath = window.GlassNative.saveBase64ToDocuments(filename, b64);
           if (savedPath) {
-            showToast('সেভ হয়েছে: Documents/GlassDoc/' + filename);
+            showToast('সেভ হয়েছে: Documents/AetherX_PDF/' + filename);
             setTimeout(scanDeviceDocuments, 600);
             return;
           }
@@ -1880,9 +1482,9 @@
     // ==================== THEME & NAVIGATION ====================
     function applyTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('gd_theme', theme);
+      localStorage.setItem('ax_theme', theme);
     }
-    applyTheme(localStorage.getItem('gd_theme') || 'dark');
+    applyTheme(localStorage.getItem('ax_theme') || 'dark');
 
     $('themeToggle').addEventListener('click', () => {
       applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
@@ -1910,7 +1512,7 @@
     }
     window.addEventListener('load', initPdfWorker);
 
-    // ==================== AUTO-DETECT DEVICE LIBRARY + PREMIUM SCROLL ANIMATION ====================
+    // ==================== ALL-DOCUMENT LIBRARY + SCROLL REVEAL ====================
     let deviceFiles = [];
     let activeFilter = 'all';
     let listObserver = null;
@@ -1922,20 +1524,18 @@
 
       if ('IntersectionObserver' in window) {
         listObserver = new IntersectionObserver((entries) => {
-          let batchIndex = 0;
+          let batch = 0;
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               const el = entry.target;
-              el.style.transitionDelay = Math.min(batchIndex * 45, 220) + 'ms';
+              el.style.transitionDelay = Math.min(batch * 40, 200) + 'ms';
               el.classList.add('in-view');
-              batchIndex++;
+              batch++;
               listObserver.unobserve(el);
-              // Clear delay after entrance so active tap feedback stays instant
-              setTimeout(() => { el.style.transitionDelay = '0ms'; }, 600);
+              setTimeout(() => { el.style.transitionDelay = '0ms'; }, 550);
             }
           });
-        }, { threshold: 0.06, rootMargin: '0px 0px -18px 0px' });
-
+        }, { threshold: 0.05, rootMargin: '0px 0px -14px 0px' });
         rows.forEach(r => listObserver.observe(r));
       } else {
         rows.forEach(r => r.classList.add('in-view'));
@@ -1945,7 +1545,10 @@
     function renderFileLibrary() {
       const q = ($('librarySearch').value || '').trim().toLowerCase();
       const filtered = deviceFiles.filter(f => {
-        const matchExt = activeFilter === 'all' || f.ext === activeFilter;
+        let matchExt = true;
+        if (activeFilter === 'pdf') matchExt = f.ext === 'pdf';
+        else if (activeFilter === 'docx') matchExt = (f.ext === 'docx' || f.ext === 'doc');
+        else if (activeFilter === 'txt') matchExt = !['pdf', 'docx', 'doc'].includes(f.ext);
         const matchQ = !q || f.name.toLowerCase().includes(q) || (f.folder || '').toLowerCase().includes(q);
         return matchExt && matchQ;
       });
@@ -1953,14 +1556,14 @@
       const container = $('autoFileList');
 
       if (!filtered.length) {
-        container.innerHTML = `<div style="text-align:center; padding:26px 12px; color:var(--text-muted); font-size:13px; line-height:1.6;">
-          ${deviceFiles.length ? 'খোঁজার সাথে মিলে এমন কোনো ফাইল পাওয়া যায়নি।' : 'কোনো PDF/DOCX পাওয়া যায়নি। উপরের <b>"ফাইল বাছুন"</b> বাটনে ট্যাপ করে যেকোনো ফাইল খুলতে পারেন।'}
+        container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:28px 12px; color:var(--text-muted); font-size:13px; line-height:1.6;">
+          ${deviceFiles.length ? 'খোঁজার সাথে মিলে এমন কোনো ফাইল পাওয়া যায়নি।' : 'কোনো ফাইল পাওয়া যায়নি। উপরের <b>"ফাইল বাছুন"</b> বাটনে ট্যাপ করে যেকোনো ফাইল খুলতে পারেন।'}
         </div>`;
         return;
       }
 
       container.innerHTML = filtered.map(f => {
-        const badgeCls = f.ext === 'pdf' ? 'pdf' : (f.ext === 'docx' ? 'docx' : 'txt');
+        const badgeCls = f.ext === 'pdf' ? 'pdf' : ((f.ext === 'docx' || f.ext === 'doc') ? 'docx' : (f.ext === 'txt' ? 'txt' : 'other'));
         const dateStr = f.modified ? new Date(f.modified).toLocaleDateString('bn-BD') : '';
         return `
           <div class="file-row" data-path="${encodeURIComponent(f.path)}" data-name="${encodeURIComponent(f.name)}" data-ext="${f.ext}">
@@ -1987,28 +1590,30 @@
 
     function scanDeviceDocuments() {
       if (window.GlassNative && typeof window.GlassNative.scanDocuments === 'function') {
-        const hasPerm = window.GlassNative.hasStoragePermission();
-        $('permBanner').style.display = hasPerm ? 'none' : 'block';
+        if (!window.GlassNative.hasStoragePermission()) {
+          deviceFiles = [];
+          renderFileLibrary();
+          return;
+        }
         try { deviceFiles = JSON.parse(window.GlassNative.scanDocuments() || '[]'); }
         catch { deviceFiles = []; }
         renderFileLibrary();
       } else {
-        $('permBanner').style.display = 'none';
         deviceFiles = [];
         renderFileLibrary();
       }
     }
 
-    $('grantPermBtn').addEventListener('click', () => {
-      if (window.GlassNative) {
-        window.GlassNative.requestStoragePermission();
-        showToast('অনুমতি চালু করে অ্যাপে ফিরে আসুন');
+    $('rescanBtn').addEventListener('click', () => {
+      if (window.GlassNative && !window.GlassNative.hasStoragePermission()) {
+        permSkippedManually = false;
+        checkPermissionGateAndLoad();
+        return;
       }
+      scanDeviceDocuments();
+      showToast('ফাইল তালিকা রিফ্রেশ হয়েছে');
     });
-    $('rescanBtn').addEventListener('click', () => { scanDeviceDocuments(); showToast('ফাইল তালিকা রিফ্রেশ হয়েছে'); });
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) scanDeviceDocuments(); });
-    window.addEventListener('focus', scanDeviceDocuments);
-    window.addEventListener('load', () => setTimeout(scanDeviceDocuments, 300));
+
     $('librarySearch').addEventListener('input', renderFileLibrary);
     $('filterChips').querySelectorAll('.chip').forEach(ch => {
       ch.addEventListener('click', () => {
@@ -2055,7 +1660,7 @@
       e.target.value = '';
     });
 
-    // ==================== EDITOR TABLE CELL TYPING FIX (BENGALI & RIDMIK IME SAFE) ====================
+    // ==================== EDITOR TABLE TYPING FIX ====================
     function normalizeEditablePaper() {
       const paper = $('editorPaper');
       paper.setAttribute('contenteditable', 'true');
@@ -2070,7 +1675,6 @@
       });
     }
 
-    // Ensure tapping an empty table cell places caret directly inside so typing works immediately!
     $('editorPaper').addEventListener('click', (e) => {
       const cell = e.target.closest('td, th');
       if (!cell) return;
@@ -2089,16 +1693,18 @@
       }
     });
 
-    // ==================== 60FPS GPU PAN & FOCAL PINCH-ZOOM ENGINE ====================
+    // ==================== DUAL-LAYER RAZOR-SHARP 60FPS PDF ENGINE (PHONE + TABLET) ====================
     let pdfDoc = null;
     let currentPdfPage = null;
     let currentPdfKey = '';
     let currentPage = 1;
+    let fitMode = 'width';      // 'width' | 'page' (handy on landscape tablets!)
     let baseW = 360, baseH = 510;
     let scale = 1.0, tx = 0, ty = 0;
-    let renderedPixelScale = 0;
-    let renderTask = null;
-    let crispTimer = null;
+    let baseRenderTask = null;
+    let detailRenderTask = null;
+    let detailTimer = null;
+    let resizeRefitTimer = null;
     let animFrame = null;
 
     let activeTool = 'read';
@@ -2111,12 +1717,24 @@
 
     const fsViewport = $('fsViewport');
     const pdfPageBox = $('pdfPageBox');
+    const detailCanvas = $('detailCanvas');
 
     function getViewportSize() {
       return {
         vw: fsViewport.clientWidth || window.innerWidth,
         vh: fsViewport.clientHeight || window.innerHeight
       };
+    }
+
+    function computeBaseDims(unscaled) {
+      const { vw, vh } = getViewportSize();
+      const aspect = unscaled.height / unscaled.width;
+      if (fitMode === 'page') {
+        const sc = Math.min(vw / unscaled.width, vh / unscaled.height);
+        return { w: Math.round(unscaled.width * sc), h: Math.round(unscaled.height * sc) };
+      }
+      // Fit width cleanly (on ultra-wide landscape tablets, still fills full width nicely)
+      return { w: vw, h: Math.round(vw * aspect) };
     }
 
     function clampTransform() {
@@ -2136,7 +1754,7 @@
       if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
     }
 
-    function animateTo(targetScale, targetTx, targetTy, duration = 220) {
+    function animateTo(targetScale, targetTx, targetTy, duration = 210) {
       stopAnimations();
       const s0 = scale, x0 = tx, y0 = ty;
       const start = performance.now();
@@ -2148,13 +1766,13 @@
         ty = y0 + (targetTy - y0) * ease;
         clampTransform(); applyTransform();
         if (p < 1) animFrame = requestAnimationFrame(step);
-        else { animFrame = null; scheduleCrispUpgrade(); }
+        else { animFrame = null; scheduleSharpDetail(); }
       }
       animFrame = requestAnimationFrame(step);
     }
 
     function zoomAroundPoint(targetScale, cx, cy, animated = true) {
-      const clamped = Math.min(5.0, Math.max(1.0, targetScale));
+      const clamped = Math.min(6.0, Math.max(1.0, targetScale));
       const docX = (cx - tx) / scale;
       const docY = (cy - ty) / scale;
       let nextTx = cx - docX * clamped;
@@ -2163,8 +1781,8 @@
       const sw = baseW * clamped, sh = baseH * clamped;
       nextTx = sw <= vw ? (vw - sw) / 2 : Math.min(0, Math.max(vw - sw, nextTx));
       nextTy = sh <= vh ? (vh - sh) / 2 : Math.min(0, Math.max(vh - sh, nextTy));
-      if (animated) animateTo(clamped, nextTx, nextTy, 220);
-      else { scale = clamped; tx = nextTx; ty = nextTy; clampTransform(); applyTransform(); scheduleCrispUpgrade(); }
+      if (animated) animateTo(clamped, nextTx, nextTy, 210);
+      else { scale = clamped; tx = nextTx; ty = nextTy; clampTransform(); applyTransform(); scheduleSharpDetail(); }
     }
 
     function openFsOverlay(title) {
@@ -2178,6 +1796,9 @@
 
     function closeFsOverlay() {
       stopAnimations();
+      clearTimeout(detailTimer);
+      if (baseRenderTask) { try { baseRenderTask.cancel(); } catch (e) {} }
+      if (detailRenderTask) { try { detailRenderTask.cancel(); } catch (e) {} }
       $('fsOverlay').classList.remove('open');
       $('sideDock').classList.remove('open');
       document.body.style.overflow = '';
@@ -2195,6 +1816,7 @@
       pdfPageBox.style.display = 'none';
       $('sideFabWrap').style.display = 'none';
       $('fsBottomHud').style.display = 'none';
+      $('fsFitToggleBtn').style.display = 'none';
       $('fsDocBox').style.display = 'block';
       $('fsDocBox').innerHTML = html;
       $('fsEditDocBtn').style.display = editable ? 'grid' : 'none';
@@ -2209,19 +1831,21 @@
         $('fsDocBox').style.display = 'none';
         $('fsEditDocBtn').style.display = 'none';
         $('fsBijoyFixBtn').style.display = 'none';
+        $('fsFitToggleBtn').style.display = 'grid';
         pdfPageBox.style.display = 'block';
         $('sideFabWrap').style.display = 'flex';
         $('fsBottomHud').style.display = 'flex';
 
         pdfDoc = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        currentPdfKey = 'gd_notes_' + (keyId || name).replace(/[^a-zA-Z0-9]/g, '_').slice(-48);
+        currentPdfKey = 'ax_notes_' + (keyId || name).replace(/[^a-zA-Z0-9]/g, '_').slice(-48);
         currentPage = 1;
+        fitMode = 'width';
         pageStrokes = {};
         setActiveTool('read');
 
         $('pageSlider').max = pdfDoc.numPages;
         $('pageSlider').value = 1;
-        setTimeout(() => loadPdfPage(currentPage), 80);
+        setTimeout(() => loadPdfPage(currentPage), 85);
       } else if (ext === 'docx') {
         const res = await window.mammoth.convertToHtml({ arrayBuffer });
         openFsHtml(res.value || '<p>(ফাইলটি খালি)</p>', name, true);
@@ -2233,16 +1857,32 @@
       }
     }
 
-    async function loadPdfPage(num) {
+    async function loadPdfPage(num, preserveView = false) {
       if (!pdfDoc) return;
       stopAnimations();
+      clearTimeout(detailTimer);
+      detailCanvas.style.display = 'none';
+
+      const prevNormX = preserveView && baseW ? ((-tx + getViewportSize().vw / 2) / (baseW * scale)) : 0.5;
+      const prevNormY = preserveView && baseH ? ((-ty + getViewportSize().vh / 2) / (baseH * scale)) : 0;
+      const prevScale = preserveView ? scale : 1.0;
+
       currentPdfPage = await pdfDoc.getPage(num);
       const unscaled = currentPdfPage.getViewport({ scale: 1.0 });
-      const { vw } = getViewportSize();
+      const dims = computeBaseDims(unscaled);
+      baseW = dims.w;
+      baseH = dims.h;
 
-      baseW = vw;
-      baseH = Math.round(vw * (unscaled.height / unscaled.width));
-      scale = 1.0; tx = 0; ty = 0;
+      if (preserveView) {
+        const { vw, vh } = getViewportSize();
+        scale = Math.min(6.0, Math.max(1.0, prevScale));
+        tx = vw / 2 - prevNormX * baseW * scale;
+        ty = vh / 2 - prevNormY * baseH * scale;
+      } else {
+        scale = 1.0;
+        tx = 0;
+        ty = 0;
+      }
       clampTransform();
 
       pdfPageBox.style.width = baseW + 'px';
@@ -2256,64 +1896,154 @@
       $('pageIndicator').textContent = `${num} / ${pdfDoc.numPages}`;
       $('pageSlider').value = num;
 
-      renderedPixelScale = 0;
-      await renderCrispBitmap(true);
+      await renderBaseCanvas();
       redrawPageStrokes();
       renderPageNotes();
+      if (scale > 1.2) scheduleSharpDetail(20);
     }
 
-    async function renderCrispBitmap(force = false) {
+    // Layer 1: High-res Full-Page Base Canvas (crisp at 1x–1.5x & instant smooth panning)
+    async function renderBaseCanvas() {
       if (!currentPdfPage) return;
-      const dpr = Math.min(window.devicePixelRatio || 2, 2.5);
+      if (baseRenderTask) { try { baseRenderTask.cancel(); } catch (e) {} }
+
       const unscaled = currentPdfPage.getViewport({ scale: 1.0 });
       const fitScale = baseW / unscaled.width;
-      const desiredPixelScale = fitScale * scale * dpr;
-      const maxDim = 2800;
-      const maxAllowedScale = maxDim / Math.max(unscaled.width, unscaled.height);
-      const targetScale = Math.min(desiredPixelScale, maxAllowedScale);
+      const dpr = Math.min(window.devicePixelRatio || 2, 2.75);
+      // Higher base clarity for both phone & tablet
+      const maxBaseDim = Math.max(window.innerWidth, window.innerHeight) >= 900 ? 3800 : 3200;
+      const desiredScale = fitScale * Math.max(dpr, 2.0);
+      const safeScale = Math.min(desiredScale, maxBaseDim / Math.max(unscaled.width, unscaled.height));
 
-      if (!force && renderedPixelScale > 0 && Math.abs(targetScale - renderedPixelScale) / renderedPixelScale < 0.16) return;
-      if (renderTask) { try { renderTask.cancel(); } catch (e) {} }
+      const viewport = currentPdfPage.getViewport({ scale: safeScale });
+      const off = document.createElement('canvas');
+      off.width = Math.floor(viewport.width);
+      off.height = Math.floor(viewport.height);
+      const offCtx = off.getContext('2d', { alpha: false });
 
-      const viewport = currentPdfPage.getViewport({ scale: targetScale });
-      const offCanvas = document.createElement('canvas');
-      offCanvas.width = Math.floor(viewport.width);
-      offCanvas.height = Math.floor(viewport.height);
-      const offCtx = offCanvas.getContext('2d', { alpha: false });
-
-      renderTask = currentPdfPage.render({ canvasContext: offCtx, viewport });
+      baseRenderTask = currentPdfPage.render({ canvasContext: offCtx, viewport });
       try {
-        await renderTask.promise;
+        await baseRenderTask.promise;
         const vis = $('pdfCanvas');
-        vis.width = offCanvas.width;
-        vis.height = offCanvas.height;
-        vis.getContext('2d', { alpha: false }).drawImage(offCanvas, 0, 0);
-        renderedPixelScale = targetScale;
+        vis.width = off.width;
+        vis.height = off.height;
+        vis.getContext('2d', { alpha: false }).drawImage(off, 0, 0);
       } catch (e) {
         if (e && e.name !== 'RenderingCancelledException') console.error(e);
       }
     }
 
-    function scheduleCrispUpgrade() {
-      clearTimeout(crispTimer);
-      crispTimer = setTimeout(() => renderCrispBitmap(false), 150);
+    // Layer 2: ULTRA-SHARP VISIBLE-VIEWPORT VECTOR DETAIL OVERLAY (Zero blur even at 600% zoom!)
+    async function renderSharpDetailTile() {
+      if (!currentPdfPage) return;
+      if (scale <= 1.22) {
+        detailCanvas.style.display = 'none';
+        return;
+      }
+
+      if (detailRenderTask) { try { detailRenderTask.cancel(); } catch (e) {} }
+
+      const { vw, vh } = getViewportSize();
+      const pad = 36; // small screen bleed margin for micro-pans
+      const sx0 = Math.max(tx, -pad);
+      const sy0 = Math.max(ty, -pad);
+      const sx1 = Math.min(tx + baseW * scale, vw + pad);
+      const sy1 = Math.min(ty + baseH * scale, vh + pad);
+
+      if (sx1 <= sx0 || sy1 <= sy0) return;
+
+      const lx = Math.max(0, (sx0 - tx) / scale);
+      const ly = Math.max(0, (sy0 - ty) / scale);
+      const lw = Math.min(baseW - lx, (sx1 - sx0) / scale);
+      const lh = Math.min(baseH - ly, (sy1 - sy0) / scale);
+
+      if (lw < 4 || lh < 4) return;
+
+      const dpr = Math.min(window.devicePixelRatio || 2, 3.0);
+      const rawTileW = lw * scale * dpr;
+      const rawTileH = lh * scale * dpr;
+      const maxTileDim = 3200;
+      const dimFactor = Math.min(1, maxTileDim / Math.max(rawTileW, rawTileH, 1));
+      const effectiveDpr = dpr * dimFactor;
+
+      const tileW = Math.max(1, Math.ceil(lw * scale * effectiveDpr));
+      const tileH = Math.max(1, Math.ceil(lh * scale * effectiveDpr));
+
+      const unscaled = currentPdfPage.getViewport({ scale: 1.0 });
+      const fitScale = baseW / unscaled.width;
+      const fullScale = fitScale * scale * effectiveDpr;
+      const vp = currentPdfPage.getViewport({ scale: fullScale });
+
+      const offX = lx * scale * effectiveDpr;
+      const offY = ly * scale * effectiveDpr;
+
+      const off = document.createElement('canvas');
+      off.width = tileW;
+      off.height = tileH;
+      const offCtx = off.getContext('2d', { alpha: false });
+      offCtx.fillStyle = '#ffffff';
+      offCtx.fillRect(0, 0, tileW, tileH);
+
+      detailRenderTask = currentPdfPage.render({
+        canvasContext: offCtx,
+        viewport: vp,
+        transform: [1, 0, 0, 1, -offX, -offY]
+      });
+
+      try {
+        await detailRenderTask.promise;
+        // Atomic swap onto visible detailCanvas aligned to exact local CSS coordinates
+        detailCanvas.width = tileW;
+        detailCanvas.height = tileH;
+        detailCanvas.getContext('2d', { alpha: false }).drawImage(off, 0, 0);
+        detailCanvas.style.left = lx.toFixed(3) + 'px';
+        detailCanvas.style.top = ly.toFixed(3) + 'px';
+        detailCanvas.style.width = lw.toFixed(3) + 'px';
+        detailCanvas.style.height = lh.toFixed(3) + 'px';
+        detailCanvas.style.display = 'block';
+      } catch (e) {
+        if (e && e.name !== 'RenderingCancelledException') console.error(e);
+      }
     }
 
-    window.addEventListener('resize', () => {
-      if (pdfDoc && $('fsOverlay').classList.contains('open')) {
-        clampTransform(); applyTransform();
+    function scheduleSharpDetail(delay = 95) {
+      clearTimeout(detailTimer);
+      if (scale <= 1.22) {
+        detailCanvas.style.display = 'none';
+        return;
       }
+      detailTimer = setTimeout(() => renderSharpDetailTile(), delay);
+    }
+
+    // TABLET & PHONE AUTO-ROTATE REFIT (Seamlessly adapts between Portrait & Landscape!)
+    function handleOrientationRefit() {
+      if (!pdfDoc || !$('fsOverlay').classList.contains('open')) return;
+      clearTimeout(resizeRefitTimer);
+      resizeRefitTimer = setTimeout(() => {
+        if (pdfDoc && currentPdfPage) {
+          loadPdfPage(currentPage, true);
+        }
+      }, 140);
+    }
+    window.addEventListener('resize', handleOrientationRefit);
+    window.addEventListener('orientationchange', handleOrientationRefit);
+
+    $('fsFitToggleBtn').addEventListener('click', () => {
+      if (!pdfDoc) return;
+      fitMode = fitMode === 'width' ? 'page' : 'width';
+      loadPdfPage(currentPage, false);
+      showToast(fitMode === 'page' ? 'পুরো পেজ ফিট মোড' : 'প্রস্থ ফিট মোড');
     });
 
-    $('zoomInBtn').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(scale + 0.45, vw / 2, vh / 2, true); });
-    $('zoomOutBtn').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(scale - 0.45, vw / 2, vh / 2, true); });
+    $('zoomInBtn').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(scale + 0.5, vw / 2, vh / 2, true); });
+    $('zoomOutBtn').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(scale - 0.5, vw / 2, vh / 2, true); });
     $('zoomLabel').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(1.0, vw / 2, vh / 2, true); });
 
-    $('prevPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage > 1) { currentPage--; loadPdfPage(currentPage); } });
-    $('nextPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage < pdfDoc.numPages) { currentPage++; loadPdfPage(currentPage); } });
+    $('prevPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage > 1) { currentPage--; loadPdfPage(currentPage, false); } });
+    $('nextPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage < pdfDoc.numPages) { currentPage++; loadPdfPage(currentPage, false); } });
     $('pageSlider').addEventListener('change', (e) => {
       const p = parseInt(e.target.value, 10);
-      if (pdfDoc && p >= 1 && p <= pdfDoc.numPages) { currentPage = p; loadPdfPage(currentPage); }
+      if (pdfDoc && p >= 1 && p <= pdfDoc.numPages) { currentPage = p; loadPdfPage(currentPage, false); }
     });
 
     $('fsNightBtn').addEventListener('click', () => {
@@ -2338,7 +2068,7 @@
       showToast('বিজয় ফন্ট ইউনিকোড বাংলায় ঠিক হয়েছে!');
     });
 
-    // ==================== SILKY TOUCH GESTURES ====================
+    // ==================== SILKY 60FPS TOUCH GESTURES (PAN + INERTIA + FOCAL PINCH + DOUBLE-TAP) ====================
     let gestureMode = 'none';
     let startX = 0, startY = 0, lastX = 0, lastY = 0, lastMoveTime = 0;
     let velX = 0, velY = 0, totalMoved = 0;
@@ -2353,6 +2083,7 @@
       if (e.touches.length === 2) {
         e.preventDefault();
         stopAnimations();
+        clearTimeout(detailTimer);
         isDrawing = false; currentStroke = null;
         gestureMode = 'pinch';
         const mid = touchMid(e.touches[0], e.touches[1]);
@@ -2365,6 +2096,7 @@
       if (activeTool !== 'read' || e.target.closest('.note-pin')) return;
       if (e.touches.length === 1) {
         stopAnimations();
+        clearTimeout(detailTimer);
         gestureMode = 'pan';
         startX = lastX = e.touches[0].clientX;
         startY = lastY = e.touches[0].clientY;
@@ -2379,7 +2111,7 @@
         e.preventDefault();
         const mid = touchMid(e.touches[0], e.touches[1]);
         const curDist = Math.max(touchDist(e.touches[0], e.touches[1]), 1);
-        scale = Math.min(5.0, Math.max(1.0, pinchStartScale * (curDist / pinchStartDist)));
+        scale = Math.min(6.0, Math.max(1.0, pinchStartScale * (curDist / pinchStartDist)));
         tx = mid.x - pinchDocX * scale;
         ty = mid.y - pinchDocY * scale;
         clampTransform(); applyTransform();
@@ -2393,8 +2125,8 @@
         const dt = Math.max(now - lastMoveTime, 1);
         tx += dx; ty += dy;
         clampTransform(); applyTransform();
-        velX = velX * 0.4 + (dx / dt) * 0.6;
-        velY = velY * 0.4 + (dy / dt) * 0.6;
+        velX = velX * 0.42 + (dx / dt) * 0.58;
+        velY = velY * 0.42 + (dy / dt) * 0.58;
         totalMoved += Math.hypot(dx, dy);
         lastX = cx; lastY = cy; lastMoveTime = now;
       }
@@ -2404,7 +2136,8 @@
       if (!pdfDoc) return;
       if (gestureMode === 'pinch' && e.touches.length < 2) {
         gestureMode = 'none';
-        clampTransform(); applyTransform(); scheduleCrispUpgrade();
+        clampTransform(); applyTransform();
+        scheduleSharpDetail(70);
         return;
       }
       if (gestureMode === 'pan' && e.touches.length === 0) {
@@ -2414,7 +2147,7 @@
           if (now - lastTapTime < 280) {
             clearTimeout(singleTapTimer);
             lastTapTime = 0;
-            zoomAroundPoint(scale > 1.3 ? 1.0 : 2.35, startX, startY, true);
+            zoomAroundPoint(scale > 1.35 ? 1.0 : 2.5, startX, startY, true);
           } else {
             lastTapTime = now;
             singleTapTimer = setTimeout(() => {
@@ -2424,16 +2157,22 @@
           }
           return;
         }
-        if (Math.hypot(velX, velY) > 0.18) {
+        if (Math.hypot(velX, velY) > 0.16) {
           let vx = velX * 16, vy = velY * 16;
           function glide() {
-            vx *= 0.92; vy *= 0.92;
+            vx *= 0.91; vy *= 0.91;
             tx += vx; ty += vy;
             clampTransform(); applyTransform();
-            if (Math.hypot(vx, vy) > 0.35) animFrame = requestAnimationFrame(glide);
-            else animFrame = null;
+            if (Math.hypot(vx, vy) > 0.35) {
+              animFrame = requestAnimationFrame(glide);
+            } else {
+              animFrame = null;
+              scheduleSharpDetail(60);
+            }
           }
           animFrame = requestAnimationFrame(glide);
+        } else {
+          scheduleSharpDetail(70);
         }
       }
     });
@@ -2598,7 +2337,7 @@
       mctx.globalCompositeOperation = 'multiply';
       mctx.drawImage(c2, 0, 0, c1.width, c1.height);
       mctx.globalCompositeOperation = 'source-over';
-      merged.toBlob((blob) => { if (blob) saveOutputFile(blob, `GlassDoc_Page_${currentPage}.png`); }, 'image/png');
+      merged.toBlob((blob) => { if (blob) saveOutputFile(blob, `AetherX_Page_${currentPage}.png`); }, 'image/png');
       $('sideDock').classList.remove('open');
     });
 
@@ -2772,23 +2511,23 @@
           pdf.addImage(imgData, 'JPEG', margin, pos, imgW, imgH);
           heightLeft -= (297 - margin * 2);
         }
-        const safeName = ($('docTitleInput').value.trim() || 'GlassDoc_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
+        const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
         await saveOutputFile(pdf.output('blob'), safeName + '.pdf');
       } catch { showToast('PDF তৈরিতে সমস্যা হয়েছে'); }
     });
 
     $('exportWordBtn').addEventListener('click', async () => {
-      const safeName = ($('docTitleInput').value.trim() || 'GlassDoc_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
+      const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
       const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${$('editorPaper').innerHTML}</body></html>`;
       await saveOutputFile(new Blob(['\ufeff', html], { type: 'application/msword' }), safeName + '.doc');
     });
 
     $('exportTxtBtn').addEventListener('click', async () => {
-      const safeName = ($('docTitleInput').value.trim() || 'GlassDoc_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
+      const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
       await saveOutputFile(new Blob([$('editorPaper').innerText], { type: 'text/plain;charset=utf-8' }), safeName + '.txt');
     });
 
-    function getDrafts() { try { return JSON.parse(localStorage.getItem('gd_drafts') || '[]'); } catch { return []; } }
+    function getDrafts() { try { return JSON.parse(localStorage.getItem('ax_drafts') || '[]'); } catch { return []; } }
     function renderDrafts() {
       const drafts = getDrafts();
       $('draftCount').textContent = drafts.length + 'টি';
@@ -2802,11 +2541,11 @@
         </div>`).join('') : '<div style="font-size:12.5px; color:var(--text-muted);">কোনো ড্রাফট সেভ নেই।</div>';
     }
     window.loadDraft = (i) => { const d = getDrafts()[i]; if (!d) return; $('docTitleInput').value = d.title; $('editorPaper').innerHTML = d.html; normalizeEditablePaper(); showToast('ড্রাফট লোড হয়েছে'); };
-    window.deleteDraft = (i) => { const d = getDrafts(); d.splice(i, 1); localStorage.setItem('gd_drafts', JSON.stringify(d)); renderDrafts(); };
+    window.deleteDraft = (i) => { const d = getDrafts(); d.splice(i, 1); localStorage.setItem('ax_drafts', JSON.stringify(d)); renderDrafts(); };
     $('saveDraftBtn').addEventListener('click', () => {
       const d = getDrafts();
       d.unshift({ title: $('docTitleInput').value.trim() || ('নোট ' + (d.length + 1)), html: $('editorPaper').innerHTML, date: new Date().toLocaleString('bn-BD') });
-      localStorage.setItem('gd_drafts', JSON.stringify(d.slice(0, 30)));
+      localStorage.setItem('ax_drafts', JSON.stringify(d.slice(0, 30)));
       renderDrafts(); showToast('ড্রাফট সেভ হয়েছে!');
     });
     renderDrafts();
@@ -2837,7 +2576,7 @@
           const p = doc.addPage([a4W, a4H]);
           p.drawImage(emb, { x: (a4W - emb.width * sc) / 2, y: (a4H - emb.height * sc) / 2, width: emb.width * sc, height: emb.height * sc });
         }
-        await saveOutputFile(new Blob([await doc.save()], { type: 'application/pdf' }), 'GlassDoc_Images.pdf');
+        await saveOutputFile(new Blob([await doc.save()], { type: 'application/pdf' }), 'AetherX_Images.pdf');
       } catch { showToast('ছবি থেকে PDF করা যায়নি'); }
     });
 
@@ -2858,7 +2597,7 @@
           const src = await PDFDocument.load(await f.arrayBuffer());
           (await merged.copyPages(src, src.getPageIndices())).forEach(p => merged.addPage(p));
         }
-        await saveOutputFile(new Blob([await merged.save()], { type: 'application/pdf' }), 'GlassDoc_Merged.pdf');
+        await saveOutputFile(new Blob([await merged.save()], { type: 'application/pdf' }), 'AetherX_Merged.pdf');
       } catch { showToast('Merge করা যায়নি'); }
     });
 
@@ -2896,7 +2635,7 @@
         const src = await PDFDocument.load(splitSrcBytes);
         const dest = await PDFDocument.create();
         (await dest.copyPages(src, sorted)).forEach(p => dest.addPage(p));
-        await saveOutputFile(new Blob([await dest.save()], { type: 'application/pdf' }), 'GlassDoc_Split.pdf');
+        await saveOutputFile(new Blob([await dest.save()], { type: 'application/pdf' }), 'AetherX_Split.pdf');
       } catch { showToast('Split করা যায়নি'); }
     });
 
@@ -2908,7 +2647,7 @@
     updateStorageMeter();
 
     $('clearAllStorageBtn').addEventListener('click', () => {
-      Object.keys(localStorage).forEach(k => { if (k.startsWith('gd_drafts') || k.startsWith('gd_notes_')) localStorage.removeItem(k); });
+      Object.keys(localStorage).forEach(k => { if (k.startsWith('ax_drafts') || k.startsWith('ax_notes_')) localStorage.removeItem(k); });
       renderDrafts(); updateStorageMeter(); showToast('সব ড্রাফট ও নোট পরিষ্কার হয়েছে!');
     });
   </script>

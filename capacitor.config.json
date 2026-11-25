@@ -1,6 +1,6 @@
 {
-  "appId": "org.glassdoc.student",
-  "appName": "GlassDoc Studio",
+  "appId": "com.aetherx.pdfreader",
+  "appName": "AetherX PDF Reader",
   "webDir": "www",
   "android": {
     "allowMixedContent": false,

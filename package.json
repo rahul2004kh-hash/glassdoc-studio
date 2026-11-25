@@ -1,10 +1,11 @@
 {
-  "name": "glassdoc-studio-android",
-  "version": "1.0.0",
-  "description": "Offline, ad-free, non-profit Glass UI PDF & Docs studio for students",
+  "name": "aetherx-pdf-reader",
+  "version": "3.0.0",
+  "description": "AetherX PDF Reader - Offline, ad-free, Liquid Glass PDF & Docs studio for phones & tablets",
   "private": true,
   "scripts": {
-    "prepare-assets": "node scripts/prepare-assets.js"
+    "prepare-assets": "node scripts/prepare-assets.js",
+    "patch-android": "node scripts/prepare-assets.js --patch-android"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",
