@@ -1,4 +1,4 @@
-name: Build GlassDoc Android APK
+name: Build GlassDoc v2.0 Signed APK
 
 on:
   push:
@@ -37,21 +37,28 @@ jobs:
           fi
           npx cap sync android
 
-      - name: Build Installable APK
+      - name: Patch Native PDF Auto-Scanner & Release Signing
+        run: node scripts/prepare-assets.js --patch-android
+
+      - name: Generate Release Signing Keystore
+        run: |
+          keytool -genkeypair -v             -keystore android/app/glassdoc-release.keystore             -alias glassdoc             -keyalg RSA -keysize 2048 -validity 10000             -storepass GlassDoc2026 -keypass GlassDoc2026             -dname "CN=GlassDoc Studio, OU=Student Initiative, O=GlassDoc NonProfit, L=Jhenaidah, S=Khulna, C=BD"
+
+      - name: Build Signed Release APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleRelease --no-daemon
 
-      - name: Prepare APK for download
+      - name: Prepare Signed APK for download
         run: |
           mkdir -p release
-          cp android/app/build/outputs/apk/debug/app-debug.apk release/GlassDoc-Studio-v1.0.apk
-          ls -lh release/GlassDoc-Studio-v1.0.apk
+          cp android/app/build/outputs/apk/release/app-release.apk release/GlassDoc-Studio-v2.0-Signed.apk
+          ls -lh release/GlassDoc-Studio-v2.0-Signed.apk
 
-      - name: Upload GlassDoc APK Artifact
+      - name: Upload GlassDoc v2.0 APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GlassDoc-Studio-APK
-          path: release/GlassDoc-Studio-v1.0.apk
+          name: GlassDoc-Studio-v2.0-APK
+          path: release/GlassDoc-Studio-v2.0-Signed.apk
           retention-days: 30
