@@ -1,0 +1,11 @@
+{
+  "appId": "org.glassdoc.student",
+  "appName": "GlassDoc Studio",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#090f1d",
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  }
+}

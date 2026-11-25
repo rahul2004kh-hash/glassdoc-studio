@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="bn" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#090f1d" />
+  <title>GlassDoc Studio — শিক্ষার্থী এডিশন</title>
+
+  <!-- 100% Offline Bundled Bengali Fonts -->
+  <link rel="stylesheet" href="./fonts/noto-sans-bengali/400.css" />
+  <link rel="stylesheet" href="./fonts/noto-sans-bengali/700.css" />
+  <link rel="stylesheet" href="./fonts/hind-siliguri/400.css" />
+  <link rel="stylesheet" href="./fonts/hind-siliguri/700.css" />
+
+  <style>
+    :root {
+      --font-bn: 'Noto Sans Bengali', 'Hind Siliguri', system-ui, -apple-system, sans-serif;
+      --bg-base: #070c18;
+      --bg-grad-1: rgba(56, 189, 248, 0.22);
+      --bg-grad-2: rgba(139, 92, 246, 0.22);
+      --bg-grad-3: rgba(16, 185, 129, 0.14);
+      --glass-bg: rgba(18, 28, 48, 0.62);
+      --glass-bg-strong: rgba(15, 23, 42, 0.84);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-highlight: rgba(255, 255, 255, 0.08);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #818cf8;
+      --success: #34d399;
+      --danger: #fb7185;
+      --warning: #fbbf24;
+      --paper-bg: #ffffff;
+      --paper-text: #111827;
+      --shadow: 0 12px 32px rgba(0, 0, 0, 0.42);
+      --radius: 18px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    [data-theme="light"] {
+      --bg-base: #e8eef8;
+      --bg-grad-1: rgba(56, 189, 248, 0.28);
+      --bg-grad-2: rgba(168, 85, 247, 0.20);
+      --bg-grad-3: rgba(52, 211, 153, 0.18);
+      --glass-bg: rgba(255, 255, 255, 0.68);
+      --glass-bg-strong: rgba(255, 255, 255, 0.88);
+      --glass-border: rgba(15, 23, 42, 0.12);
+      --glass-highlight: rgba(255, 255, 255, 0.9);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --accent: #0284c7;
+      --accent-2: #6366f1;
+      --success: #059669;
+      --danger: #e11d48;
+      --warning: #d97706;
+      --shadow: 0 10px 28px rgba(15, 23, 42, 0.10);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: var(--font-bn);
+      color: var(--text-main);
+      background: var(--bg-base);
+      background-image:
+        radial-gradient(circle at 12% 10%, var(--bg-grad-1), transparent 45%),
+        radial-gradient(circle at 88% 22%, var(--bg-grad-2), transparent 48%),
+        radial-gradient(circle at 50% 92%, var(--bg-grad-3), transparent 50%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+
+    /* Top Glass AppBar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: calc(10px + var(--safe-top)) 14px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--glass-bg-strong);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.15;
+      font-weight: 700;
+    }
+
+    .brand small {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      color: var(--text-main);
+      border-radius: 12px;
+      padding: 8px 11px;
+      font-size: 13px;
+      font-family: var(--font-bn);
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+
+    .icon-btn:active { transform: scale(0.95); }
+
+    /* Main Container */
+    main {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 14px 12px calc(92px + var(--safe-bottom));
+    }
+
+    .view { display: none; animation: fadeIn 0.22s ease; }
+    .view.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Glass Cards */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 15px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .subtitle {
+      margin: 0 0 12px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      border: 1px solid var(--glass-border);
+      background: var(--glass-highlight);
+      color: var(--text-main);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-family: var(--font-bn);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.14s ease, opacity 0.15s ease;
+    }
+
+    .btn:active { transform: scale(0.96); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 6px 18px rgba(56, 189, 248, 0.28);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: transparent;
+      color: #ffffff;
+    }
+
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.18);
+      border-color: rgba(244, 63, 94, 0.4);
+      color: var(--danger);
+    }
+
+    .btn-sm { padding: 7px 10px; font-size: 12px; border-radius: 10px; }
+
+    /* Dropzone / File Picker */
+    .upload-box {
+      border: 1.5px dashed var(--accent);
+      background: rgba(56, 189, 248, 0.07);
+      border-radius: 16px;
+      padding: 20px 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .upload-box:active { background: rgba(56, 189, 248, 0.14); }
+    .upload-box strong { display: block; font-size: 14.5px; margin-bottom: 4px; }
+    .upload-box span { font-size: 12px; color: var(--text-muted); }
+
+    input[type="file"] { display: none; }
+
+    /* Inputs & Selects */
+    .input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      background: rgba(0, 0, 0, 0.18);
+      color: var(--text-main);
+      font-family: var(--font-bn);
+      font-size: 14px;
+      outline: none;
+    }
+
+    [data-theme="light"] .input,
+    [data-theme="light"] select,
+    [data-theme="light"] textarea {
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+
+    /* Reader Stage */
+    .reader-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .pdf-stage {
+      position: relative;
+      overflow: auto;
+      max-height: 66vh;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 10px;
+      text-align: center;
+    }
+
+    .pdf-canvas-wrap {
+      position: relative;
+      display: inline-block;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .pdf-canvas-wrap.night-invert {
+      filter: invert(0.92) hue-rotate(180deg);
+    }
+
+    #pdfCanvas { display: block; max-width: 100%; height: auto; }
+    #drawCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      pointer-events: none;
+    }
+    #drawCanvas.drawing-active { pointer-events: auto; cursor: crosshair; }
+
+    .doc-preview {
+      background: var(--paper-bg);
+      color: var(--paper-text);
+      border-radius: 14px;
+      padding: 20px 18px;
+      font-family: var(--font-bn);
+      font-size: 15px;
+      line-height: 1.75;
+      max-height: 65vh;
+      overflow-y: auto;
+      text-align: left;
+      word-wrap: break-word;
+    }
+
+    .doc-preview.night-invert {
+      background: #111827;
+      color: #e5e7eb;
+    }
+
+    .doc-preview table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+    .doc-preview th, .doc-preview td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 8px;
+    }
+
+    /* Alert Banner */
+    .alert-banner {
+      display: none;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(251, 191, 36, 0.16);
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      color: var(--text-main);
+      font-size: 12.5px;
+      margin-bottom: 10px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Editor Toolbar & Paper */
+    .editor-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.16);
+      border: 1px solid var(--glass-border);
+      margin-bottom: 10px;
+    }
+
+    [data-theme="light"] .editor-toolbar { background: rgba(15, 23, 42, 0.05); }
+
+    .tool-btn {
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      color: var(--text-main);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: var(--font-bn);
+      cursor: pointer;
+    }
+
+    .tool-btn:active { background: var(--accent); color: #fff; }
+
+    .editor-paper {
+      background: var(--paper-bg);
+      color: var(--paper-text);
+      min-height: 300px;
+      padding: 20px 18px;
+      border-radius: 14px;
+      font-family: var(--font-bn);
+      font-size: 15px;
+      line-height: 1.75;
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+      word-break: break-word;
+    }
+
+    .editor-paper img { max-width: 100%; border-radius: 8px; margin: 8px 0; }
+    .editor-paper table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    .editor-paper td, .editor-paper th { border: 1px solid #94a3b8; padding: 6px; }
+
+    /* Drafts & File List */
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.16);
+      border: 1px solid var(--glass-border);
+      font-size: 13px;
+    }
+
+    [data-theme="light"] .list-item { background: rgba(255, 255, 255, 0.65); }
+
+    .list-item-info { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .list-item-info small { display: block; color: var(--text-muted); font-size: 11px; }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .thumb-card {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      aspect-ratio: 3/4;
+      background: #000;
+    }
+
+    .thumb-card img { width: 100%; height: 100%; object-fit: cover; }
+    .thumb-del {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(225, 29, 72, 0.9);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Bottom Glass Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
+      padding: 8px 10px calc(8px + var(--safe-bottom));
+      background: var(--glass-bg-strong);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-top: 1px solid var(--glass-border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 14px;
+      padding: 8px 4px;
+      font-family: var(--font-bn);
+      font-size: 11.5px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .nav-btn span.ico { font-size: 18px; line-height: 1; }
+
+    .nav-btn.active {
+      background: rgba(56, 189, 248, 0.16);
+      color: var(--accent);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(84px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(15, 23, 42, 0.94);
+      color: #fff;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+      transition: all 0.25s ease;
+      max-width: 90vw;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(52, 211, 153, 0.18);
+      color: var(--success);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">G</div>
+      <div>
+        <h1>GlassDoc Studio</h1>
+        <small>১০০% অফলাইন • বিজ্ঞাপন মুক্ত</small>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="themeToggle" title="থিম বদলান">☀️ লাইট</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ==================== TAB 1: READER ==================== -->
+    <section id="view-reader" class="view active">
+      <div class="glass-card">
+        <div class="section-title">
+          <span>📖 ফাইল রিডার ও অ্যানোটেটর</span>
+          <span class="badge">অফলাইন</span>
+        </div>
+        <p class="subtitle">PDF, DOCX, TXT, MD, HTML বা ছবি খুলুন। বাংলা যুক্তবর্ণ নিখুঁত দেখাবে, কোনো ফাইল সার্ভারে যাবে না।</p>
+        <label class="upload-box" for="readerFileInput">
+          <strong>📂 ফাইল নির্বাচন করতে এখানে ট্যাপ করুন</strong>
+          <span>সাপোর্ট: .pdf, .docx, .txt, .md, .html, .jpg, .png</span>
+        </label>
+        <input type="file" id="readerFileInput" accept=".pdf,.docx,.txt,.md,.html,.htm,image/*" />
+      </div>
+
+      <div class="glass-card" id="readerContentCard" style="display:none;">
+        <div class="reader-toolbar">
+          <strong id="readerFileName" style="font-size:13.5px; word-break:break-all;">ফাইল</strong>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-sm" id="nightReadBtn">🌙 নাইট মোড</button>
+            <button class="btn btn-sm btn-primary" id="sendToEditorBtn" style="display:none;">✏️ এডিটরে নিন</button>
+          </div>
+        </div>
+
+        <div class="alert-banner" id="bijoyAlert">
+          <span>⚠️ এই ফাইলে পুরনো <b>বিজয় (SutonnyMJ)</b> ফন্টের টেক্সট পাওয়া গেছে!</span>
+          <button class="btn btn-sm btn-primary" id="autoFixBijoyBtn">✨ ইউনিকোড বাংলা করুন</button>
+        </div>
+
+        <!-- PDF Controls -->
+        <div id="pdfControls" style="display:none;">
+          <div class="btn-row" style="margin-top:0; margin-bottom:10px; justify-content:space-between; align-items:center;">
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button class="btn btn-sm" id="prevPageBtn">◀ আগের</button>
+              <span id="pageIndicator" style="font-size:13px; font-weight:700;">1 / 1</span>
+              <button class="btn btn-sm" id="nextPageBtn">পরের ▶</button>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-sm" id="zoomOutBtn">➖</button>
+              <button class="btn btn-sm" id="zoomInBtn">➕</button>
+            </div>
+          </div>
+
+          <div class="btn-row" style="margin-top:0; margin-bottom:10px;">
+            <button class="btn btn-sm" id="penModeBtn">🖊️ কলম</button>
+            <button class="btn btn-sm" id="highlightModeBtn">🖍️ হাইলাইটার</button>
+            <button class="btn btn-sm" id="clearDrawBtn">🧹 মুছুন</button>
+            <button class="btn btn-sm btn-success" id="saveAnnotatedBtn">💾 পেজ সেভ</button>
+          </div>
+
+          <div class="pdf-stage">
+            <div class="pdf-canvas-wrap" id="pdfCanvasWrap">
+              <canvas id="pdfCanvas"></canvas>
+              <canvas id="drawCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Document / Text / Image Preview -->
+        <div id="docPreview" class="doc-preview" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: EDITOR ==================== -->
+    <section id="view-editor" class="view">
+      <div class="glass-card">
+        <div class="section-title">
+          <span>✍️ ডকুমেন্ট এডিটর ও PDF মেকার</span>
+          <span class="badge">বাংলা ফন্ট</span>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+          <input type="text" id="docTitleInput" class="input" placeholder="ডকুমেন্টের নাম (যেমন: HSC_ICT_Note)" style="flex:1; min-width:180px;" />
+          <select id="templateSelect" style="width:auto; min-width:140px;">
+            <option value="">📄 টেমপ্লেট নিন...</option>
+            <option value="mcq">📝 MCQ প্রশ্নপত্র</option>
+            <option value="assignment">🎓 অ্যাসাইনমেন্ট কভার</option>
+            <option value="application">✉️ বাংলা আবেদনপত্র</option>
+            <option value="notes">📒 ক্লাস নোট</option>
+          </select>
+        </div>
+
+        <div class="editor-toolbar">
+          <button class="tool-btn" data-cmd="bold"><b>B</b></button>
+          <button class="tool-btn" data-cmd="italic"><i>I</i></button>
+          <button class="tool-btn" data-cmd="underline"><u>U</u></button>
+          <button class="tool-btn" data-cmd="formatBlock" data-val="H2">H2</button>
+          <button class="tool-btn" data-cmd="formatBlock" data-val="P">P</button>
+          <button class="tool-btn" data-cmd="insertUnorderedList">• তালিকা</button>
+          <button class="tool-btn" data-cmd="insertOrderedList">1. ক্রম</button>
+          <button class="tool-btn" data-cmd="justifyLeft">⬅️</button>
+          <button class="tool-btn" data-cmd="justifyCenter">↔️</button>
+          <button class="tool-btn" id="insertTableBtn">📊 টেবিল</button>
+          <label class="tool-btn" for="editorImgInput" style="margin:0;">🖼️ ছবি</label>
+          <input type="file" id="editorImgInput" accept="image/*" />
+        </div>
+
+        <div id="editorPaper" class="editor-paper" contenteditable="true">
+          <h2 style="margin-top:0;">নতুন নোট / ডকুমেন্ট</h2>
+          <p>এখানে বাংলা বা ইংরেজিতে নির্ভুলভাবে লিখুন। লেখা শেষে নিচে থেকে সরাসরি <b>PDF</b> অথবা <b>Word (.doc)</b> হিসেবে সেভ করতে পারবেন।</p>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="exportPdfBtn">📄 PDF বানান</button>
+          <button class="btn btn-success" id="exportWordBtn">📘 Word (.doc)</button>
+          <button class="btn" id="exportTxtBtn">📝 TXT</button>
+          <button class="btn" id="saveDraftBtn">💾 ড্রাফট সেভ</button>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div class="section-title">
+          <span>🗂️ সেভ করা ড্রাফটসমূহ</span>
+          <small id="draftCount" style="color:var(--text-muted); font-weight:600;">০টি</small>
+        </div>
+        <div id="draftList" class="item-list"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: PDF TOOLS ==================== -->
+    <section id="view-tools" class="view">
+      <!-- Image to PDF -->
+      <div class="glass-card">
+        <div class="section-title"><span>🖼️ ছবি থেকে PDF (Image to PDF)</span></div>
+        <p class="subtitle">হাতে লেখা নোট বা বইয়ের পাতার একাধিক ছবি বেছে নিয়ে মুহূর্তেই একটি পরিষ্কার PDF তৈরি করুন।</p>
+        <label class="upload-box" for="imgToPdfInput">
+          <strong>📷 একাধিক ছবি নির্বাচন করুন</strong>
+          <span>JPG বা PNG ফরম্যাট</span>
+        </label>
+        <input type="file" id="imgToPdfInput" accept="image/*" multiple />
+        <div id="imgThumbGrid" class="thumb-grid"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="buildImgPdfBtn">📄 ছবিগুলো PDF করুন</button>
+          <button class="btn btn-danger" id="clearImgPdfBtn">🗑️ সব মুছুন</button>
+        </div>
+      </div>
+
+      <!-- Merge PDF -->
+      <div class="glass-card">
+        <div class="section-title"><span>🔗 একাধিক PDF জোড়া লাগান (Merge)</span></div>
+        <p class="subtitle">২ বা ততোধিক PDF ফাইল একসাথে জুড়ে একটি ফাইলে পরিণত করুন।</p>
+        <label class="upload-box" for="mergePdfInput">
+          <strong>📎 PDF ফাইলগুলো সিলেক্ট করুন</strong>
+          <span>একাধিক .pdf ফাইল যোগ করা যাবে</span>
+        </label>
+        <input type="file" id="mergePdfInput" accept=".pdf" multiple />
+        <div id="mergeFileList" class="item-list"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="mergePdfBtn">🔗 Merge করে সেভ করুন</button>
+          <button class="btn btn-danger" id="clearMergeBtn">🗑️ তালিকা মুছুন</button>
+        </div>
+      </div>
+
+      <!-- Split PDF -->
+      <div class="glass-card">
+        <div class="section-title"><span>✂️ PDF পেজ আলাদা করুন (Split)</span></div>
+        <p class="subtitle">বড় PDF থেকে শুধু প্রয়োজনীয় পেজগুলো আলাদা করে নতুন PDF বানান (যেমন: 1-3, 5)।</p>
+        <label class="upload-box" for="splitPdfInput">
+          <strong id="splitFileLabel">📄 একটি PDF ফাইল বাছুন</strong>
+          <span id="splitPageCount">পেজ সংখ্যা এখানে দেখাবে</span>
+        </label>
+        <input type="file" id="splitPdfInput" accept=".pdf" />
+        <div style="margin-top:10px;">
+          <input type="text" id="splitRangeInput" class="input" placeholder="পেজ নম্বর লিখুন (যেমন: 1-3, 5, 7-8)" />
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="splitPdfBtn">✂️ আলাদা PDF বানান</button>
+        </div>
+      </div>
+
+      <!-- Storage Info -->
+      <div class="glass-card">
+        <div class="section-title">
+          <span>📱 অ্যাপ স্টোরেজ (হালকা ও নিরাপদ)</span>
+          <span class="badge" id="storageUsedBadge">0 KB</span>
+        </div>
+        <p class="subtitle">এই অ্যাপ কোনো বিজ্ঞাপন ক্যাশ জমায় না। আপনার সব ডকুমেন্ট শুধু আপনার ফোনেই থাকে।</p>
+        <button class="btn btn-danger btn-sm" id="clearAllStorageBtn">🧹 সব সেভড ড্রাফট পরিষ্কার করুন</button>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: BIJOY FIXER ==================== -->
+    <section id="view-bijoy" class="view">
+      <div class="glass-card">
+        <div class="section-title">
+          <span>🔤 বিজয় → ইউনিকোড বাংলা কনভার্টার</span>
+          <span class="badge">বাক্স ফন্ট ফিক্স</span>
+        </div>
+        <p class="subtitle">পুরনো বিজয় (`SutonnyMJ`) ফন্টে লেখা প্রশ্ন বা নোট যা ফোনে বাক্স বা হিজিবিজি দেখায়, এখানে পেস্ট করে ১ ক্লিকে পরিষ্কার বাংলা করুন।</p>
+        <textarea id="bijoyInput" placeholder="বিজয় ফন্টের হিজিবিজি টেক্সট এখানে পেস্ট করুন (যেমন: Avgvi †mvbvi evsjv)..."></textarea>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="convertBijoyBtn">✨ ইউনিকোড বাংলা করুন</button>
+          <button class="btn" id="clearBijoyBtn">🧹 মুছুন</button>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div class="section-title"><span>✅ পরিষ্কার ইউনিকোড বাংলা আউটপুট</span></div>
+        <textarea id="unicodeOutput" placeholder="রূপান্তরিত বাংলা লেখা এখানে দেখাবে..."></textarea>
+        <div class="btn-row">
+          <button class="btn btn-success" id="copyUnicodeBtn">📋 কপি করুন</button>
+          <button class="btn btn-primary" id="unicodeToEditorBtn">✏️ এডিটরে নিয়ে PDF বানান</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="reader">
+      <span class="ico">📖</span>
+      <span>রিডার</span>
+    </button>
+    <button class="nav-btn" data-tab="editor">
+      <span class="ico">✍️</span>
+      <span>এডিটর</span>
+    </button>
+    <button class="nav-btn" data-tab="tools">
+      <span class="ico">🛠️</span>
+      <span>PDF টুলস</span>
+    </button>
+    <button class="nav-btn" data-tab="bijoy">
+      <span class="ico">🔤</span>
+      <span>বিজয় ফিক্স</span>
+    </button>
+  </nav>
+
+  <div id="toast">বার্তা</div>
+
+  <!-- Offline Local Vendor Libraries (with CDN fallback for raw browser testing) -->
+  <script src="./vendor/pdf.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js'"></script>
+  <script src="./vendor/mammoth.browser.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js'"></script>
+  <script src="./vendor/pdf-lib.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js'"></script>
+  <script src="./vendor/jspdf.umd.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'"></script>
+  <script src="./vendor/html2canvas.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'"></script>
+
+  <script>
+    // ==================== UTILITIES & CAPACITOR NATIVE SAVE ====================
+    const $ = (id) => document.getElementById(id);
+
+    let toastTimer;
+    function showToast(msg) {
+      const el = $('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const res = reader.result || '';
+          resolve(res.toString().split(',')[1] || '');
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function saveOutputFile(blob, filename) {
+      try {
+        const cap = window.Capacitor;
+        if (cap && typeof cap.isNativePlatform === 'function' && cap.isNativePlatform()) {
+          const plugins = cap.Plugins || {};
+          const Filesystem = plugins.Filesystem;
+          const Share = plugins.Share;
+          if (Filesystem) {
+            const base64Data = await blobToBase64(blob);
+            try {
+              const saved = await Filesystem.writeFile({
+                path: 'GlassDoc/' + filename,
+                data: base64Data,
+                directory: 'DOCUMENTS',
+                recursive: true
+              });
+              showToast('সেভ হয়েছে: Documents/GlassDoc/' + filename);
+              if (Share) {
+                await Share.share({
+                  title: filename,
+                  url: saved.uri,
+                  dialogTitle: 'ফাইল ওপেন বা শেয়ার করুন'
+                });
+              }
+              return;
+            } catch (docErr) {
+              const cached = await Filesystem.writeFile({
+                path: filename,
+                data: base64Data,
+                directory: 'CACHE'
+              });
+              if (Share) {
+                await Share.share({
+                  title: filename,
+                  url: cached.uri,
+                  dialogTitle: 'ফাইল সেভ বা শেয়ার করুন'
+                });
+                showToast('শেয়ার মেনু থেকে ফাইল সেভ করুন');
+                return;
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Native save fallback:', err);
+      }
+
+      // Standard Browser Download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      showToast('ডাউনলোড শুরু হয়েছে: ' + filename);
+    }
+
+    // ==================== THEME & NAVIGATION ====================
+    const savedTheme = localStorage.getItem('gd_theme') || 'dark';
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      $('themeToggle').textContent = theme === 'dark' ? '☀️ লাইট' : '🌙 ডার্ক';
+      localStorage.setItem('gd_theme', theme);
+    }
+    applyTheme(savedTheme);
+
+    $('themeToggle').addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+    });
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      const view = $('view-' + tabName);
+      if (view) view.classList.add('active');
+      const btn = document.querySelector(`.nav-btn[data-tab="${tabName}"]`);
+      if (btn) btn.classList.add('active');
+      if (tabName === 'tools') updateStorageMeter();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    // Configure PDF.js worker offline
+    function initPdfWorker() {
+      if (window.pdfjsLib) {
+        const isLocal = window.location.protocol !== 'http:' && window.location.protocol !== 'https:'
+          ? true
+          : true;
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdf.worker.min.js';
+      }
+    }
+    window.addEventListener('load', initPdfWorker);
+
+    // ==================== BIJOY TO UNICODE ENGINE ====================
+    const bijoyMap = {
+      'Av': 'আ', 'A': 'অ', 'B': 'ই', 'C': 'ঈ', 'D': 'উ', 'E': 'ঊ', 'F': 'ঋ', 'G': 'এ', 'H': 'ঐ', 'I': 'ও', 'J': 'ঔ',
+      'K': 'ক', 'L': 'খ', 'M': 'গ', 'N': 'ঘ', 'O': 'ঙ', 'P': 'চ', 'Q': 'ছ', 'R': 'জ', 'S': 'ঝ', 'T': 'ঞ',
+      'U': 'ট', 'V': 'ঠ', 'W': 'ড', 'X': 'ঢ', 'Y': 'ণ', 'Z': 'ত', '_': 'থ', '`': 'দ', 'a': 'ধ', 'b': 'ন',
+      'c': 'প', 'd': 'ফ', 'e': 'ব', 'f': 'ভ', 'g': 'ম', 'h': 'য', 'i': 'র', 'j': 'ল', 'k': 'শ', 'l': 'ষ',
+      'm': 'স', 'n': 'হ', 'o': 'ড়', 'p': 'ঢ়', 'q': 'য়', 'r': 'ৎ', 's': 'ং', 't': 'ঃ', 'u': 'ঁ',
+      '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯',
+      'v': 'া', 'w': 'ি', 'x': 'ী', 'y': 'ু', 'z': 'ু', '“': 'ু', '~': 'ূ', '‚': 'ূ', '„': 'ৃ', '†': 'ে', '‡': 'ে', '‰': 'ৈ', 'Š': 'ৈ',
+      '&': '্', '¨': '্য', 'ª': '্র', '«': '্র', '©': 'র্', '|': '।', '—': '—', '–': '–',
+      '¶': 'ক্ষ', 'ÿ': 'ক্ষ', 'Á': 'জ্ঞ', 'Â': 'ঞ্চ', 'Ã': 'ঞ্ছ', 'Ä': 'ঞ্জ', 'Å': 'ঞ্ঝ',
+      'Æ': 'ট্ট', 'Ç': 'ড্ড', 'È': 'ণ্ট', 'É': 'ণ্ঠ', 'Ê': 'ণ্ড', 'Ë': 'ত্ত', 'Ì': 'ত্থ', 'Í': 'ত্ন',
+      'Î': 'ত্র', 'Ï': 'দ্দ', 'Ð': 'দ্ধ', 'Ñ': 'দ্ব', 'Ò': 'দ্ম', 'Ó': 'ন্ত', 'Ô': 'ন্থ', 'Õ': 'ন্দ',
+      'Ö': 'ন্ধ', '×': 'ন্ন', 'Ø': 'প্ট', 'Ù': 'প্ত', 'Ú': 'প্প', 'Û': 'ব্দ', 'Ü': 'ব্ধ', 'Ý': 'ব্ব',
+      'Þ': 'ভ্র', 'ß': 'ম্প', 'à': 'ম্ফ', 'á': 'ম্ব', 'â': 'ম্ভ', 'ã': 'ম্ম', 'ä': 'ল্ক', 'å': 'ল্গ',
+      'æ': 'ল্ট', 'ç': 'ল্ড', 'è': 'ল্প', 'é': 'ল্ম', 'ê': 'ল্ল', 'ë': 'শ্চ', 'ì': 'শ্ন', 'í': 'শ্ব',
+      'î': 'শ্ম', 'ï': 'শ্ল', 'ð': 'ষ্ক', 'ñ': 'ষ্ট', 'ò': 'ষ্ঠ', 'ó': 'ষ্ণ', 'ô': 'ষ্প', 'õ': 'ষ্ফ',
+      'ö': 'ষ্ম', '÷': 'স্ক', 'ø': 'স্ট', 'ù': 'স্ত', 'ú': 'স্থ', 'û': 'স্ন', 'ü': 'স্প', 'ý': 'স্ফ',
+      'þ': 'স্ব', '¼': 'ঙ্ক', '½': 'ঙ্গ', '¾': 'চ্ছ', '¿': 'জ্জ', 'À': 'জ্ঝ', 'ˆ': 'ৈ', '‹': 'ৃ',
+      '¡': 'ক্ক', '¢': 'ক্ট', '£': 'ক্ত', '¤': 'ক্ল', '¥': 'ক্ষ', '¦': 'ক্ষ্ম', '§': 'গ্ন', '¯': 'ঙ্গ',
+      '°': 'চ্চ', '±': 'চ্ছ', '²': 'জ্জ', '³': 'জ্ঝ', '´': 'জ্ঞ', 'µ': 'ঞ্চ', '·': 'ঞ্জ'
+    };
+
+    function isLikelyBijoy(text) {
+      if (!text || text.length < 15) return false;
+      const bnChars = (text.match(/[\u0980-\u09FF]/g) || []).length;
+      if (bnChars > text.length * 0.15) return false;
+      const markers = (text.match(/[†‡‰©¨ª&vwi]|Av|evsjv|K‡i|n‡q/g) || []).length;
+      return markers >= 4;
+    }
+
+    function convertBijoyToUnicode(input) {
+      if (!input) return '';
+      let str = input;
+
+      // Replace multi-char sequences first
+      str = str.replace(/Av/g, 'আ');
+      str = str.replace(/†([\s\S]?)v/g, '$1ো');
+      str = str.replace(/‡([\s\S]?)v/g, '$1ো');
+
+      // Direct char mapping
+      let out = '';
+      for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        out += (bijoyMap[ch] !== undefined) ? bijoyMap[ch] : ch;
+      }
+
+      // Reorder pre-base vowels (ি, ে, ৈ) to follow consonant cluster
+      const preVowels = /([িেৈ])([ক-হড়-য়](?:্[ক-হড়-য়])*)/g;
+      out = out.replace(preVowels, '$2$1');
+
+      // Combine ে + া -> ো and ে + ৗ -> ৌ
+      out = out.replace(/ো/g, 'ো').replace(/ৌ/g, 'ৌ');
+
+      // Move reph (র্) before consonant cluster if placed after
+      out = out.replace(/([ক-হড়-য়](?:্[ক-হড়-য়])*)([া-ৌ]?)র্/g, 'র্$1$2');
+
+      // Clean double hasanta or stray fixes
+      out = out.replace(/অা/g, 'আ');
+      return out;
+    }
+
+    $('convertBijoyBtn').addEventListener('click', () => {
+      const val = $('bijoyInput').value;
+      if (!val.trim()) return showToast('আগে কিছু টেক্সট পেস্ট করুন');
+      $('unicodeOutput').value = convertBijoyToUnicode(val);
+      showToast('ইউনিকোড বাংলায় রূপান্তরিত হয়েছে!');
+    });
+
+    $('clearBijoyBtn').addEventListener('click', () => {
+      $('bijoyInput').value = '';
+      $('unicodeOutput').value = '';
+    });
+
+    $('copyUnicodeBtn').addEventListener('click', async () => {
+      const txt = $('unicodeOutput').value;
+      if (!txt) return showToast('কপি করার মতো লেখা নেই');
+      try {
+        await navigator.clipboard.writeText(txt);
+        showToast('কপি করা হয়েছে!');
+      } catch {
+        $('unicodeOutput').select();
+        document.execCommand('copy');
+        showToast('কপি করা হয়েছে!');
+      }
+    });
+
+    $('unicodeToEditorBtn').addEventListener('click', () => {
+      const txt = $('unicodeOutput').value.trim();
+      if (!txt) return showToast('আউটপুটে কোনো লেখা নেই');
+      $('editorPaper').innerHTML = txt.split('\n').map(l => `<p>${l || '&nbsp;'}</p>`).join('');
+      $('docTitleInput').value = 'Converted_Bangla_Doc';
+      switchTab('editor');
+      showToast('এডিটরে লোড হয়েছে! এখন PDF বানাতে পারেন।');
+    });
+
+    // ==================== TAB 1: UNIVERSAL READER & ANNOTATOR ====================
+    let pdfDoc = null;
+    let currentPage = 1;
+    let pdfScale = 1.25;
+    let drawMode = null; // null | 'pen' | 'highlight'
+    let isDrawing = false;
+    let lastLoadedDocHtml = '';
+    let lastLoadedPlainText = '';
+
+    async function renderPdfPage(num) {
+      if (!pdfDoc) return;
+      const page = await pdfDoc.getPage(num);
+      const viewport = page.getViewport({ scale: pdfScale });
+      const canvas = $('pdfCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      const drawCanvas = $('drawCanvas');
+      drawCanvas.width = viewport.width;
+      drawCanvas.height = viewport.height;
+
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      $('pageIndicator').textContent = `${num} / ${pdfDoc.numPages}`;
+    }
+
+    $('readerFileInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      $('readerContentCard').style.display = 'block';
+      $('readerFileName').textContent = file.name;
+      $('pdfControls').style.display = 'none';
+      $('docPreview').style.display = 'none';
+      $('sendToEditorBtn').style.display = 'none';
+      $('bijoyAlert').style.display = 'none';
+
+      const ext = file.name.split('.').pop().toLowerCase();
+
+      try {
+        if (ext === 'pdf') {
+          initPdfWorker();
+          const buf = await file.arrayBuffer();
+          pdfDoc = await window.pdfjsLib.getDocument({ data: buf }).promise;
+          currentPage = 1;
+          pdfScale = 1.25;
+          $('pdfControls').style.display = 'block';
+          await renderPdfPage(currentPage);
+          showToast(`PDF লোড হয়েছে (${pdfDoc.numPages} পেজ)`);
+        } else if (ext === 'docx') {
+          const buf = await file.arrayBuffer();
+          const res = await window.mammoth.convertToHtml({ arrayBuffer: buf });
+          lastLoadedDocHtml = res.value || '<p>(ফাইলটি খালি)</p>';
+          $('docPreview').innerHTML = lastLoadedDocHtml;
+          $('docPreview').style.display = 'block';
+          $('sendToEditorBtn').style.display = 'inline-flex';
+          const plain = $('docPreview').innerText;
+          lastLoadedPlainText = plain;
+          if (isLikelyBijoy(plain)) $('bijoyAlert').style.display = 'flex';
+          showToast('DOCX ফাইল লোড হয়েছে!');
+        } else if (['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext)) {
+          const url = URL.createObjectURL(file);
+          $('docPreview').innerHTML = `<img src="${url}" style="max-width:100%; border-radius:10px;" />`;
+          $('docPreview').style.display = 'block';
+          showToast('ছবি লোড হয়েছে!');
+        } else {
+          const text = await file.text();
+          lastLoadedPlainText = text;
+          if (ext === 'html' || ext === 'htm') {
+            lastLoadedDocHtml = text;
+            $('docPreview').innerHTML = text;
+          } else {
+            lastLoadedDocHtml = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>');
+            $('docPreview').innerHTML = lastLoadedDocHtml;
+          }
+          $('docPreview').style.display = 'block';
+          $('sendToEditorBtn').style.display = 'inline-flex';
+          if (isLikelyBijoy(text)) $('bijoyAlert').style.display = 'flex';
+          showToast('ফাইল লোড হয়েছে!');
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('ফাইল পড়তে সমস্যা হয়েছে: ' + (err.message || 'অজানা ত্রুটি'));
+      }
+      e.target.value = '';
+    });
+
+    $('autoFixBijoyBtn').addEventListener('click', () => {
+      const converted = convertBijoyToUnicode($('docPreview').innerText);
+      lastLoadedDocHtml = converted.split('\n').map(l => `<p>${l || '&nbsp;'}</p>`).join('');
+      $('docPreview').innerHTML = lastLoadedDocHtml;
+      $('bijoyAlert').style.display = 'none';
+      showToast('বিজয় ফন্ট ইউনিকোড বাংলায় ঠিক করা হয়েছে!');
+    });
+
+    $('sendToEditorBtn').addEventListener('click', () => {
+      $('editorPaper').innerHTML = $('docPreview').innerHTML;
+      const baseName = $('readerFileName').textContent.replace(/\.[^.]+$/, '');
+      $('docTitleInput').value = baseName + '_Edited';
+      switchTab('editor');
+      showToast('এডিটরে নেওয়া হয়েছে!');
+    });
+
+    $('nightReadBtn').addEventListener('click', () => {
+      $('pdfCanvasWrap').classList.toggle('night-invert');
+      $('docPreview').classList.toggle('night-invert');
+    });
+
+    $('prevPageBtn').addEventListener('click', () => {
+      if (pdfDoc && currentPage > 1) { currentPage--; renderPdfPage(currentPage); }
+    });
+    $('nextPageBtn').addEventListener('click', () => {
+      if (pdfDoc && currentPage < pdfDoc.numPages) { currentPage++; renderPdfPage(currentPage); }
+    });
+    $('zoomInBtn').addEventListener('click', () => {
+      if (pdfDoc && pdfScale < 2.6) { pdfScale += 0.25; renderPdfPage(currentPage); }
+    });
+    $('zoomOutBtn').addEventListener('click', () => {
+      if (pdfDoc && pdfScale > 0.6) { pdfScale -= 0.25; renderPdfPage(currentPage); }
+    });
+
+    // PDF Drawing / Annotation
+    function setDrawMode(mode) {
+      drawMode = drawMode === mode ? null : mode;
+      const dc = $('drawCanvas');
+      dc.classList.toggle('drawing-active', !!drawMode);
+      $('penModeBtn').classList.toggle('btn-primary', drawMode === 'pen');
+      $('highlightModeBtn').classList.toggle('btn-primary', drawMode === 'highlight');
+      showToast(drawMode ? (drawMode === 'pen' ? 'কলম চালু হয়েছে' : 'হাইলাইটার চালু হয়েছে') : 'আঁকা বন্ধ হয়েছে');
+    }
+
+    $('penModeBtn').addEventListener('click', () => setDrawMode('pen'));
+    $('highlightModeBtn').addEventListener('click', () => setDrawMode('highlight'));
+    $('clearDrawBtn').addEventListener('click', () => {
+      const dc = $('drawCanvas');
+      dc.getContext('2d').clearRect(0, 0, dc.width, dc.height);
+    });
+
+    const drawCanvas = $('drawCanvas');
+    const drawCtx = drawCanvas.getContext('2d');
+
+    function getCanvasPos(ev) {
+      const rect = drawCanvas.getBoundingClientRect();
+      const touch = ev.touches ? ev.touches[0] : ev;
+      return {
+        x: (touch.clientX - rect.left) * (drawCanvas.width / rect.width),
+        y: (touch.clientY - rect.top) * (drawCanvas.height / rect.height)
+      };
+    }
+
+    function startDraw(ev) {
+      if (!drawMode) return;
+      ev.preventDefault();
+      isDrawing = true;
+      const p = getCanvasPos(ev);
+      drawCtx.beginPath();
+      drawCtx.moveTo(p.x, p.y);
+      drawCtx.lineCap = 'round';
+      drawCtx.lineJoin = 'round';
+      if (drawMode === 'pen') {
+        drawCtx.strokeStyle = '#e11d48';
+        drawCtx.lineWidth = 3;
+      } else {
+        drawCtx.strokeStyle = 'rgba(250, 204, 21, 0.35)';
+        drawCtx.lineWidth = 18;
+      }
+    }
+
+    function moveDraw(ev) {
+      if (!isDrawing) return;
+      ev.preventDefault();
+      const p = getCanvasPos(ev);
+      drawCtx.lineTo(p.x, p.y);
+      drawCtx.stroke();
+    }
+
+    function endDraw() { isDrawing = false; }
+
+    drawCanvas.addEventListener('mousedown', startDraw);
+    drawCanvas.addEventListener('mousemove', moveDraw);
+    window.addEventListener('mouseup', endDraw);
+    drawCanvas.addEventListener('touchstart', startDraw, { passive: false });
+    drawCanvas.addEventListener('touchmove', moveDraw, { passive: false });
+    window.addEventListener('touchend', endDraw);
+
+    $('saveAnnotatedBtn').addEventListener('click', async () => {
+      const c1 = $('pdfCanvas');
+      const c2 = $('drawCanvas');
+      if (!c1.width) return;
+      const merged = document.createElement('canvas');
+      merged.width = c1.width;
+      merged.height = c1.height;
+      const mctx = merged.getContext('2d');
+      mctx.drawImage(c1, 0, 0);
+      mctx.drawImage(c2, 0, 0);
+      merged.toBlob((blob) => {
+        if (blob) saveOutputFile(blob, `Annotated_Page_${currentPage}.png`);
+      }, 'image/png');
+    });
+
+    // ==================== TAB 2: DOCUMENT EDITOR & EXPORT ====================
+    document.querySelectorAll('.tool-btn[data-cmd]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        $('editorPaper').focus();
+        document.execCommand(btn.dataset.cmd, false, btn.dataset.val || null);
+      });
+    });
+
+    $('insertTableBtn').addEventListener('click', () => {
+      $('editorPaper').focus();
+      const tbl = `<table><tr><th>ক্রমিক</th><th>বিষয়</th><th>মন্তব্য</th></tr><tr><td>১</td><td>উদাহরণ</td><td>সম্পন্ন</td></tr></table><p><br></p>`;
+      document.execCommand('insertHTML', false, tbl);
+    });
+
+    $('editorImgInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        $('editorPaper').focus();
+        document.execCommand('insertHTML', false, `<img src="${reader.result}" /><p><br></p>`);
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    });
+
+    const templates = {
+      mcq: `<h2 style="text-align:center;">বহুনির্বাচনি প্রশ্নপত্র (HSC / অনার্স)</h2>
+        <p style="text-align:center;"><b>বিষয়:</b> তথ্য ও যোগাযোগ প্রযুক্তি (ICT) &nbsp;|&nbsp; <b>পূর্ণমান:</b> ২৫</p><hr>
+        <p><b>১. বিশ্বগ্রাম (Global Village) ধারণার প্রবক্তা কে?</b><br>ক) মার্শাল ম্যাকলুহান &nbsp;&nbsp; খ) টিম বার্নার্স লি<br>গ) চার্লস ব্যাবেজ &nbsp;&nbsp; ঘ) অ্যাডা লাভলেস</p>
+        <p><b>২. নিচের কোনটি আউটপুট ডিভাইস?</b><br>ক) স্ক্যানার &nbsp;&nbsp; খ) ওয়েবক্যাম &nbsp;&nbsp; গ) প্লটার &nbsp;&nbsp; ঘ) মাইক্রোফোন</p>`,
+      assignment: `<div style="text-align:center; padding:18px; border:2px solid #1e293b;">
+        <h2 style="margin-bottom:4px;">অ্যাসাইনমেন্ট কভার পেজ</h2>
+        <p><b>কলেজ / বিশ্ববিদ্যালয়ের নাম:</b> আপনার প্রতিষ্ঠানের নাম</p><hr>
+        <p><b>বিষয়:</b> ____________________</p>
+        <p><b>শিরোনাম:</b> ____________________</p><br>
+        <p><b>জমাদানকারী:</b> আপনার নাম<br><b>রোল/আইডি:</b> _________ &nbsp;|&nbsp; <b>বিভাগ:</b> _________</p>
+        <p><b>জমা দেওয়ার তারিখ:</b> ___/___/২০২৬</p></div>`,
+      application: `<p>তারিখ: ___/___/২০২৬ খ্রি.</p>
+        <p>বরাবর,<br>অধ্যক্ষ / বিভাগীয় প্রধান,<br>আপনার প্রতিষ্ঠানের নাম।</p>
+        <p><b>বিষয়:</b> ছুটির জন্য আবেদন।</p>
+        <p>জনাব,<br>বিনীত নিবেদন এই যে, আমি আপনার প্রতিষ্ঠানের নিয়মিত শিক্ষার্থী। জরুরি ব্যক্তিগত কারণে আগামী ____ তারিখ থেকে ____ তারিখ পর্যন্ত ক্লাসে উপস্থিত থাকতে পারব না।</p>
+        <p>অতএব, মহোদয়ের নিকট প্রার্থনা, আমাকে উক্ত দিনগুলোর ছুটি মঞ্জুর করে বাধিত করবেন।</p>
+        <p>বিনীত নিবেদক,<br>আপনার নাম<br>রোল নং: _____</p>`,
+      notes: `<h2>ক্লাস নোট — অধ্যায় ০১</h2>
+        <p><b>তারিখ:</b> আজকের তারিখ</p>
+        <ul><li><b>মূল পয়েন্ট ১:</b> এখানে ব্যাখ্যা লিখুন...</li><li><b>মূল পয়েন্ট ২:</b> গুরুত্বপূর্ণ সূত্র বা সংজ্ঞা লিখুন...</li></ul>`
+    };
+
+    $('templateSelect').addEventListener('change', (e) => {
+      if (templates[e.target.value]) {
+        $('editorPaper').innerHTML = templates[e.target.value];
+        $('docTitleInput').value = e.target.value.toUpperCase() + '_Doc';
+        showToast('টেমপ্লেট লোড হয়েছে!');
+      }
+      e.target.value = '';
+    });
+
+    // Multi-page Bangla-perfect PDF Export via html2canvas + jsPDF
+    $('exportPdfBtn').addEventListener('click', async () => {
+      showToast('PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...');
+      try {
+        const paper = $('editorPaper');
+        const canvas = await window.html2canvas(paper, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff'
+        });
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageW = 210;
+        const pageH = 297;
+        const margin = 12;
+        const imgW = pageW - margin * 2;
+        const imgH = (canvas.height * imgW) / canvas.width;
+        const imgData = canvas.toDataURL('image/jpeg', 0.94);
+
+        let heightLeft = imgH;
+        let position = margin;
+
+        pdf.addImage(imgData, 'JPEG', margin, position, imgW, imgH);
+        heightLeft -= (pageH - margin * 2);
+
+        while (heightLeft > 0) {
+          position = heightLeft - imgH + margin;
+          pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', margin, position, imgW, imgH);
+          heightLeft -= (pageH - margin * 2);
+        }
+
+        const safeName = ($('docTitleInput').value.trim() || 'GlassDoc_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
+        const blob = pdf.output('blob');
+        await saveOutputFile(blob, safeName + '.pdf');
+      } catch (err) {
+        console.error(err);
+        showToast('PDF তৈরিতে সমস্যা হয়েছে');
+      }
+    });
+
+    $('exportWordBtn').addEventListener('click', async () => {
+      const safeName = ($('docTitleInput').value.trim() || 'GlassDoc_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
+      const html = `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>body{font-family:'Noto Sans Bengali','Kalpurush',sans-serif;line-height:1.7;}</style></head><body>${$('editorPaper').innerHTML}</body></html>`;
+      const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+      await saveOutputFile(blob, safeName + '.doc');
+    });
+
+    $('exportTxtBtn').addEventListener('click', async () => {
+      const safeName = ($('docTitleInput').value.trim() || 'GlassDoc_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
+      const blob = new Blob([$('editorPaper').innerText], { type: 'text/plain;charset=utf-8' });
+      await saveOutputFile(blob, safeName + '.txt');
+    });
+
+    // Drafts Manager
+    function getDrafts() {
+      try { return JSON.parse(localStorage.getItem('gd_drafts') || '[]'); }
+      catch { return []; }
+    }
+
+    function renderDrafts() {
+      const drafts = getDrafts();
+      $('draftCount').textContent = drafts.length + 'টি';
+      const list = $('draftList');
+      if (!drafts.length) {
+        list.innerHTML = '<div style="font-size:12.5px; color:var(--text-muted);">এখনো কোনো ড্রাফট সেভ করা হয়নি।</div>';
+        return;
+      }
+      list.innerHTML = drafts.map((d, i) => `
+        <div class="list-item">
+          <div class="list-item-info">
+            <b>${d.title}</b>
+            <small>${d.date}</small>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-sm btn-primary" onclick="loadDraft(${i})">খুলুন</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteDraft(${i})">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.loadDraft = (idx) => {
+      const drafts = getDrafts();
+      if (!drafts[idx]) return;
+      $('docTitleInput').value = drafts[idx].title;
+      $('editorPaper').innerHTML = drafts[idx].html;
+      showToast('ড্রাফট লোড হয়েছে!');
+    };
+
+    window.deleteDraft = (idx) => {
+      const drafts = getDrafts();
+      drafts.splice(idx, 1);
+      localStorage.setItem('gd_drafts', JSON.stringify(drafts));
+      renderDrafts();
+      showToast('ড্রাফট মুছে ফেলা হয়েছে');
+    };
+
+    $('saveDraftBtn').addEventListener('click', () => {
+      const title = $('docTitleInput').value.trim() || ('নোট ' + (getDrafts().length + 1));
+      const drafts = getDrafts();
+      drafts.unshift({
+        title,
+        html: $('editorPaper').innerHTML,
+        date: new Date().toLocaleString('bn-BD')
+      });
+      localStorage.setItem('gd_drafts', JSON.stringify(drafts.slice(0, 30)));
+      renderDrafts();
+      showToast('ড্রাফট ফোনে সেভ হয়েছে!');
+    });
+
+    renderDrafts();
+
+    // ==================== TAB 3: PDF TOOLS ====================
+    // 1. Image to PDF
+    let imgFiles = [];
+    function renderImgThumbs() {
+      const grid = $('imgThumbGrid');
+      grid.innerHTML = imgFiles.map((item, idx) => `
+        <div class="thumb-card">
+          <img src="${item.url}" alt="img" />
+          <button class="thumb-del" onclick="removeImg(${idx})">×</button>
+        </div>
+      `).join('');
+    }
+    window.removeImg = (idx) => {
+      URL.revokeObjectURL(imgFiles[idx].url);
+      imgFiles.splice(idx, 1);
+      renderImgThumbs();
+    };
+
+    $('imgToPdfInput').addEventListener('change', (e) => {
+      for (const f of e.target.files) {
+        imgFiles.push({ file: f, url: URL.createObjectURL(f) });
+      }
+      renderImgThumbs();
+      e.target.value = '';
+    });
+
+    $('clearImgPdfBtn').addEventListener('click', () => {
+      imgFiles.forEach(i => URL.revokeObjectURL(i.url));
+      imgFiles = [];
+      renderImgThumbs();
+    });
+
+    $('buildImgPdfBtn').addEventListener('click', async () => {
+      if (!imgFiles.length) return showToast('আগে অন্তত ১টি ছবি বাছুন');
+      showToast('ছবি থেকে PDF তৈরি হচ্ছে...');
+      try {
+        const { PDFDocument } = window.PDFLib;
+        const doc = await PDFDocument.create();
+        for (const item of imgFiles) {
+          // Normalize any image via canvas to clean JPEG so WebP/PNG/JPG all work seamlessly
+          const img = new Image();
+          img.src = item.url;
+          await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+          const c = document.createElement('canvas');
+          c.width = img.naturalWidth;
+          c.height = img.naturalHeight;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, c.width, c.height);
+          ctx.drawImage(img, 0, 0);
+          const jpgBytes = await fetch(c.toDataURL('image/jpeg', 0.88)).then(r => r.arrayBuffer());
+          const embedded = await doc.embedJpg(jpgBytes);
+          const a4W = 595.28, a4H = 841.89, pad = 24;
+          const scale = Math.min((a4W - pad * 2) / embedded.width, (a4H - pad * 2) / embedded.height);
+          const w = embedded.width * scale;
+          const h = embedded.height * scale;
+          const page = doc.addPage([a4W, a4H]);
+          page.drawImage(embedded, { x: (a4W - w) / 2, y: (a4H - h) / 2, width: w, height: h });
+        }
+        const pdfBytes = await doc.save();
+        await saveOutputFile(new Blob([pdfBytes], { type: 'application/pdf' }), 'GlassDoc_Images.pdf');
+      } catch (err) {
+        console.error(err);
+        showToast('ছবি থেকে PDF তৈরিতে সমস্যা হয়েছে');
+      }
+    });
+
+    // 2. Merge PDF
+    let mergeFiles = [];
+    function renderMergeList() {
+      $('mergeFileList').innerHTML = mergeFiles.map((f, i) => `
+        <div class="list-item">
+          <div class="list-item-info"><b>${i + 1}. ${f.name}</b><small>${(f.size / 1024).toFixed(1)} KB</small></div>
+          <button class="btn btn-sm btn-danger" onclick="removeMergeFile(${i})">×</button>
+        </div>
+      `).join('');
+    }
+    window.removeMergeFile = (i) => { mergeFiles.splice(i, 1); renderMergeList(); };
+
+    $('mergePdfInput').addEventListener('change', (e) => {
+      for (const f of e.target.files) mergeFiles.push(f);
+      renderMergeList();
+      e.target.value = '';
+    });
+
+    $('clearMergeBtn').addEventListener('click', () => { mergeFiles = []; renderMergeList(); });
+
+    $('mergePdfBtn').addEventListener('click', async () => {
+      if (mergeFiles.length < 2) return showToast('কমপক্ষে ২টি PDF ফাইল সিলেক্ট করুন');
+      showToast('PDF জোড়া লাগানো হচ্ছে...');
+      try {
+        const { PDFDocument } = window.PDFLib;
+        const merged = await PDFDocument.create();
+        for (const f of mergeFiles) {
+          const bytes = await f.arrayBuffer();
+          const src = await PDFDocument.load(bytes);
+          const pages = await merged.copyPages(src, src.getPageIndices());
+          pages.forEach(p => merged.addPage(p));
+        }
+        const out = await merged.save();
+        await saveOutputFile(new Blob([out], { type: 'application/pdf' }), 'GlassDoc_Merged.pdf');
+      } catch (err) {
+        console.error(err);
+        showToast('PDF Merge করতে সমস্যা হয়েছে');
+      }
+    });
+
+    // 3. Split PDF
+    let splitSrcBytes = null;
+    let splitTotalPages = 0;
+
+    $('splitPdfInput').addEventListener('change', async (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      try {
+        splitSrcBytes = await f.arrayBuffer();
+        const { PDFDocument } = window.PDFLib;
+        const doc = await PDFDocument.load(splitSrcBytes);
+        splitTotalPages = doc.getPageCount();
+        $('splitFileLabel').textContent = '📄 ' + f.name;
+        $('splitPageCount').textContent = `মোট পেজ: ${splitTotalPages}টি`;
+        $('splitRangeInput').value = splitTotalPages > 1 ? `1-${Math.min(2, splitTotalPages)}` : '1';
+      } catch (err) {
+        showToast('PDF পড়া যায়নি');
+      }
+      e.target.value = '';
+    });
+
+    function parsePageRanges(str, max) {
+      const indices = new Set();
+      str.split(',').forEach(part => {
+        const p = part.trim();
+        if (!p) return;
+        if (p.includes('-')) {
+          const [a, b] = p.split('-').map(n => parseInt(n.trim(), 10));
+          if (!isNaN(a) && !isNaN(b)) {
+            for (let i = Math.max(1, a); i <= Math.min(max, b); i++) indices.add(i - 1);
+          }
+        } else {
+          const n = parseInt(p, 10);
+          if (!isNaN(n) && n >= 1 && n <= max) indices.add(n - 1);
+        }
+      });
+      return Array.from(indices).sort((a, b) => a - b);
+    }
+
+    $('splitPdfBtn').addEventListener('click', async () => {
+      if (!splitSrcBytes) return showToast('আগে একটি PDF বাছুন');
+      const pagesIdx = parsePageRanges($('splitRangeInput').value, splitTotalPages);
+      if (!pagesIdx.length) return showToast('সঠিক পেজ নম্বর দিন (যেমন: 1-3, 5)');
+      showToast('পেজ আলাদা করা হচ্ছে...');
+      try {
+        const { PDFDocument } = window.PDFLib;
+        const src = await PDFDocument.load(splitSrcBytes);
+        const dest = await PDFDocument.create();
+        const copied = await dest.copyPages(src, pagesIdx);
+        copied.forEach(p => dest.addPage(p));
+        const out = await dest.save();
+        await saveOutputFile(new Blob([out], { type: 'application/pdf' }), 'GlassDoc_Split.pdf');
+      } catch (err) {
+        showToast('Split করতে সমস্যা হয়েছে');
+      }
+    });
+
+    // Storage Meter
+    function updateStorageMeter() {
+      let bytes = 0;
+      for (const k in localStorage) {
+        if (Object.prototype.hasOwnProperty.call(localStorage, k)) {
+          bytes += (localStorage[k].length + k.length) * 2;
+        }
+      }
+      $('storageUsedBadge').textContent = (bytes / 1024).toFixed(1) + ' KB';
+    }
+    updateStorageMeter();
+
+    $('clearAllStorageBtn').addEventListener('click', () => {
+      localStorage.removeItem('gd_drafts');
+      renderDrafts();
+      updateStorageMeter();
+      showToast('সব ড্রাফট পরিষ্কার করা হয়েছে!');
+    });
+  </script>
+</body>
+</html>
