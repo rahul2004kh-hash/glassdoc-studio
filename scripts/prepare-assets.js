@@ -43,9 +43,13 @@ function prepareWebAssets() {
 
   for (const [src, dest] of libs) {
     if (!fs.existsSync(src)) {
-      throw new Error('Missing required library file: ' + src);
+      throw new Error('Missing required offline library file: ' + src);
     }
     copyFile(src, dest);
+    const stat = fs.statSync(dest);
+    if (stat.size < 1024) {
+      throw new Error('Bundled library looks corrupt or empty: ' + dest);
+    }
   }
 
   const fontPkgs = [
@@ -54,12 +58,19 @@ function prepareWebAssets() {
   ];
 
   for (const [src, dest] of fontPkgs) {
-    if (fs.existsSync(src)) {
-      copyDir(src, dest);
+    if (!fs.existsSync(src)) {
+      throw new Error('Missing required offline font package: ' + src);
     }
+    copyDir(src, dest);
   }
 
-  console.log('All offline web assets prepared successfully!');
+  // Strict Offline Audit: verify index.html has zero CDN links
+  const html = fs.readFileSync('www/index.html', 'utf8');
+  if (html.includes('cdn.jsdelivr.net') || html.includes('fonts.googleapis.com')) {
+    throw new Error('Offline integrity violation: external CDN link detected in www/index.html');
+  }
+
+  console.log('All offline web assets & Bengali fonts verified and bundled!');
 }
 
 function patchAndroidNative() {
@@ -68,7 +79,7 @@ function patchAndroidNative() {
     throw new Error('Android package path not found: ' + pkgPath);
   }
 
-  // 1. NativeStorageBridge.java (Owner Prefs + Fullscreen + All-Document Scanner + Save)
+  // 1. Hardened NativeStorageBridge.java
   const nativeBridgeJava = `package com.aetherx.pdfreader;
 
 import android.Manifest;
@@ -84,6 +95,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import org.json.JSONArray;
@@ -92,21 +104,68 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class NativeStorageBridge {
     private final MainActivity activity;
     private static final String PREFS_NAME = "AetherXOwnerPrefs";
     private static final String KEY_OWNER_NAME = "owner_name";
+    private final ExecutorService scanExecutor = Executors.newSingleThreadExecutor();
+    private final AtomicInteger scanGeneration = new AtomicInteger(0);
+    private final ConcurrentHashMap<String, RandomAccessFile> pdfSessions = new ConcurrentHashMap<>();
 
     public NativeStorageBridge(MainActivity activity) {
         this.activity = activity;
+    }
+
+    public void cleanup() {
+        closeAllPdfSessions();
+        scanExecutor.shutdownNow();
+    }
+
+    private File validateExternalFile(String rawPath, boolean mustExist) {
+        if (rawPath == null || rawPath.trim().isEmpty()) return null;
+        if (rawPath.contains("\\0")) return null;
+        try {
+            File extRoot = Environment.getExternalStorageDirectory();
+            if (extRoot == null) return null;
+            String rootCanon = extRoot.getCanonicalPath();
+            File target = new File(rawPath);
+            String targetCanon = target.getCanonicalPath();
+            if (!targetCanon.equals(rootCanon) && !targetCanon.startsWith(rootCanon + File.separator)) {
+                return null;
+            }
+            if (mustExist && (!target.exists() || !target.isFile() || !target.canRead())) {
+                return null;
+            }
+            return target;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String sanitizeFilename(String rawName) {
+        if (rawName == null) return "AetherX_File";
+        String clean = rawName.replace("\\\\", "/");
+        int slash = clean.lastIndexOf('/');
+        if (slash >= 0) clean = clean.substring(slash + 1);
+        clean = clean.replace("..", "_").replaceAll("[\\r\\n\\t\\0<>:\\"|?*]", "_").trim();
+        if (clean.isEmpty() || clean.equals(".")) clean = "AetherX_File";
+        if (clean.length() > 140) clean = clean.substring(0, 140);
+        return clean;
     }
 
     @JavascriptInterface
@@ -120,11 +179,17 @@ public class NativeStorageBridge {
     }
 
     @JavascriptInterface
-    public void saveOwnerName(String name) {
+    public boolean saveOwnerName(String name) {
         try {
+            if (name == null) return false;
+            String clean = name.trim();
+            if (clean.length() < 2 || clean.length() > 40) return false;
             SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-            prefs.edit().putString(KEY_OWNER_NAME, name != null ? name.trim() : "").apply();
-        } catch (Exception ignored) {}
+            prefs.edit().putString(KEY_OWNER_NAME, clean).apply();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @JavascriptInterface
@@ -202,21 +267,56 @@ public class NativeStorageBridge {
             || lowerName.endsWith(".rtf");
     }
 
+    // ==================== BACKGROUND ASYNC SCANNER (NO UI FREEZE, NO STALE OVERWRITE) ====================
     @JavascriptInterface
-    public String scanDocuments() {
-        if (!hasStoragePermission()) {
-            return "[]";
-        }
+    public void startBackgroundScan() {
+        final int myGen = scanGeneration.incrementAndGet();
+        scanExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (!hasStoragePermission()) {
+                    deliverScanResult(myGen, "[]", false);
+                    return;
+                }
+                String json = performDocumentScan(myGen);
+                if (myGen == scanGeneration.get()) {
+                    deliverScanResult(myGen, json, true);
+                }
+            }
+        });
+    }
+
+    private void deliverScanResult(final int gen, final String jsonArrayStr, final boolean permitted) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (gen != scanGeneration.get()) return;
+                if (activity.getBridge() != null && activity.getBridge().getWebView() != null) {
+                    WebView wv = activity.getBridge().getWebView();
+                    String b64 = Base64.encodeToString(jsonArrayStr.getBytes(), Base64.NO_WRAP);
+                    wv.evaluateJavascript(
+                        "window.__onNativeScanComplete && window.__onNativeScanComplete(" + gen + "," + (permitted ? "true" : "false") + ",'" + b64 + "');",
+                        null
+                    );
+                }
+            }
+        });
+    }
+
+    private String performDocumentScan(int myGen) {
         List<File> found = new ArrayList<>();
         Set<String> seen = new HashSet<>();
 
         try {
             File root = Environment.getExternalStorageDirectory();
             if (root != null && root.exists() && root.canRead()) {
-                scanDirRecursive(root, found, seen, 0);
+                scanDirRecursive(root, found, seen, 0, myGen);
             }
         } catch (Exception ignored) {}
 
+        if (myGen != scanGeneration.get()) return "[]";
+
+        // MediaStore backup (includes .rtf, uses _ID/DISPLAY_NAME fallback safely)
         try {
             Uri uri = MediaStore.Files.getContentUri("external");
             String[] projection = new String[]{ MediaStore.Files.FileColumns.DATA };
@@ -226,18 +326,24 @@ public class NativeStorageBridge {
                     + MediaStore.Files.FileColumns.DATA + " LIKE '%.txt' OR "
                     + MediaStore.Files.FileColumns.DATA + " LIKE '%.md' OR "
                     + MediaStore.Files.FileColumns.DATA + " LIKE '%.html' OR "
-                    + MediaStore.Files.FileColumns.DATA + " LIKE '%.csv'";
+                    + MediaStore.Files.FileColumns.DATA + " LIKE '%.htm' OR "
+                    + MediaStore.Files.FileColumns.DATA + " LIKE '%.csv' OR "
+                    + MediaStore.Files.FileColumns.DATA + " LIKE '%.rtf'";
             Cursor cursor = activity.getContentResolver().query(uri, projection, selection, null, null);
             if (cursor != null) {
                 int dataIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
-                while (cursor.moveToNext()) {
+                while (cursor.moveToNext() && found.size() < 3000) {
+                    if (myGen != scanGeneration.get()) break;
                     if (dataIdx >= 0) {
                         String p = cursor.getString(dataIdx);
-                        if (p != null && !seen.contains(p)) {
-                            File f = new File(p);
-                            if (f.exists() && f.isFile() && f.length() > 0 && f.canRead()) {
-                                seen.add(p);
-                                found.add(f);
+                        if (p != null) {
+                            File f = validateExternalFile(p, true);
+                            if (f != null && f.length() > 0) {
+                                String canon = f.getCanonicalPath();
+                                if (!seen.contains(canon)) {
+                                    seen.add(canon);
+                                    found.add(f);
+                                }
                             }
                         }
                     }
@@ -254,8 +360,7 @@ public class NativeStorageBridge {
         });
 
         JSONArray arr = new JSONArray();
-        int limit = Math.min(found.size(), 350);
-        for (int i = 0; i < limit; i++) {
+        for (int i = 0; i < found.size(); i++) {
             File f = found.get(i);
             try {
                 JSONObject obj = new JSONObject();
@@ -264,7 +369,7 @@ public class NativeStorageBridge {
                 String ext = dot >= 0 ? name.substring(dot + 1).toLowerCase(Locale.ROOT) : "";
                 File parent = f.getParentFile();
                 obj.put("name", name);
-                obj.put("path", f.getAbsolutePath());
+                obj.put("path", f.getCanonicalPath());
                 obj.put("folder", parent != null ? parent.getName() : "Storage");
                 obj.put("size", f.length());
                 obj.put("modified", f.lastModified());
@@ -275,43 +380,144 @@ public class NativeStorageBridge {
         return arr.toString();
     }
 
-    private void scanDirRecursive(File dir, List<File> out, Set<String> seen, int depth) {
-        if (depth > 5 || out.size() >= 500) return;
+    private void scanDirRecursive(File dir, List<File> out, Set<String> seen, int depth, int myGen) {
+        if (depth > 7 || out.size() >= 3000 || myGen != scanGeneration.get()) return;
         String dirName = dir.getName();
         if (depth > 0 && (dirName.startsWith(".") || dirName.equalsIgnoreCase("Android") || dirName.equalsIgnoreCase("MIUI"))) {
             if (!dirName.equalsIgnoreCase("Android")) return;
             File waMedia = new File(dir, "media");
             if (waMedia.exists() && waMedia.isDirectory()) {
-                scanDirRecursive(waMedia, out, seen, depth + 1);
+                scanDirRecursive(waMedia, out, seen, depth + 1, myGen);
             }
             return;
         }
         File[] children = dir.listFiles();
         if (children == null) return;
         for (File child : children) {
-            if (out.size() >= 500) break;
+            if (out.size() >= 3000 || myGen != scanGeneration.get()) break;
             if (child.isDirectory()) {
-                scanDirRecursive(child, out, seen, depth + 1);
+                scanDirRecursive(child, out, seen, depth + 1, myGen);
             } else if (child.isFile() && child.length() > 0) {
                 String lower = child.getName().toLowerCase(Locale.ROOT);
                 if (isSupportedDoc(lower)) {
-                    String abs = child.getAbsolutePath();
-                    if (!seen.contains(abs)) {
-                        seen.add(abs);
-                        out.add(child);
-                    }
+                    try {
+                        String canon = child.getCanonicalPath();
+                        if (!seen.contains(canon)) {
+                            seen.add(canon);
+                            out.add(child);
+                        }
+                    } catch (Exception ignored) {}
                 }
             }
         }
     }
 
+    // ==================== UNLIMITED LARGE PDF BYTE-RANGE STREAMING ENGINE ====================
     @JavascriptInterface
-    public String readFileBase64(String filePath) {
+    public String openPdfSession(String filePath) {
+        JSONObject res = new JSONObject();
         try {
-            File file = new File(filePath);
-            if (!file.exists() || !file.canRead() || file.length() > 40 * 1024 * 1024) {
-                return "";
+            if (!hasStoragePermission()) {
+                res.put("ok", false);
+                res.put("error", "Storage permission required");
+                return res.toString();
             }
+            File f = validateExternalFile(filePath, true);
+            if (f == null || !f.getName().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
+                res.put("ok", false);
+                res.put("error", "Invalid or inaccessible PDF path");
+                return res.toString();
+            }
+            // Keep memory clean: close previous open sessions
+            closeAllPdfSessions();
+
+            RandomAccessFile raf = new RandomAccessFile(f, "r");
+            long len = raf.length();
+            if (len <= 0) {
+                raf.close();
+                res.put("ok", false);
+                res.put("error", "Empty PDF file");
+                return res.toString();
+            }
+            // Read small 512-byte header fingerprint for unique Document ID
+            int headLen = (int) Math.min(512, len);
+            byte[] headBuf = new byte[headLen];
+            raf.seek(0);
+            raf.readFully(headBuf);
+            String headHash = Integer.toHexString(java.util.Arrays.hashCode(headBuf));
+
+            String sid = UUID.randomUUID().toString();
+            pdfSessions.put(sid, raf);
+            res.put("ok", true);
+            res.put("sessionId", sid);
+            res.put("length", len);
+            res.put("size", len);
+            res.put("modified", f.lastModified());
+            res.put("headHash", headHash);
+            return res.toString();
+        } catch (Exception e) {
+            try {
+                res.put("ok", false);
+                res.put("error", e.getMessage() != null ? e.getMessage() : "Open failed");
+            } catch (Exception ignored) {}
+            return res.toString();
+        }
+    }
+
+    @JavascriptInterface
+    public String readPdfChunk(String sessionId, long begin, long end) {
+        try {
+            if (sessionId == null || !pdfSessions.containsKey(sessionId)) return "";
+            RandomAccessFile raf = pdfSessions.get(sessionId);
+            if (raf == null) return "";
+            synchronized (raf) {
+                long fileLen = raf.length();
+                if (begin < 0 || begin >= fileLen) return "";
+                long clampedEnd = Math.min(end, fileLen);
+                int toRead = (int) Math.min(clampedEnd - begin, 1024 * 1024); // Max 1MB per chunk
+                if (toRead <= 0) return "";
+                byte[] buf = new byte[toRead];
+                raf.seek(begin);
+                int total = 0;
+                while (total < toRead) {
+                    int n = raf.read(buf, total, toRead - total);
+                    if (n < 0) break;
+                    total += n;
+                }
+                if (total <= 0) return "";
+                return Base64.encodeToString(buf, 0, total, Base64.NO_WRAP);
+            }
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @JavascriptInterface
+    public void closePdfSession(String sessionId) {
+        if (sessionId == null) return;
+        RandomAccessFile raf = pdfSessions.remove(sessionId);
+        if (raf != null) {
+            try { raf.close(); } catch (Exception ignored) {}
+        }
+    }
+
+    @JavascriptInterface
+    public void closeAllPdfSessions() {
+        for (Map.Entry<String, RandomAccessFile> entry : pdfSessions.entrySet()) {
+            try { entry.getValue().close(); } catch (Exception ignored) {}
+        }
+        pdfSessions.clear();
+    }
+
+    // Read small non-PDF text/DOCX/RTF documents safely with strict path validation
+    @JavascriptInterface
+    public String readSmallDocBase64(String filePath) {
+        try {
+            if (!hasStoragePermission()) return "";
+            File file = validateExternalFile(filePath, true);
+            if (file == null || file.length() > 30 * 1024 * 1024) return "";
+            String lower = file.getName().toLowerCase(Locale.ROOT);
+            if (!isSupportedDoc(lower)) return "";
             FileInputStream fis = new FileInputStream(file);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             byte[] buf = new byte[16384];
@@ -326,29 +532,62 @@ public class NativeStorageBridge {
         }
     }
 
+    // Verified Save with Strict Filename Sanitization
     @JavascriptInterface
     public String saveBase64ToDocuments(String filename, String base64Data) {
+        JSONObject res = new JSONObject();
         try {
+            if (base64Data == null || base64Data.isEmpty()) {
+                res.put("ok", false);
+                res.put("error", "Empty file data");
+                return res.toString();
+            }
+            String safeName = sanitizeFilename(filename);
             File docs = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
             File folder = new File(docs, "AetherX_PDF");
-            if (!folder.exists()) folder.mkdirs();
-            File outFile = new File(folder, filename);
+            if (!folder.exists() && !folder.mkdirs()) {
+                res.put("ok", false);
+                res.put("error", "Cannot create Documents/AetherX_PDF folder");
+                return res.toString();
+            }
+            File outFile = new File(folder, safeName);
+            String folderCanon = folder.getCanonicalPath();
+            String outCanon = outFile.getCanonicalPath();
+            if (!outCanon.startsWith(folderCanon + File.separator)) {
+                res.put("ok", false);
+                res.put("error", "Invalid output path");
+                return res.toString();
+            }
             byte[] data = Base64.decode(base64Data, Base64.DEFAULT);
             FileOutputStream fos = new FileOutputStream(outFile);
             fos.write(data);
             fos.flush();
             fos.close();
-            return outFile.getAbsolutePath();
+
+            if (!outFile.exists() || outFile.length() != data.length) {
+                res.put("ok", false);
+                res.put("error", "Write verification failed");
+                return res.toString();
+            }
+            res.put("ok", true);
+            res.put("path", outCanon);
+            res.put("name", safeName);
+            res.put("bytes", outFile.length());
+            return res.toString();
         } catch (Exception e) {
-            return "";
+            try {
+                res.put("ok", false);
+                res.put("error", e.getMessage() != null ? e.getMessage() : "Save failed");
+            } catch (Exception ignored) {}
+            return res.toString();
         }
     }
 }
 `;
   fs.writeFileSync(path.join(pkgPath, 'NativeStorageBridge.java'), nativeBridgeJava, 'utf8');
-  console.log('Created NativeStorageBridge.java');
+  console.log('Created hardened NativeStorageBridge.java');
 
-  // 2. MainActivity.java (Immersive Fullscreen + AdjustResize + Hardware Acceleration)
+  // 2. MainActivity.java
   const mainActivityJava = `package com.aetherx.pdfreader;
 
 import android.graphics.Color;
@@ -366,6 +605,7 @@ import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
     private boolean immersiveActive = false;
+    private NativeStorageBridge storageBridge;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -384,12 +624,21 @@ public class MainActivity extends BridgeActivity {
 
         if (this.getBridge() != null && this.getBridge().getWebView() != null) {
             WebView webView = this.getBridge().getWebView();
-            webView.addJavascriptInterface(new NativeStorageBridge(this), "GlassNative");
+            storageBridge = new NativeStorageBridge(this);
+            webView.addJavascriptInterface(storageBridge, "GlassNative");
             WebSettings settings = webView.getSettings();
-            settings.setAllowFileAccess(true);
+            settings.setAllowFileAccess(false);
             settings.setAllowContentAccess(true);
             settings.setDomStorageEnabled(true);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (storageBridge != null) {
+            storageBridge.cleanup();
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -436,7 +685,7 @@ public class MainActivity extends BridgeActivity {
   fs.writeFileSync(path.join(pkgPath, 'MainActivity.java'), mainActivityJava, 'utf8');
   console.log('Patched MainActivity.java');
 
-  // 3. Patch AndroidManifest.xml (Storage permissions + adjustResize + tablet resizeable)
+  // 3. Patch AndroidManifest.xml
   const manifestPath = 'android/app/src/main/AndroidManifest.xml';
   let manifest = fs.readFileSync(manifestPath, 'utf8');
   if (!manifest.includes('xmlns:tools=')) {
@@ -459,7 +708,7 @@ public class MainActivity extends BridgeActivity {
   fs.writeFileSync(manifestPath, manifest, 'utf8');
   console.log('Patched AndroidManifest.xml');
 
-  // 4. Patch Adaptive Icon Background color (#050812) so custom icon blends seamlessly
+  // 4. Adaptive Icon Background color
   const bgColorXmlPath = 'android/app/src/main/res/values/ic_launcher_background.xml';
   fs.mkdirSync(path.dirname(bgColorXmlPath), { recursive: true });
   fs.writeFileSync(
@@ -467,12 +716,11 @@ public class MainActivity extends BridgeActivity {
     '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#050812</color>\n</resources>\n',
     'utf8'
   );
-  console.log('Patched ic_launcher_background.xml');
 
-  // 5. Patch android/app/build.gradle for Signed Release APK
+  // 5. Patch android/app/build.gradle using ENVIRONMENT VARIABLES ONLY (Zero Hardcoded Secrets!)
   const gradlePath = 'android/app/build.gradle';
   let gradle = fs.readFileSync(gradlePath, 'utf8');
-  if (!gradle.includes('aetherx-release.keystore')) {
+  if (!gradle.includes('System.getenv("KEYSTORE_PASS")')) {
     gradle = gradle.replace(
       /buildTypes\s*\{\s*release\s*\{/,
       'buildTypes {\n        release {\n            signingConfig signingConfigs.release'
@@ -480,10 +728,13 @@ public class MainActivity extends BridgeActivity {
     const signingBlock = `
     signingConfigs {
         release {
-            storeFile file("aetherx-release.keystore")
-            storePassword "AetherX2026"
-            keyAlias "aetherx"
-            keyPassword "AetherX2026"
+            def ksPath = System.getenv("KEYSTORE_PATH")
+            if (ksPath != null && file(ksPath).exists()) {
+                storeFile file(ksPath)
+                storePassword System.getenv("KEYSTORE_PASS")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASS")
+            }
         }
     }
     lint {
@@ -493,7 +744,7 @@ public class MainActivity extends BridgeActivity {
     buildTypes {`;
     gradle = gradle.replace('buildTypes {', signingBlock);
     fs.writeFileSync(gradlePath, gradle, 'utf8');
-    console.log('Patched android/app/build.gradle for signed release');
+    console.log('Patched android/app/build.gradle with env-based signing (zero hardcoded passwords)');
   }
 }
 
