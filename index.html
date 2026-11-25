@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#050812" />
-  <title>GlassDoc Studio v2.1 — শিক্ষার্থী এডিশন</title>
+  <title>GlassDoc Studio v2.2 — শিক্ষার্থী এডিশন</title>
 
   <!-- 100% Offline Bundled Bengali Fonts -->
   <link rel="stylesheet" href="./fonts/noto-sans-bengali/400.css" />
@@ -17,7 +17,7 @@
       --font-bn: 'Noto Sans Bengali', 'Hind Siliguri', system-ui, -apple-system, sans-serif;
       --bg-base: #050812;
       --glass-surface: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
-      --glass-surface-strong: rgba(10, 17, 32, 0.76);
+      --glass-surface-strong: rgba(10, 17, 32, 0.78);
       --glass-pill: rgba(255, 255, 255, 0.085);
       --glass-border: rgba(255, 255, 255, 0.18);
       --glass-border-soft: rgba(255, 255, 255, 0.10);
@@ -28,9 +28,9 @@
       --accent: #38bdf8;
       --accent-2: #818cf8;
       --accent-glow: rgba(56, 189, 248, 0.36);
+      --gold: #fbbf24;
       --success: #34d399;
       --danger: #fb7185;
-      --warning: #fbbf24;
       --paper-bg: #ffffff;
       --paper-text: #0f172a;
       --radius: 22px;
@@ -41,7 +41,7 @@
     [data-theme="light"] {
       --bg-base: #e7eef9;
       --glass-surface: linear-gradient(145deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.46) 100%);
-      --glass-surface-strong: rgba(248, 251, 255, 0.80);
+      --glass-surface-strong: rgba(248, 251, 255, 0.82);
       --glass-pill: rgba(15, 23, 42, 0.055);
       --glass-border: rgba(255, 255, 255, 0.88);
       --glass-border-soft: rgba(15, 23, 42, 0.09);
@@ -54,7 +54,6 @@
       --accent-glow: rgba(2, 132, 199, 0.24);
       --success: #059669;
       --danger: #e11d48;
-      --warning: #d97706;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -111,6 +110,371 @@
     @keyframes floatOrb2 { from { transform: translate(0, 0) scale(1); } to { transform: translate(-50px, -40px) scale(1.15); } }
     @keyframes floatOrb3 { from { transform: translate(0, 0) scale(1); } to { transform: translate(40px, -45px) scale(1.1); } }
 
+    /* ==================== STARTUP OVERLAYS (SIMPLE LOADER & ONE-TIME OWNERSHIP CEREMONY) ==================== */
+    .startup-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      background: #050812;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      overflow: hidden;
+      transition: opacity 0.48s cubic-bezier(0.22, 1, 0.36, 1), transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .startup-screen.show { display: flex; }
+    .startup-screen.fade-out { opacity: 0; transform: scale(1.04); pointer-events: none; }
+
+    /* Simple Splash (Every launch after first) */
+    .simple-splash-box {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 14px;
+      animation: fadeUpSoft 0.4s ease;
+    }
+    .splash-emblem {
+      width: 72px; height: 72px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      display: grid; place-items: center;
+      color: #fff;
+      box-shadow: 0 14px 40px rgba(56, 189, 248, 0.42), inset 0 1.5px 1px rgba(255, 255, 255, 0.5);
+      animation: emblemPulse 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes emblemPulse {
+      from { transform: scale(1); box-shadow: 0 12px 32px rgba(56, 189, 248, 0.35); }
+      to { transform: scale(1.05); box-shadow: 0 18px 46px rgba(99, 102, 241, 0.55); }
+    }
+    .splash-owner-name {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: #f8fafc;
+    }
+    .splash-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: -8px;
+    }
+    .splash-bar-track {
+      width: 170px;
+      height: 4px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .splash-bar-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399);
+      animation: simpleLoadFill 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes simpleLoadFill { from { width: 0%; } to { width: 100%; } }
+
+    /* One-Time Ownership Transfer Ceremony */
+    .ceremony-stage {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 390px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    .ceremony-stage.active {
+      display: flex;
+      animation: certAppear 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes certAppear {
+      from { opacity: 0; transform: translateY(24px) scale(0.94); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes fadeUpSoft {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Modern Holographic Glass Certificate Card */
+    .cert-card {
+      position: relative;
+      width: 100%;
+      border-radius: 26px;
+      padding: 26px 22px 24px;
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.13) 0%, rgba(15, 23, 42, 0.72) 55%, rgba(56, 189, 248, 0.10) 100%);
+      backdrop-filter: blur(30px) saturate(190%);
+      -webkit-backdrop-filter: blur(30px) saturate(190%);
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 40px rgba(56, 189, 248, 0.16);
+      overflow: hidden;
+      text-align: center;
+      color: #f8fafc;
+    }
+
+    .cert-card.impact-shake {
+      animation: certThump 0.34s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    }
+    @keyframes certThump {
+      0% { transform: scale(1); }
+      30% { transform: scale(0.975) translateY(3px); }
+      65% { transform: scale(1.01) translateY(-1px); }
+      100% { transform: scale(1); }
+    }
+
+    /* Decorative Inner Gold/Cyan Foil Frame */
+    .cert-inner-frame {
+      position: absolute;
+      inset: 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(251, 191, 36, 0.28);
+      pointer-events: none;
+    }
+
+    /* Holographic Scanning Shimmer Sweep */
+    .cert-shimmer {
+      position: absolute;
+      top: -60%;
+      left: -80%;
+      width: 60%;
+      height: 220%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), rgba(56, 189, 248, 0.18), transparent);
+      transform: rotate(24deg);
+      pointer-events: none;
+      animation: certSweep 2.8s ease-in-out infinite;
+    }
+    @keyframes certSweep {
+      0% { left: -80%; }
+      55%, 100% { left: 145%; }
+    }
+
+    .cert-crest {
+      width: 56px; height: 56px;
+      margin: 0 auto 12px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(56, 189, 248, 0.25));
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      display: grid; place-items: center;
+      color: #fde68a;
+      box-shadow: 0 8px 24px rgba(251, 191, 36, 0.22);
+    }
+
+    .cert-kicker {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: #38bdf8;
+      margin-bottom: 5px;
+    }
+
+    .cert-heading {
+      font-size: 19px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      background: linear-gradient(135deg, #ffffff 10%, #bae6fd 60%, #fde68a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .cert-desc {
+      font-size: 12.5px;
+      color: #cbd5e1;
+      line-height: 1.55;
+      margin: 0 0 16px;
+    }
+
+    /* Animated Progress Lines in Stage 1 */
+    .cert-scan-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 14px 0 18px;
+      text-align: left;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 11.5px;
+      color: #cbd5e1;
+    }
+    .scan-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transform: translateX(-8px);
+      animation: scanRowIn 0.45s ease forwards;
+    }
+    .scan-row:nth-child(1) { animation-delay: 0.25s; }
+    .scan-row:nth-child(2) { animation-delay: 0.95s; }
+    .scan-row:nth-child(3) { animation-delay: 1.65s; }
+    @keyframes scanRowIn { to { opacity: 1; transform: translateX(0); } }
+
+    .scan-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 10px #34d399;
+      flex-shrink: 0;
+    }
+
+    .cert-progress-track {
+      width: 100%;
+      height: 5px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.10);
+      overflow: hidden;
+    }
+    .cert-progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #fbbf24);
+      animation: certIntroBar 2.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes certIntroBar { from { width: 0%; } to { width: 100%; } }
+
+    /* Stage 2: English Name Input */
+    .owner-name-input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1.5px solid rgba(56, 189, 248, 0.45);
+      background: rgba(5, 10, 22, 0.72);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-align: center;
+      outline: none;
+      margin-bottom: 8px;
+    }
+    .owner-name-input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.2);
+    }
+    .owner-error {
+      font-size: 11.5px;
+      color: #fb7185;
+      min-height: 18px;
+      margin-bottom: 10px;
+    }
+
+    /* Stage 3: Final Certificate & Slamming Verified Seal */
+    .cert-name-stage {
+      position: relative;
+      margin: 14px 0 16px;
+      padding: 18px 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px dashed rgba(251, 191, 36, 0.42);
+    }
+    .cert-transfer-label {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    .cert-owner-display {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #ffffff;
+      text-shadow: 0 4px 18px rgba(56, 189, 248, 0.45);
+      word-break: break-word;
+    }
+
+    .cert-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+      font-size: 11px;
+      text-align: left;
+    }
+    .cert-meta-cell {
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .cert-meta-cell span { display: block; color: #94a3b8; font-size: 10px; }
+    .cert-meta-cell b { color: #f8fafc; font-weight: 700; }
+
+    /* Official Metallic Stamp Seal slamming onto the name */
+    .official-seal {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      border: 3px double #fbbf24;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.24) 0%, rgba(15, 23, 42, 0.72) 72%);
+      box-shadow: 0 0 28px rgba(251, 191, 36, 0.45), inset 0 0 14px rgba(251, 191, 36, 0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fde68a;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(-50%) scale(2.8) rotate(-28deg);
+      z-index: 10;
+    }
+    .official-seal.stamped {
+      animation: stampSlam 0.46s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes stampSlam {
+      0%   { opacity: 0; transform: translateY(-50%) scale(2.9) rotate(-30deg); }
+      65%  { opacity: 1; transform: translateY(-50%) scale(0.92) rotate(-10deg); }
+      85%  { opacity: 1; transform: translateY(-50%) scale(1.04) rotate(-14deg); }
+      100% { opacity: 0.96; transform: translateY(-50%) scale(1.0) rotate(-12deg); }
+    }
+    .seal-ring-inner {
+      width: 76px; height: 76px;
+      border-radius: 50%;
+      border: 1px dashed rgba(253, 230, 138, 0.75);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.1;
+    }
+    .seal-top { font-size: 7.5px; font-weight: 800; letter-spacing: 1px; }
+    .seal-mid { font-size: 10.5px; font-weight: 900; letter-spacing: 0.7px; color: #34d399; margin: 2px 0; text-shadow: 0 0 8px rgba(52, 211, 153, 0.5); }
+    .seal-bot { font-size: 7px; font-weight: 700; letter-spacing: 0.8px; opacity: 0.9; }
+
+    .seal-ripple {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      border: 2px solid rgba(251, 191, 36, 0.8);
+      transform: translateY(-50%) scale(0.8);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .seal-ripple.burst {
+      animation: rippleOut 0.7s ease-out forwards;
+    }
+    @keyframes rippleOut {
+      0% { opacity: 0.9; transform: translateY(-50%) scale(0.9); }
+      100% { opacity: 0; transform: translateY(-50%) scale(2.1); }
+    }
+
+    /* ==================== MAIN APP SHELL ==================== */
     .app-shell { position: relative; z-index: 1; min-height: 100vh; }
 
     /* Top Frosted Glass AppBar */
@@ -129,7 +493,7 @@
       border-bottom: 1px solid var(--glass-border-soft);
     }
 
-    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; }
 
     .brand-logo {
       width: 38px; height: 38px;
@@ -137,11 +501,33 @@
       background: linear-gradient(135deg, #38bdf8, #6366f1);
       display: grid; place-items: center;
       color: #fff;
+      flex-shrink: 0;
       box-shadow: 0 6px 20px var(--accent-glow), inset 0 1px 1px rgba(255,255,255,0.45);
     }
 
-    .brand h1 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
-    .brand small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .brand-text { min-width: 0; flex: 1; }
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .owner-verified-icon {
+      display: none;
+      color: #fbbf24;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.55));
+    }
+    .owner-verified-icon.show { display: inline-flex; }
+    .brand small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .icon-btn {
       width: 38px; height: 38px;
@@ -152,6 +538,7 @@
       color: var(--text-main);
       display: grid; place-items: center;
       cursor: pointer;
+      flex-shrink: 0;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       transition: transform 0.14s ease;
@@ -327,7 +714,7 @@
 
     input[type="file"] { display: none; }
 
-    /* File Cards */
+    /* ==================== PREMIUM SCROLL-REVEAL FILE LIBRARY ==================== */
     .file-list { display: flex; flex-direction: column; gap: 9px; margin-top: 10px; }
 
     .file-row {
@@ -339,9 +726,25 @@
       background: var(--glass-pill);
       border: 1px solid var(--glass-border-soft);
       cursor: pointer;
-      transition: transform 0.13s ease, background 0.18s ease;
+      /* Smooth Premium Scroll Entrance */
+      opacity: 0;
+      transform: translate3d(0, 26px, 0) scale(0.95);
+      transition:
+        opacity 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.18s ease,
+        border-color 0.2s ease;
+      will-change: transform, opacity;
     }
-    .file-row:active { transform: scale(0.985); background: rgba(56, 189, 248, 0.14); }
+    .file-row.in-view {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    .file-row.in-view:active {
+      transform: translate3d(0, 0, 0) scale(0.975);
+      background: rgba(56, 189, 248, 0.16);
+      border-color: rgba(56, 189, 248, 0.35);
+    }
 
     .file-badge {
       width: 42px; height: 46px;
@@ -384,7 +787,7 @@
     .perm-banner h4 { margin: 0 0 4px; font-size: 14px; }
     .perm-banner p { margin: 0 0 10px; font-size: 12px; color: var(--text-muted); line-height: 1.45; }
 
-    /* Editor & Forms */
+    /* ==================== EDITOR & FULL ANDROID IME COMPATIBILITY ==================== */
     .input, select, textarea {
       width: 100%;
       padding: 11px 13px;
@@ -395,6 +798,8 @@
       font-family: var(--font-bn);
       font-size: 14px;
       outline: none;
+      user-select: text;
+      -webkit-user-select: text;
     }
     textarea { resize: vertical; min-height: 115px; line-height: 1.65; }
 
@@ -428,10 +833,28 @@
       line-height: 1.75;
       outline: none;
       word-break: break-word;
+      overflow-x: auto;
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      -webkit-touch-callout: default;
+    }
+    .editor-paper * {
+      user-select: text !important;
+      -webkit-user-select: text !important;
     }
     .editor-paper img { max-width: 100%; border-radius: 10px; margin: 8px 0; }
-    .editor-paper table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-    .editor-paper td, .editor-paper th { border: 1px solid #94a3b8; padding: 6px; }
+    .editor-paper table { width: 100%; border-collapse: collapse; margin: 10px 0; table-layout: fixed; }
+    .editor-paper td, .editor-paper th {
+      border: 1px solid #94a3b8;
+      padding: 8px 9px;
+      min-width: 60px;
+      min-height: 36px;
+      vertical-align: top;
+      word-wrap: break-word;
+    }
+    .editor-paper td:focus-within, .editor-paper td:focus {
+      background: rgba(56, 189, 248, 0.08);
+    }
 
     .item-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
     .list-item {
@@ -449,7 +872,7 @@
     .thumb-card img { width: 100%; height: 100%; object-fit: cover; }
     .thumb-del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(225, 29, 72, 0.92); color: #fff; font-weight: 700; cursor: pointer; }
 
-    /* Floating Glass Bottom Dock */
+    /* Floating Glass Bottom Dock (Auto-hides cleanly when typing!) */
     .bottom-dock-wrap {
       position: fixed;
       bottom: calc(10px + var(--safe-bottom));
@@ -457,6 +880,12 @@
       z-index: 50;
       max-width: 520px;
       margin: 0 auto;
+      transition: transform 0.22s ease, opacity 0.22s ease;
+    }
+    .bottom-dock-wrap.kb-hidden {
+      transform: translateY(150%);
+      opacity: 0;
+      pointer-events: none;
     }
     .bottom-nav {
       padding: 6px;
@@ -501,17 +930,11 @@
     }
     .fs-overlay.open { display: flex; }
 
-    /* Top Floating Glass HUD */
     .fs-top-hud {
       position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
+      top: 10px; left: 10px; right: 10px;
       z-index: 230;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
       padding: 7px 10px;
       border-radius: 18px;
       background: rgba(11, 18, 34, 0.78);
@@ -537,17 +960,14 @@
     }
     .hud-btn.active { background: var(--accent); color: #050812; border-color: transparent; }
 
-    /* GPU-Accelerated Full-Screen PDF Viewport (No Flexbox Overflow Clipping!) */
     .fs-viewport {
       position: relative;
       flex: 1;
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       overflow: hidden;
       touch-action: none;
       background: #0b101d;
     }
-
     .fs-viewport.doc-scroll-mode {
       overflow: auto;
       touch-action: pan-x pan-y;
@@ -557,8 +977,7 @@
 
     .pdf-page-box {
       position: absolute;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       background: #ffffff;
       box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65);
       transform-origin: 0 0;
@@ -566,18 +985,10 @@
     }
     .pdf-page-box.night-invert { filter: invert(0.92) hue-rotate(180deg); }
 
-    #pdfCanvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Multiply blend makes highlighter look like a real physical marker without blurring text! */
+    #pdfCanvas { display: block; width: 100%; height: 100%; }
     #drawCanvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
       mix-blend-mode: multiply;
       pointer-events: none;
     }
@@ -596,59 +1007,41 @@
       border: 2px solid #ffffff;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
       display: grid; place-items: center;
-      pointer-events: auto;
-      cursor: pointer;
-      z-index: 15;
+      pointer-events: auto; cursor: pointer; z-index: 15;
     }
 
     .fs-doc-box {
-      width: 100%;
-      max-width: 780px;
-      background: #ffffff;
-      color: #0f172a;
-      border-radius: 16px;
-      padding: 20px 18px;
-      font-size: 15.5px;
-      line-height: 1.8;
-      margin: 0 auto;
-      word-break: break-word;
-      user-select: text;
-      -webkit-user-select: text;
+      width: 100%; max-width: 780px;
+      background: #ffffff; color: #0f172a;
+      border-radius: 16px; padding: 20px 18px;
+      font-size: 15.5px; line-height: 1.8;
+      margin: 0 auto; word-break: break-word;
+      user-select: text; -webkit-user-select: text;
     }
     .fs-doc-box.night-invert { background: #111827; color: #e2e8f0; }
 
-    /* Floating Side Glass Action Button & Expandable Tool Dock */
     .side-fab-wrap {
       position: absolute;
-      right: 10px;
-      bottom: 72px;
+      right: 10px; bottom: 72px;
       z-index: 240;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 10px;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
     }
-
     .side-fab {
       width: 44px; height: 44px;
       border-radius: 15px;
       border: 1px solid rgba(255, 255, 255, 0.28);
       background: linear-gradient(135deg, rgba(14, 165, 233, 0.78), rgba(99, 102, 241, 0.78));
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
       color: #ffffff;
       display: grid; place-items: center;
       box-shadow: 0 10px 26px rgba(14, 165, 233, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      cursor: pointer;
-      opacity: 0.86;
-      transition: transform 0.18s ease, opacity 0.2s ease;
+      cursor: pointer; opacity: 0.86;
     }
     .side-fab:active { transform: scale(0.92); opacity: 1; }
 
     .side-dock {
       display: none;
-      flex-direction: column;
-      gap: 9px;
+      flex-direction: column; gap: 9px;
       padding: 12px 10px;
       border-radius: 22px;
       background: rgba(11, 18, 34, 0.88);
@@ -667,129 +1060,50 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .dock-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 6px;
-    }
-
+    .dock-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
     .dock-item {
-      height: 40px;
-      border-radius: 12px;
+      height: 40px; border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.11);
       background: rgba(255, 255, 255, 0.07);
       color: #f8fafc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      font-size: 11px;
-      font-family: var(--font-bn);
-      font-weight: 600;
-      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      font-size: 11px; font-family: var(--font-bn); font-weight: 600; cursor: pointer;
     }
     .dock-item.active {
       background: linear-gradient(135deg, #0ea5e9, #6366f1);
-      color: #fff;
-      border-color: rgba(255,255,255,0.28);
+      color: #fff; border-color: rgba(255,255,255,0.28);
       box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
     }
 
-    /* Brush / Highlighter Size & Color Panel inside Dock */
     .brush-panel {
-      padding: 8px;
-      border-radius: 14px;
+      padding: 8px; border-radius: 14px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.09);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      display: flex; flex-direction: column; gap: 8px;
     }
-
-    .color-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2px;
-    }
-    .color-dot {
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.22);
-      cursor: pointer;
-      transition: transform 0.14s ease;
-    }
+    .color-row { display: flex; align-items: center; justify-content: space-between; padding: 0 2px; }
+    .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.22); cursor: pointer; }
     .color-dot.selected { border-color: #ffffff; transform: scale(1.16); box-shadow: 0 0 10px rgba(255,255,255,0.45); }
 
-    .size-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 11px;
-      color: #cbd5e1;
-      font-weight: 600;
-    }
-
-    .size-preview-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .size-dot-wrap {
-      width: 24px; height: 24px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.12);
-      display: grid; place-items: center;
-      flex-shrink: 0;
-    }
-    .size-dot {
-      border-radius: 50%;
-      background: #fde047;
-      transition: width 0.1s ease, height 0.1s ease;
-    }
-
-    .size-slider {
-      flex: 1;
-      width: 100%;
-      accent-color: #38bdf8;
-      cursor: pointer;
-    }
-
-    .size-presets {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 4px;
-    }
+    .size-head { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #cbd5e1; font-weight: 600; }
+    .size-preview-box { display: flex; align-items: center; gap: 8px; }
+    .size-dot-wrap { width: 24px; height: 24px; border-radius: 8px; background: rgba(255, 255, 255, 0.12); display: grid; place-items: center; flex-shrink: 0; }
+    .size-dot { border-radius: 50%; background: #fde047; }
+    .size-slider { flex: 1; width: 100%; accent-color: #38bdf8; cursor: pointer; }
+    .size-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
     .preset-btn {
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.06);
-      color: #cbd5e1;
-      border-radius: 8px;
-      padding: 4px 0;
-      font-size: 10.5px;
-      font-family: var(--font-bn);
-      font-weight: 700;
-      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06);
+      color: #cbd5e1; border-radius: 8px; padding: 4px 0;
+      font-size: 10.5px; font-family: var(--font-bn); font-weight: 700; cursor: pointer;
     }
     .preset-btn.active { background: rgba(56, 189, 248, 0.28); color: #fff; border-color: #38bdf8; }
 
-    /* Floating Bottom Page & Zoom HUD */
     .fs-bottom-hud {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      right: 10px;
-      z-index: 230;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 7px 10px;
-      border-radius: 18px;
+      position: absolute; bottom: 10px; left: 10px; right: 10px; z-index: 230;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 7px 10px; border-radius: 18px;
       background: rgba(11, 18, 34, 0.78);
-      backdrop-filter: blur(26px) saturate(190%);
-      -webkit-backdrop-filter: blur(26px) saturate(190%);
+      backdrop-filter: blur(26px) saturate(190%); -webkit-backdrop-filter: blur(26px) saturate(190%);
       border: 1px solid rgba(255, 255, 255, 0.16);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
       color: #f8fafc;
@@ -797,11 +1111,7 @@
     }
     .fs-overlay.hud-hidden .fs-bottom-hud { transform: translateY(150%); opacity: 0; pointer-events: none; }
 
-    .zoom-pill {
-      display: flex; align-items: center; gap: 3px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 12px; padding: 2px 4px;
-    }
+    .zoom-pill { display: flex; align-items: center; gap: 3px; background: rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 2px 4px; }
     .zoom-pill button { width: 28px; height: 28px; border: none; border-radius: 9px; background: transparent; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
     .zoom-pill span { font-size: 11px; font-weight: 700; min-width: 36px; text-align: center; cursor: pointer; }
 
@@ -809,11 +1119,9 @@
     .page-nav-pill input[type="range"] { flex: 1; max-width: 120px; accent-color: #38bdf8; }
     .page-badge { font-size: 11.5px; font-weight: 700; white-space: nowrap; }
 
-    /* Modal */
     .modal-backdrop {
       position: fixed; inset: 0; z-index: 300;
-      background: rgba(3, 6, 15, 0.70);
-      backdrop-filter: blur(8px);
+      background: rgba(3, 6, 15, 0.70); backdrop-filter: blur(8px);
       display: none; align-items: center; justify-content: center; padding: 16px;
     }
     .modal-backdrop.open { display: flex; }
@@ -827,20 +1135,14 @@
     .modal-card h3 { margin: 0 0 10px; font-size: 15px; }
 
     #toast {
-      position: fixed;
-      left: 50%;
-      bottom: calc(92px + var(--safe-bottom));
+      position: fixed; left: 50%; bottom: calc(92px + var(--safe-bottom));
       transform: translateX(-50%) translateY(18px);
-      background: rgba(11, 18, 34, 0.92);
-      backdrop-filter: blur(16px);
-      color: #fff;
-      border: 1px solid rgba(56, 189, 248, 0.45);
-      padding: 10px 18px;
-      border-radius: 999px;
+      background: rgba(11, 18, 34, 0.92); backdrop-filter: blur(16px);
+      color: #fff; border: 1px solid rgba(56, 189, 248, 0.45);
+      padding: 10px 18px; border-radius: 999px;
       font-size: 12.5px; font-weight: 600;
-      opacity: 0; pointer-events: none; z-index: 400;
-      transition: all 0.24s ease;
-      max-width: 90vw; text-align: center;
+      opacity: 0; pointer-events: none; z-index: 950;
+      transition: all 0.24s ease; max-width: 90vw; text-align: center;
       box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
     }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -853,15 +1155,122 @@
     <div class="orb orb-3"></div>
   </div>
 
+  <!-- ==================== 1. SIMPLE SPLASH (EVERY SUBSEQUENT LAUNCH) ==================== -->
+  <div id="simpleSplash" class="startup-screen">
+    <div class="ambient-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+    <div class="simple-splash-box">
+      <div class="splash-emblem">
+        <svg class="ic" style="width:34px;height:34px;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      </div>
+      <div class="splash-owner-name" id="splashOwnerLabel">GlassDoc Studio</div>
+      <div class="splash-sub">অফলাইন ও বিজ্ঞাপনমুক্ত • লোড হচ্ছে...</div>
+      <div class="splash-bar-track"><div class="splash-bar-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. ONE-TIME FIRST-INSTALL OWNERSHIP TRANSFER CEREMONY ==================== -->
+  <div id="ownershipScreen" class="startup-screen">
+    <div class="ambient-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+
+    <!-- Stage 1: Modern Certificate Intro Animation -->
+    <div id="ceremonyStage1" class="ceremony-stage">
+      <div class="cert-card">
+        <div class="cert-inner-frame"></div>
+        <div class="cert-shimmer"></div>
+        <div class="cert-crest">
+          <svg class="ic" style="width:28px;height:28px;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        </div>
+        <div class="cert-kicker">OWNERSHIP TRANSFER PROTOCOL</div>
+        <h2 class="cert-heading">মালিকানা হস্তান্তর সনদ প্রস্তুত হচ্ছে</h2>
+        <p class="cert-desc">এই ডিভাইসে প্রথমবারের মতো অ্যাপটি চালু হয়েছে। আপনার নামে একক মালিকানা হস্তান্তরের ডিজিটাল সার্টিফিকেট তৈরি করা হচ্ছে...</p>
+
+        <div class="cert-scan-lines">
+          <div class="scan-row"><span class="scan-dot"></span><span>ডিভাইস সিকিউরিটি ও অফলাইন ইঞ্জিন যাচাই সম্পন্ন</span></div>
+          <div class="scan-row"><span class="scan-dot"></span><span>বিজ্ঞাপনমুক্ত প্রিমিয়াম লাইসেন্স আনলক সম্পন্ন</span></div>
+          <div class="scan-row"><span class="scan-dot"></span><span>মালিকানা হস্তান্তর সার্টিফিকেট সক্রিয় হচ্ছে...</span></div>
+        </div>
+
+        <div class="cert-progress-track"><div class="cert-progress-fill"></div></div>
+      </div>
+    </div>
+
+    <!-- Stage 2: English Name Entry -->
+    <div id="ceremonyStage2" class="ceremony-stage">
+      <div class="cert-card">
+        <div class="cert-inner-frame"></div>
+        <div class="cert-crest">
+          <svg class="ic" style="width:26px;height:26px;" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="cert-kicker">DEVICE OWNER REGISTRATION</div>
+        <h2 class="cert-heading">আপনার নাম ইংরেজিতে লিখুন</h2>
+        <p class="cert-desc">এই মোবাইলে অ্যাপটির মালিকানা আপনার নামে চূড়ান্তভাবে হস্তান্তর করা হবে এবং অ্যাপের শিরোনামে আপনার নাম দেখাবে।</p>
+
+        <input type="text" id="ownerNameInput" class="owner-name-input" placeholder="Enter Name in English" maxlength="28" autocomplete="off" />
+        <div id="ownerNameError" class="owner-error"></div>
+
+        <button class="btn btn-primary" id="claimOwnershipBtn" style="width:100%; padding:13px;">
+          <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          মালিকানা গ্রহণ করুন
+        </button>
+      </div>
+    </div>
+
+    <!-- Stage 3: Official Ownership Certificate + Slamming Verified Seal -->
+    <div id="ceremonyStage3" class="ceremony-stage">
+      <div class="cert-card" id="finalCertCard">
+        <div class="cert-inner-frame"></div>
+        <div class="cert-shimmer"></div>
+        <div class="cert-crest">
+          <svg class="ic" style="width:28px;height:28px;" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+        </div>
+        <div class="cert-kicker">CERTIFICATE OF OWNERSHIP</div>
+        <h2 class="cert-heading">মালিকানা হস্তান্তর সম্পন্ন</h2>
+
+        <div class="cert-name-stage">
+          <div class="cert-transfer-label">OFFICIALLY TRANSFERRED TO</div>
+          <div class="cert-owner-display" id="certOwnerDisplay">OWNER NAME</div>
+
+          <!-- Official Seal & Impact Ripple -->
+          <div id="sealRipple" class="seal-ripple"></div>
+          <div id="officialSeal" class="official-seal">
+            <div class="seal-ring-inner">
+              <span class="seal-top">★ OFFICIAL ★</span>
+              <span class="seal-mid">VERIFIED</span>
+              <span class="seal-bot">OWNER SEAL</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cert-meta-grid">
+          <div class="cert-meta-cell">
+            <span>ডিভাইস</span>
+            <b id="certDeviceVal">Android Device</b>
+          </div>
+          <div class="cert-meta-cell">
+            <span>সনদ নম্বর</span>
+            <b id="certSerialVal">GD-2026-001</b>
+          </div>
+        </div>
+
+        <p class="cert-desc" style="margin:14px 0 0; font-size:11.5px; color:#34d399; font-weight:600;" id="certStatusLine">সিল অনুমোদন করা হচ্ছে...</p>
+      </div>
+    </div>
+  </div>
+
   <div class="app-shell">
     <header class="topbar">
       <div class="brand">
         <div class="brand-logo">
           <svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         </div>
-        <div>
-          <h1>GlassDoc Studio</h1>
-          <small>শিক্ষার্থী সংস্করণ • অফলাইন ও বিজ্ঞাপনমুক্ত</small>
+        <div class="brand-text">
+          <div class="brand-title-row">
+            <h1 id="brandTitle">GlassDoc Studio</h1>
+            <span id="ownerVerifiedBadge" class="owner-verified-icon" title="Verified Owner">
+              <svg class="ic ic-sm" style="fill:rgba(251,191,36,0.22);" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </span>
+          </div>
+          <small id="brandSubtitle">শিক্ষার্থী সংস্করণ • অফলাইন ও বিজ্ঞাপনমুক্ত</small>
         </div>
       </div>
       <div style="display:flex; gap:8px;">
@@ -954,7 +1363,7 @@
             <input type="file" id="editorImgInput" accept="image/*" />
           </div>
 
-          <div id="editorPaper" class="editor-paper" contenteditable="true">
+          <div id="editorPaper" class="editor-paper" contenteditable="true" spellcheck="false">
             <h2 style="margin-top:0;">নতুন নোট / ডকুমেন্ট</h2>
             <p>এখানে বাংলা বা ইংরেজিতে নির্ভুলভাবে লিখুন। লেখা শেষে নিচ থেকে সরাসরি <b>PDF</b> অথবা <b>Word (.doc)</b> তৈরি করুন।</p>
           </div>
@@ -1082,7 +1491,7 @@
     </main>
 
     <!-- Floating Frosted Glass Bottom Dock -->
-    <div class="bottom-dock-wrap">
+    <div class="bottom-dock-wrap" id="bottomDockWrap">
       <nav class="bottom-nav">
         <button class="nav-btn active" data-tab="reader">
           <svg class="ic" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -1151,7 +1560,6 @@
           </button>
         </div>
 
-        <!-- Brush Color + Size Control -->
         <div class="brush-panel">
           <div class="color-row" id="colorPalette">
             <span class="color-dot selected" data-color="yellow" style="background:#fde047;"></span>
@@ -1162,7 +1570,7 @@
 
           <div class="size-head">
             <span id="sizePanelLabel">সাইজ (হাইলাইট)</span>
-            <span id="sizeValueLabel">১২ px</span>
+            <span id="sizeValueLabel">12 px</span>
           </div>
 
           <div class="size-preview-box">
@@ -1279,6 +1687,164 @@
       } catch (e) {}
     }
 
+    // ==================== ONE-TIME OWNERSHIP CEREMONY & SUBSEQUENT SIMPLE LOADER ====================
+    function getStoredOwner() {
+      let nativeName = '';
+      try {
+        if (window.GlassNative && typeof window.GlassNative.getOwnerName === 'function') {
+          nativeName = (window.GlassNative.getOwnerName() || '').trim();
+        }
+      } catch (e) {}
+      const localName = (localStorage.getItem('gd_owner_name') || '').trim();
+      const finalName = nativeName || localName;
+      if (finalName && !localName) localStorage.setItem('gd_owner_name', finalName);
+      if (finalName && !nativeName && window.GlassNative && typeof window.GlassNative.saveOwnerName === 'function') {
+        try { window.GlassNative.saveOwnerName(finalName); } catch (e) {}
+      }
+      return finalName;
+    }
+
+    function persistOwner(name) {
+      const clean = name.trim();
+      localStorage.setItem('gd_owner_name', clean);
+      try {
+        if (window.GlassNative && typeof window.GlassNative.saveOwnerName === 'function') {
+          window.GlassNative.saveOwnerName(clean);
+        }
+      } catch (e) {}
+    }
+
+    function applyOwnerBranding(ownerName) {
+      if (!ownerName) return;
+      $('brandTitle').textContent = ownerName;
+      $('brandSubtitle').textContent = 'GlassDoc Studio • Official Owner';
+      $('ownerVerifiedBadge').classList.add('show');
+    }
+
+    function initStartupFlow() {
+      const existingOwner = getStoredOwner();
+
+      if (existingOwner) {
+        // SUBSEQUENT LAUNCHES: Simple, clean loading animation ONLY!
+        applyOwnerBranding(existingOwner);
+        $('splashOwnerLabel').textContent = existingOwner;
+        const splash = $('simpleSplash');
+        splash.classList.add('show');
+        setTimeout(() => {
+          splash.classList.add('fade-out');
+          setTimeout(() => { splash.classList.remove('show', 'fade-out'); }, 480);
+        }, 1050);
+        return;
+      }
+
+      // FIRST-TIME INSTALL LAUNCH ONLY: Ownership Transfer Ceremony
+      const screen = $('ownershipScreen');
+      const s1 = $('ceremonyStage1');
+      const s2 = $('ceremonyStage2');
+      const s3 = $('ceremonyStage3');
+
+      screen.classList.add('show');
+      s1.classList.add('active');
+
+      // Stage 1 runs for 2.8 seconds, then opens English name input
+      setTimeout(() => {
+        s1.classList.remove('active');
+        s2.classList.add('active');
+        setTimeout(() => $('ownerNameInput').focus(), 220);
+      }, 2800);
+
+      // Filter & validate English name input
+      $('ownerNameInput').addEventListener('input', () => {
+        $('ownerNameError').textContent = '';
+      });
+
+      function completeOwnershipTransfer() {
+        const raw = ($('ownerNameInput').value || '').trim();
+        if (raw.length < 2) {
+          $('ownerNameError').textContent = 'অনুগ্রহ করে কমপক্ষে ২ অক্ষরের নাম লিখুন।';
+          return;
+        }
+        if (!/^[A-Za-z][A-Za-z .'-]{1,27}$/.test(raw)) {
+          $('ownerNameError').textContent = 'নামটি অবশ্যই ইংরেজি অক্ষরে (A-Z) লিখতে হবে।';
+          return;
+        }
+
+        // Format nicely (Title Case if all lowercase)
+        const formatted = raw === raw.toLowerCase()
+          ? raw.replace(/\b\w/g, ch => ch.toUpperCase())
+          : raw;
+
+        $('ownerNameInput').blur();
+        persistOwner(formatted);
+        applyOwnerBranding(formatted);
+
+        // Populate Stage 3 Certificate
+        $('certOwnerDisplay').textContent = formatted;
+        let deviceName = 'Verified Mobile';
+        try {
+          if (window.GlassNative && typeof window.GlassNative.getDeviceModel === 'function') {
+            deviceName = window.GlassNative.getDeviceModel() || 'Verified Mobile';
+          }
+        } catch (e) {}
+        $('certDeviceVal').textContent = deviceName;
+        const serial = 'GD-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+        $('certSerialVal').textContent = serial;
+
+        s2.classList.remove('active');
+        s3.classList.add('active');
+
+        // Slam the official verified seal onto the name after 650ms!
+        setTimeout(() => {
+          $('officialSeal').classList.add('stamped');
+          $('sealRipple').classList.add('burst');
+          $('finalCertCard').classList.add('impact-shake');
+          $('certStatusLine').textContent = '✓ মালিকানা সিল অনুমোদিত! অ্যাপ চালু হচ্ছে...';
+          try { if (navigator.vibrate) navigator.vibrate([35, 30, 55]); } catch (e) {}
+        }, 650);
+
+        // Smoothly enter the app after displaying stamped certificate
+        setTimeout(() => {
+          screen.classList.add('fade-out');
+          setTimeout(() => {
+            screen.classList.remove('show', 'fade-out');
+            s3.classList.remove('active');
+          }, 500);
+        }, 3100);
+      }
+
+      $('claimOwnershipBtn').addEventListener('click', completeOwnershipTransfer);
+      $('ownerNameInput').addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') completeOwnershipTransfer();
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', initStartupFlow);
+
+    // ==================== AUTO-HIDE BOTTOM DOCK WHEN KEYBOARD OPENS ====================
+    const bottomDockWrap = $('bottomDockWrap');
+    let baseWindowHeight = window.innerHeight;
+
+    function updateKeyboardState() {
+      const active = document.activeElement;
+      const isEditing = active && (
+        active.id === 'editorPaper'
+        || active.isContentEditable
+        || active.tagName === 'INPUT'
+        || active.tagName === 'TEXTAREA'
+      );
+      const viewportShrunk = window.visualViewport
+        ? window.visualViewport.height < baseWindowHeight * 0.78
+        : window.innerHeight < baseWindowHeight * 0.78;
+      bottomDockWrap.classList.toggle('kb-hidden', !!(isEditing || viewportShrunk));
+    }
+
+    document.addEventListener('focusin', updateKeyboardState);
+    document.addEventListener('focusout', () => setTimeout(updateKeyboardState, 120));
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateKeyboardState);
+    }
+
+    // ==================== NATIVE FILE SAVE ====================
     async function saveOutputFile(blob, filename) {
       try {
         const b64 = await blobToBase64(blob);
@@ -1344,9 +1910,37 @@
     }
     window.addEventListener('load', initPdfWorker);
 
-    // ==================== AUTO-DETECT DEVICE LIBRARY ====================
+    // ==================== AUTO-DETECT DEVICE LIBRARY + PREMIUM SCROLL ANIMATION ====================
     let deviceFiles = [];
     let activeFilter = 'all';
+    let listObserver = null;
+
+    function attachScrollReveal(container) {
+      if (listObserver) listObserver.disconnect();
+      const rows = container.querySelectorAll('.file-row');
+      if (!rows.length) return;
+
+      if ('IntersectionObserver' in window) {
+        listObserver = new IntersectionObserver((entries) => {
+          let batchIndex = 0;
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const el = entry.target;
+              el.style.transitionDelay = Math.min(batchIndex * 45, 220) + 'ms';
+              el.classList.add('in-view');
+              batchIndex++;
+              listObserver.unobserve(el);
+              // Clear delay after entrance so active tap feedback stays instant
+              setTimeout(() => { el.style.transitionDelay = '0ms'; }, 600);
+            }
+          });
+        }, { threshold: 0.06, rootMargin: '0px 0px -18px 0px' });
+
+        rows.forEach(r => listObserver.observe(r));
+      } else {
+        rows.forEach(r => r.classList.add('in-view'));
+      }
+    }
 
     function renderFileLibrary() {
       const q = ($('librarySearch').value || '').trim().toLowerCase();
@@ -1387,6 +1981,8 @@
           openDeviceFile(decodeURIComponent(row.dataset.path), decodeURIComponent(row.dataset.name), row.dataset.ext);
         });
       });
+
+      attachScrollReveal(container);
     }
 
     function scanDeviceDocuments() {
@@ -1459,6 +2055,40 @@
       e.target.value = '';
     });
 
+    // ==================== EDITOR TABLE CELL TYPING FIX (BENGALI & RIDMIK IME SAFE) ====================
+    function normalizeEditablePaper() {
+      const paper = $('editorPaper');
+      paper.setAttribute('contenteditable', 'true');
+      paper.querySelectorAll('td, th').forEach(cell => {
+        cell.removeAttribute('contenteditable');
+        const txt = (cell.textContent || '').replace(/\u00A0/g, '').trim();
+        if (!txt && !cell.querySelector('img')) {
+          cell.innerHTML = '<p><br></p>';
+        } else if (!cell.querySelector('p, div, br') && txt) {
+          cell.innerHTML = `<p>${cell.innerHTML}</p>`;
+        }
+      });
+    }
+
+    // Ensure tapping an empty table cell places caret directly inside so typing works immediately!
+    $('editorPaper').addEventListener('click', (e) => {
+      const cell = e.target.closest('td, th');
+      if (!cell) return;
+      const txt = (cell.textContent || '').replace(/\u00A0/g, '').trim();
+      if (!txt && !cell.querySelector('img')) {
+        if (!cell.querySelector('p')) cell.innerHTML = '<p><br></p>';
+        const target = cell.querySelector('p') || cell;
+        try {
+          const range = document.createRange();
+          range.setStart(target, 0);
+          range.collapse(true);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        } catch (err) {}
+      }
+    });
+
     // ==================== 60FPS GPU PAN & FOCAL PINCH-ZOOM ENGINE ====================
     let pdfDoc = null;
     let currentPdfPage = null;
@@ -1473,8 +2103,8 @@
 
     let activeTool = 'read';
     let activeColor = 'yellow';
-    let highlightSize = 12;   // 4..32 px (relative to fit-width)
-    let penSize = 2.5;        // 1..10 px (relative to fit-width)
+    let highlightSize = 12;
+    let penSize = 2.5;
     let pageStrokes = {};
     let currentStroke = null;
     let isDrawing = false;
@@ -1493,17 +2123,8 @@
       const { vw, vh } = getViewportSize();
       const sw = baseW * scale;
       const sh = baseH * scale;
-      if (sw <= vw) {
-        tx = (vw - sw) / 2;
-      } else {
-        // Left edge at 0, right edge at vw - sw (100% scrollable both sides!)
-        tx = Math.min(0, Math.max(vw - sw, tx));
-      }
-      if (sh <= vh) {
-        ty = (vh - sh) / 2;
-      } else {
-        ty = Math.min(0, Math.max(vh - sh, ty));
-      }
+      tx = sw <= vw ? (vw - sw) / 2 : Math.min(0, Math.max(vw - sw, tx));
+      ty = sh <= vh ? (vh - sh) / 2 : Math.min(0, Math.max(vh - sh, ty));
     }
 
     function applyTransform() {
@@ -1525,14 +2146,9 @@
         scale = s0 + (targetScale - s0) * ease;
         tx = x0 + (targetTx - x0) * ease;
         ty = y0 + (targetTy - y0) * ease;
-        clampTransform();
-        applyTransform();
-        if (p < 1) {
-          animFrame = requestAnimationFrame(step);
-        } else {
-          animFrame = null;
-          scheduleCrispUpgrade();
-        }
+        clampTransform(); applyTransform();
+        if (p < 1) animFrame = requestAnimationFrame(step);
+        else { animFrame = null; scheduleCrispUpgrade(); }
       }
       animFrame = requestAnimationFrame(step);
     }
@@ -1547,13 +2163,8 @@
       const sw = baseW * clamped, sh = baseH * clamped;
       nextTx = sw <= vw ? (vw - sw) / 2 : Math.min(0, Math.max(vw - sw, nextTx));
       nextTy = sh <= vh ? (vh - sh) / 2 : Math.min(0, Math.max(vh - sh, nextTy));
-      if (animated) {
-        animateTo(clamped, nextTx, nextTy, 220);
-      } else {
-        scale = clamped; tx = nextTx; ty = nextTy;
-        clampTransform(); applyTransform();
-        scheduleCrispUpgrade();
-      }
+      if (animated) animateTo(clamped, nextTx, nextTy, 220);
+      else { scale = clamped; tx = nextTx; ty = nextTy; clampTransform(); applyTransform(); scheduleCrispUpgrade(); }
     }
 
     function openFsOverlay(title) {
@@ -1562,7 +2173,6 @@
       $('fsOverlay').classList.remove('hud-hidden');
       $('sideDock').classList.remove('open');
       document.body.style.overflow = 'hidden';
-      // Hide Android Status Bar + Bottom Navigation Bar completely!
       setNativeFullscreen(true);
     }
 
@@ -1574,7 +2184,6 @@
       setActiveTool('read');
       pdfDoc = null;
       currentPdfPage = null;
-      // Restore Android system bars cleanly
       setNativeFullscreen(false);
     }
 
@@ -1612,7 +2221,6 @@
 
         $('pageSlider').max = pdfDoc.numPages;
         $('pageSlider').value = 1;
-        // Wait briefly for immersive fullscreen dimensions to settle
         setTimeout(() => loadPdfPage(currentPage), 80);
       } else if (ext === 'docx') {
         const res = await window.mammoth.convertToHtml({ arrayBuffer });
@@ -1634,15 +2242,12 @@
 
       baseW = vw;
       baseH = Math.round(vw * (unscaled.height / unscaled.width));
-      scale = 1.0;
-      tx = 0;
-      ty = 0;
+      scale = 1.0; tx = 0; ty = 0;
       clampTransform();
 
       pdfPageBox.style.width = baseW + 'px';
       pdfPageBox.style.height = baseH + 'px';
 
-      // High-res 2x drawing layer matching page geometry
       const drawCanvas = $('drawCanvas');
       drawCanvas.width = Math.round(baseW * 2);
       drawCanvas.height = Math.round(baseH * 2);
@@ -1657,26 +2262,18 @@
       renderPageNotes();
     }
 
-    // Zero-flicker offscreen HiDPI bitmap renderer
     async function renderCrispBitmap(force = false) {
       if (!currentPdfPage) return;
       const dpr = Math.min(window.devicePixelRatio || 2, 2.5);
       const unscaled = currentPdfPage.getViewport({ scale: 1.0 });
       const fitScale = baseW / unscaled.width;
       const desiredPixelScale = fitScale * scale * dpr;
-
-      // Cap canvas memory safely (~2800px max dimension) for silky performance on 4GB RAM phones
       const maxDim = 2800;
       const maxAllowedScale = maxDim / Math.max(unscaled.width, unscaled.height);
       const targetScale = Math.min(desiredPixelScale, maxAllowedScale);
 
-      if (!force && renderedPixelScale > 0 && Math.abs(targetScale - renderedPixelScale) / renderedPixelScale < 0.16) {
-        return;
-      }
-
-      if (renderTask) {
-        try { renderTask.cancel(); } catch (e) {}
-      }
+      if (!force && renderedPixelScale > 0 && Math.abs(targetScale - renderedPixelScale) / renderedPixelScale < 0.16) return;
+      if (renderTask) { try { renderTask.cancel(); } catch (e) {} }
 
       const viewport = currentPdfPage.getViewport({ scale: targetScale });
       const offCanvas = document.createElement('canvas');
@@ -1687,7 +2284,6 @@
       renderTask = currentPdfPage.render({ canvasContext: offCtx, viewport });
       try {
         await renderTask.promise;
-        // Atomic swap onto visible canvas — ZERO blink or jump!
         const vis = $('pdfCanvas');
         vis.width = offCanvas.width;
         vis.height = offCanvas.height;
@@ -1705,31 +2301,16 @@
 
     window.addEventListener('resize', () => {
       if (pdfDoc && $('fsOverlay').classList.contains('open')) {
-        clampTransform();
-        applyTransform();
+        clampTransform(); applyTransform();
       }
     });
 
-    // Zoom Buttons & Reset
-    $('zoomInBtn').addEventListener('click', () => {
-      const { vw, vh } = getViewportSize();
-      zoomAroundPoint(scale + 0.45, vw / 2, vh / 2, true);
-    });
-    $('zoomOutBtn').addEventListener('click', () => {
-      const { vw, vh } = getViewportSize();
-      zoomAroundPoint(scale - 0.45, vw / 2, vh / 2, true);
-    });
-    $('zoomLabel').addEventListener('click', () => {
-      const { vw, vh } = getViewportSize();
-      zoomAroundPoint(1.0, vw / 2, vh / 2, true);
-    });
+    $('zoomInBtn').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(scale + 0.45, vw / 2, vh / 2, true); });
+    $('zoomOutBtn').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(scale - 0.45, vw / 2, vh / 2, true); });
+    $('zoomLabel').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(1.0, vw / 2, vh / 2, true); });
 
-    $('prevPageBtn').addEventListener('click', () => {
-      if (pdfDoc && currentPage > 1) { currentPage--; loadPdfPage(currentPage); }
-    });
-    $('nextPageBtn').addEventListener('click', () => {
-      if (pdfDoc && currentPage < pdfDoc.numPages) { currentPage++; loadPdfPage(currentPage); }
-    });
+    $('prevPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage > 1) { currentPage--; loadPdfPage(currentPage); } });
+    $('nextPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage < pdfDoc.numPages) { currentPage++; loadPdfPage(currentPage); } });
     $('pageSlider').addEventListener('change', (e) => {
       const p = parseInt(e.target.value, 10);
       if (pdfDoc && p >= 1 && p <= pdfDoc.numPages) { currentPage = p; loadPdfPage(currentPage); }
@@ -1743,10 +2324,11 @@
 
     $('fsEditDocBtn').addEventListener('click', () => {
       $('editorPaper').innerHTML = $('fsDocBox').innerHTML;
+      normalizeEditablePaper();
       $('docTitleInput').value = $('fsFileTitle').textContent.replace(/\.[^.]+$/, '') + '_Edited';
       closeFsOverlay();
       switchTab('editor');
-      showToast('এডিটরে নেওয়া হয়েছে!');
+      showToast('এডিটরে নেওয়া হয়েছে! যেকোনো ঘরে ট্যাপ করে লিখুন।');
     });
 
     $('fsBijoyFixBtn').addEventListener('click', () => {
@@ -1756,8 +2338,8 @@
       showToast('বিজয় ফন্ট ইউনিকোড বাংলায় ঠিক হয়েছে!');
     });
 
-    // ==================== SILKY TOUCH GESTURES (PAN + INERTIA + FOCAL PINCH + DOUBLE-TAP) ====================
-    let gestureMode = 'none'; // 'pan' | 'pinch'
+    // ==================== SILKY TOUCH GESTURES ====================
+    let gestureMode = 'none';
     let startX = 0, startY = 0, lastX = 0, lastY = 0, lastMoveTime = 0;
     let velX = 0, velY = 0, totalMoved = 0;
     let pinchStartDist = 0, pinchStartScale = 1, pinchDocX = 0, pinchDocY = 0;
@@ -1768,7 +2350,6 @@
 
     fsViewport.addEventListener('touchstart', (e) => {
       if (!pdfDoc) return;
-      // Allow two-finger pinch/pan EVEN while in highlighter/pen mode!
       if (e.touches.length === 2) {
         e.preventDefault();
         stopAnimations();
@@ -1781,9 +2362,7 @@
         pinchDocY = (mid.y - ty) / scale;
         return;
       }
-
       if (activeTool !== 'read' || e.target.closest('.note-pin')) return;
-
       if (e.touches.length === 1) {
         stopAnimations();
         gestureMode = 'pan';
@@ -1803,25 +2382,17 @@
         scale = Math.min(5.0, Math.max(1.0, pinchStartScale * (curDist / pinchStartDist)));
         tx = mid.x - pinchDocX * scale;
         ty = mid.y - pinchDocY * scale;
-        clampTransform();
-        applyTransform();
+        clampTransform(); applyTransform();
         return;
       }
-
       if (gestureMode === 'pan' && e.touches.length === 1 && activeTool === 'read') {
         e.preventDefault();
         const now = performance.now();
-        const cx = e.touches[0].clientX;
-        const cy = e.touches[0].clientY;
-        const dx = cx - lastX;
-        const dy = cy - lastY;
+        const cx = e.touches[0].clientX, cy = e.touches[0].clientY;
+        const dx = cx - lastX, dy = cy - lastY;
         const dt = Math.max(now - lastMoveTime, 1);
-
-        tx += dx;
-        ty += dy;
-        clampTransform();
-        applyTransform();
-
+        tx += dx; ty += dy;
+        clampTransform(); applyTransform();
         velX = velX * 0.4 + (dx / dt) * 0.6;
         velY = velY * 0.4 + (dy / dt) * 0.6;
         totalMoved += Math.hypot(dx, dy);
@@ -1833,15 +2404,11 @@
       if (!pdfDoc) return;
       if (gestureMode === 'pinch' && e.touches.length < 2) {
         gestureMode = 'none';
-        clampTransform();
-        applyTransform();
-        scheduleCrispUpgrade();
+        clampTransform(); applyTransform(); scheduleCrispUpgrade();
         return;
       }
-
       if (gestureMode === 'pan' && e.touches.length === 0) {
         gestureMode = 'none';
-        // Tap detection (single tap toggles HUD, double tap zooms smoothly)
         if (totalMoved < 10) {
           const now = performance.now();
           if (now - lastTapTime < 280) {
@@ -1857,59 +2424,37 @@
           }
           return;
         }
-
-        // Smooth inertial glide scrolling in all directions
         if (Math.hypot(velX, velY) > 0.18) {
           let vx = velX * 16, vy = velY * 16;
           function glide() {
-            vx *= 0.92;
-            vy *= 0.92;
-            tx += vx;
-            ty += vy;
-            clampTransform();
-            applyTransform();
-            if (Math.hypot(vx, vy) > 0.35) {
-              animFrame = requestAnimationFrame(glide);
-            } else {
-              animFrame = null;
-            }
+            vx *= 0.92; vy *= 0.92;
+            tx += vx; ty += vy;
+            clampTransform(); applyTransform();
+            if (Math.hypot(vx, vy) > 0.35) animFrame = requestAnimationFrame(glide);
+            else animFrame = null;
           }
           animFrame = requestAnimationFrame(glide);
         }
       }
     });
 
-    // ==================== FLOATING SIDE DOCK + ADJUSTABLE HIGHLIGHTER & PEN SIZE ====================
-    $('sideFabToggle').addEventListener('click', () => {
-      $('sideDock').classList.toggle('open');
-    });
+    // ==================== FLOATING SIDE DOCK + BRUSH SIZE ====================
+    $('sideFabToggle').addEventListener('click', () => { $('sideDock').classList.toggle('open'); });
 
     const colorMap = {
-      highlight: {
-        yellow: '#fde047',
-        green:  '#6ee7b7',
-        pink:   '#fda4af',
-        blue:   '#7dd3fc'
-      },
-      pen: {
-        yellow: '#d97706',
-        green:  '#059669',
-        pink:   '#e11d48',
-        blue:   '#2563eb'
-      }
+      highlight: { yellow: '#fde047', green: '#6ee7b7', pink: '#fda4af', blue: '#7dd3fc' },
+      pen:       { yellow: '#d97706', green: '#059669', pink: '#e11d48', blue: '#2563eb' }
     };
 
     function syncBrushUI() {
       const isPen = activeTool === 'pen';
       const slider = $('brushSizeSlider');
       if (isPen) {
-        slider.min = '1'; slider.max = '10'; slider.step = '0.5';
-        slider.value = String(penSize);
+        slider.min = '1'; slider.max = '10'; slider.step = '0.5'; slider.value = String(penSize);
         $('sizePanelLabel').textContent = 'সাইজ (কলম)';
         $('sizeValueLabel').textContent = penSize + ' px';
       } else {
-        slider.min = '4'; slider.max = '32'; slider.step = '1';
-        slider.value = String(highlightSize);
+        slider.min = '4'; slider.max = '32'; slider.step = '1'; slider.value = String(highlightSize);
         $('sizePanelLabel').textContent = 'সাইজ (হাইলাইট)';
         $('sizeValueLabel').textContent = highlightSize + ' px';
       }
@@ -1920,10 +2465,7 @@
       dot.style.height = dotPx + 'px';
       dot.style.background = colorMap[isPen ? 'pen' : 'highlight'][activeColor] || '#fde047';
 
-      // Highlight matching preset chip
-      const smallV = isPen ? 1.5 : 7;
-      const medV = isPen ? 3 : 13;
-      const lgV = isPen ? 6 : 22;
+      const smallV = isPen ? 1.5 : 7, medV = isPen ? 3 : 13, lgV = isPen ? 6 : 22;
       $('sizePresets').querySelectorAll('.preset-btn').forEach(b => {
         const key = b.dataset.size;
         const match = (key === 'small' && Math.abs(curSize - smallV) <= 2)
@@ -1935,8 +2477,7 @@
 
     $('brushSizeSlider').addEventListener('input', (e) => {
       const val = parseFloat(e.target.value);
-      if (activeTool === 'pen') penSize = val;
-      else highlightSize = val;
+      if (activeTool === 'pen') penSize = val; else highlightSize = val;
       syncBrushUI();
     });
 
@@ -1957,7 +2498,6 @@
       if (tool === 'highlight') $('toolHighlightBtn').classList.add('active');
       if (tool === 'pen') $('toolPenBtn').classList.add('active');
       if (tool === 'note') $('toolNoteBtn').classList.add('active');
-
       const isDraw = tool === 'highlight' || tool === 'pen';
       $('drawCanvas').classList.toggle('active', isDraw);
       $('notesLayer').classList.toggle('placing', tool === 'note');
@@ -1980,7 +2520,6 @@
 
     syncBrushUI();
 
-    // Drawing Canvas (2x HiDPI with multiply blend + normalized stroke widths)
     const drawCanvas = $('drawCanvas');
     const drawCtx = drawCanvas.getContext('2d');
 
@@ -2006,9 +2545,7 @@
         drawCtx.globalAlpha = s.tool === 'highlight' ? 0.72 : 0.95;
         drawCtx.lineWidth = s.widthRatio * w;
         drawCtx.moveTo(s.points[0].x * w, s.points[0].y * h);
-        for (let i = 1; i < s.points.length; i++) {
-          drawCtx.lineTo(s.points[i].x * w, s.points[i].y * h);
-        }
+        for (let i = 1; i < s.points.length; i++) drawCtx.lineTo(s.points[i].x * w, s.points[i].y * h);
         drawCtx.stroke();
       }
       drawCtx.globalAlpha = 1.0;
@@ -2016,13 +2553,12 @@
 
     function beginStroke(ev) {
       if (activeTool !== 'pen' && activeTool !== 'highlight') return;
-      if (ev.touches && ev.touches.length > 1) return; // let 2-finger pinch pass through!
+      if (ev.touches && ev.touches.length > 1) return;
       ev.preventDefault();
       $('sideDock').classList.remove('open');
       isDrawing = true;
       const pt = normPoint(ev);
       if (!pageStrokes[currentPage]) pageStrokes[currentPage] = [];
-      // Scale stroke thickness nicely relative to document width (and scale down slightly when zoomed in so fine highlighting works!)
       const rawPx = activeTool === 'highlight' ? highlightSize : penSize;
       const widthRatio = (rawPx / Math.max(scale, 1)) / Math.max(baseW, 300);
       currentStroke = { tool: activeTool, color: activeColor, widthRatio, points: [pt] };
@@ -2037,7 +2573,6 @@
       currentStroke.points.push(normPoint(ev));
       redrawPageStrokes();
     }
-
     function finishStroke() { isDrawing = false; currentStroke = null; }
 
     drawCanvas.addEventListener('touchstart', beginStroke, { passive: false });
@@ -2049,52 +2584,33 @@
 
     $('toolUndoBtn').addEventListener('click', () => {
       const list = pageStrokes[currentPage];
-      if (list && list.length) {
-        list.pop();
-        redrawPageStrokes();
-        showToast('শেষ দাগটি মুছে ফেলা হয়েছে');
-      } else {
-        showToast('মোছার মতো কোনো দাগ নেই');
-      }
+      if (list && list.length) { list.pop(); redrawPageStrokes(); showToast('শেষ দাগটি মুছে ফেলা হয়েছে'); }
+      else showToast('মোছার মতো কোনো দাগ নেই');
     });
 
     $('toolSavePageBtn').addEventListener('click', () => {
-      const c1 = $('pdfCanvas');
-      const c2 = $('drawCanvas');
+      const c1 = $('pdfCanvas'), c2 = $('drawCanvas');
       if (!c1.width) return;
       const merged = document.createElement('canvas');
-      merged.width = c1.width;
-      merged.height = c1.height;
+      merged.width = c1.width; merged.height = c1.height;
       const mctx = merged.getContext('2d');
       mctx.drawImage(c1, 0, 0);
       mctx.globalCompositeOperation = 'multiply';
       mctx.drawImage(c2, 0, 0, c1.width, c1.height);
       mctx.globalCompositeOperation = 'source-over';
-      merged.toBlob((blob) => {
-        if (blob) saveOutputFile(blob, `GlassDoc_Page_${currentPage}.png`);
-      }, 'image/png');
+      merged.toBlob((blob) => { if (blob) saveOutputFile(blob, `GlassDoc_Page_${currentPage}.png`); }, 'image/png');
       $('sideDock').classList.remove('open');
     });
 
-    // ==================== PERSISTENT STICKY NOTES ====================
-    let pendingNotePos = null;
-    let editingNoteIdx = -1;
-
-    function loadAllNotes() {
-      if (!currentPdfKey) return {};
-      try { return JSON.parse(localStorage.getItem(currentPdfKey) || '{}'); }
-      catch { return {}; }
-    }
-    function saveAllNotes(data) {
-      if (!currentPdfKey) return;
-      localStorage.setItem(currentPdfKey, JSON.stringify(data));
-    }
+    // ==================== STICKY NOTES ====================
+    let pendingNotePos = null, editingNoteIdx = -1;
+    function loadAllNotes() { if (!currentPdfKey) return {}; try { return JSON.parse(localStorage.getItem(currentPdfKey) || '{}'); } catch { return {}; } }
+    function saveAllNotes(data) { if (!currentPdfKey) return; localStorage.setItem(currentPdfKey, JSON.stringify(data)); }
 
     function renderPageNotes() {
       const layer = $('notesLayer');
       layer.innerHTML = '';
-      const list = loadAllNotes()[currentPage] || [];
-      list.forEach((n, idx) => {
+      (loadAllNotes()[currentPage] || []).forEach((n, idx) => {
         const pin = document.createElement('button');
         pin.className = 'note-pin';
         pin.style.left = (n.x * 100) + '%';
@@ -2108,10 +2624,7 @@
     $('notesLayer').addEventListener('click', (ev) => {
       if (activeTool !== 'note' || ev.target.closest('.note-pin')) return;
       const rect = $('notesLayer').getBoundingClientRect();
-      pendingNotePos = {
-        x: (ev.clientX - rect.left) / Math.max(rect.width, 1),
-        y: (ev.clientY - rect.top) / Math.max(rect.height, 1)
-      };
+      pendingNotePos = { x: (ev.clientX - rect.left) / Math.max(rect.width, 1), y: (ev.clientY - rect.top) / Math.max(rect.height, 1) };
       openNoteModal(-1, '');
     });
 
@@ -2132,22 +2645,13 @@
       if (!all[currentPage]) all[currentPage] = [];
       if (editingNoteIdx >= 0) all[currentPage][editingNoteIdx].text = txt;
       else if (pendingNotePos) all[currentPage].push({ x: pendingNotePos.x, y: pendingNotePos.y, text: txt });
-      saveAllNotes(all);
-      renderPageNotes();
-      $('noteModal').classList.remove('open');
-      setActiveTool('read');
-      showToast('নোট সেভ হয়েছে!');
+      saveAllNotes(all); renderPageNotes();
+      $('noteModal').classList.remove('open'); setActiveTool('read'); showToast('নোট সেভ হয়েছে!');
     });
     $('noteDeleteBtn').addEventListener('click', () => {
       const all = loadAllNotes();
-      if (all[currentPage] && editingNoteIdx >= 0) {
-        all[currentPage].splice(editingNoteIdx, 1);
-        saveAllNotes(all);
-        renderPageNotes();
-      }
-      $('noteModal').classList.remove('open');
-      setActiveTool('read');
-      showToast('নোট মুছে ফেলা হয়েছে');
+      if (all[currentPage] && editingNoteIdx >= 0) { all[currentPage].splice(editingNoteIdx, 1); saveAllNotes(all); renderPageNotes(); }
+      $('noteModal').classList.remove('open'); setActiveTool('read'); showToast('নোট মুছে ফেলা হয়েছে');
     });
 
     // ==================== BIJOY TO UNICODE ====================
@@ -2205,7 +2709,8 @@
     $('unicodeToEditorBtn').addEventListener('click', () => {
       const txt = $('unicodeOutput').value.trim();
       if (!txt) return showToast('আউটপুটে কোনো লেখা নেই');
-      $('editorPaper').innerHTML = txt.split('\n').map(l => `<p>${l || '&nbsp;'}</p>`).join('');
+      $('editorPaper').innerHTML = txt.split('\n').map(l => `<p>${l || '<br>'}</p>`).join('');
+      normalizeEditablePaper();
       $('docTitleInput').value = 'Converted_Bangla_Doc';
       switchTab('editor');
       showToast('এডিটরে লোড হয়েছে!');
@@ -2221,7 +2726,8 @@
 
     $('insertTableBtn').addEventListener('click', () => {
       $('editorPaper').focus();
-      document.execCommand('insertHTML', false, `<table><tr><th>ক্রমিক</th><th>বিষয়</th><th>মন্তব্য</th></tr><tr><td>১</td><td>উদাহরণ</td><td>সম্পন্ন</td></tr></table><p><br></p>`);
+      document.execCommand('insertHTML', false, `<table><tr><th>ক্রমিক</th><th>বিষয়</th><th>মন্তব্য</th></tr><tr><td><p>১</p></td><td><p>উদাহরণ</p></td><td><p><br></p></td></tr></table><p><br></p>`);
+      normalizeEditablePaper();
     });
 
     $('editorImgInput').addEventListener('change', (e) => {
@@ -2234,7 +2740,7 @@
 
     const templates = {
       mcq: `<h2 style="text-align:center;">বহুনির্বাচনি প্রশ্নপত্র</h2><p style="text-align:center;"><b>বিষয়:</b> তথ্য ও যোগাযোগ প্রযুক্তি &nbsp;|&nbsp; <b>পূর্ণমান:</b> ২৫</p><hr><p><b>১. বিশ্বগ্রাম (Global Village) ধারণার প্রবক্তা কে?</b><br>ক) মার্শাল ম্যাকলুহান &nbsp;&nbsp; খ) টিম বার্নার্স লি<br>গ) চার্লস ব্যাবেজ &nbsp;&nbsp; ঘ) অ্যাডা লাভলেস</p>`,
-      assignment: `<div style="text-align:center; padding:18px; border:2px solid #1e293b;"><h2>অ্যাসাইনমেন্ট কভার পেজ</h2><p><b>প্রতিষ্ঠান:</b> আপনার প্রতিষ্ঠানের নাম</p><hr><p><b>বিষয়:</b> ____________________</p><p><b>শিরোনাম:</b> ____________________</p><br><p><b>জমাদানকারী:</b> আপনার নাম | <b>রোল:</b> _______</p></div>`,
+      assignment: `<div style="text-align:center; padding:18px; border:2px solid #1e293b;"><h2>অ্যাসাইনমেন্ট কভার পেজ</h2><p><b>প্রতিষ্ঠান:</b> আপনার প্রতিষ্ঠানের নাম</p><hr><table><tr><td><b>শিক্ষার্থীর নাম</b></td><td><p><br></p></td></tr><tr><td><b>শ্রেণি / রোল</b></td><td><p><br></p></td></tr><tr><td><b>বিষয়</b></td><td><p>তথ্য ও যোগাযোগ প্রযুক্তি (ICT)</p></td></tr><tr><td><b>জমাদানের তারিখ</b></td><td><p><br></p></td></tr></table></div>`,
       application: `<p>তারিখ: ___/___/২০২৬ খ্রি.</p><p>বরাবর,<br>অধ্যক্ষ / বিভাগীয় প্রধান,<br>আপনার প্রতিষ্ঠানের নাম।</p><p><b>বিষয়:</b> ছুটির জন্য আবেদন।</p><p>জনাব,<br>বিনীত নিবেদন এই যে, আমি আপনার প্রতিষ্ঠানের নিয়মিত শিক্ষার্থী...</p><p>বিনীত নিবেদক,<br>আপনার নাম</p>`,
       notes: `<h2>ক্লাস নোট — অধ্যায় ০১</h2><ul><li><b>মূল পয়েন্ট ১:</b> এখানে ব্যাখ্যা লিখুন...</li><li><b>মূল পয়েন্ট ২:</b> সূত্র বা সংজ্ঞা...</li></ul>`
     };
@@ -2242,6 +2748,7 @@
     $('templateSelect').addEventListener('change', (e) => {
       if (templates[e.target.value]) {
         $('editorPaper').innerHTML = templates[e.target.value];
+        normalizeEditablePaper();
         $('docTitleInput').value = e.target.value.toUpperCase() + '_Doc';
         showToast('টেমপ্লেট লোড হয়েছে!');
       }
@@ -2294,7 +2801,7 @@
           </div>
         </div>`).join('') : '<div style="font-size:12.5px; color:var(--text-muted);">কোনো ড্রাফট সেভ নেই।</div>';
     }
-    window.loadDraft = (i) => { const d = getDrafts()[i]; if (!d) return; $('docTitleInput').value = d.title; $('editorPaper').innerHTML = d.html; showToast('ড্রাফট লোড হয়েছে'); };
+    window.loadDraft = (i) => { const d = getDrafts()[i]; if (!d) return; $('docTitleInput').value = d.title; $('editorPaper').innerHTML = d.html; normalizeEditablePaper(); showToast('ড্রাফট লোড হয়েছে'); };
     window.deleteDraft = (i) => { const d = getDrafts(); d.splice(i, 1); localStorage.setItem('gd_drafts', JSON.stringify(d)); renderDrafts(); };
     $('saveDraftBtn').addEventListener('click', () => {
       const d = getDrafts();

@@ -4,8 +4,8 @@
   "webDir": "www",
   "android": {
     "allowMixedContent": false,
-    "backgroundColor": "#090f1d",
-    "captureInput": true,
+    "backgroundColor": "#050812",
+    "captureInput": false,
     "webContentsDebuggingEnabled": false
   }
 }
