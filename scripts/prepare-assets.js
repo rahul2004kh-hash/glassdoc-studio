@@ -28,6 +28,10 @@ function prepareWebAssets() {
     throw new Error('Missing index.html in root or www/');
   }
 
+  if (fs.existsSync('app-icon.png')) {
+    copyFile('app-icon.png', 'www/app-icon.png');
+  }
+
   const libs = [
     ['node_modules/pdfjs-dist/build/pdf.min.js', 'www/vendor/pdf.min.js'],
     ['node_modules/pdfjs-dist/build/pdf.worker.min.js', 'www/vendor/pdf.worker.min.js'],
@@ -59,13 +63,13 @@ function prepareWebAssets() {
 }
 
 function patchAndroidNative() {
-  const pkgPath = 'android/app/src/main/java/org/glassdoc/student';
+  const pkgPath = 'android/app/src/main/java/com/aetherx/pdfreader';
   if (!fs.existsSync(pkgPath)) {
     throw new Error('Android package path not found: ' + pkgPath);
   }
 
-  // 1. NativeStorageBridge.java (Owner SharedPreferences + Fullscreen + PDF Auto-Scanner + File Save)
-  const nativeBridgeJava = `package org.glassdoc.student;
+  // 1. NativeStorageBridge.java (Owner Prefs + Fullscreen + All-Document Scanner + Save)
+  const nativeBridgeJava = `package com.aetherx.pdfreader;
 
 import android.Manifest;
 import android.content.Context;
@@ -98,7 +102,7 @@ import java.util.Set;
 
 public class NativeStorageBridge {
     private final MainActivity activity;
-    private static final String PREFS_NAME = "GlassDocOwnerPrefs";
+    private static final String PREFS_NAME = "AetherXOwnerPrefs";
     private static final String KEY_OWNER_NAME = "owner_name";
 
     public NativeStorageBridge(MainActivity activity) {
@@ -186,8 +190,23 @@ public class NativeStorageBridge {
         });
     }
 
+    private boolean isSupportedDoc(String lowerName) {
+        return lowerName.endsWith(".pdf")
+            || lowerName.endsWith(".docx")
+            || lowerName.endsWith(".doc")
+            || lowerName.endsWith(".txt")
+            || lowerName.endsWith(".md")
+            || lowerName.endsWith(".html")
+            || lowerName.endsWith(".htm")
+            || lowerName.endsWith(".csv")
+            || lowerName.endsWith(".rtf");
+    }
+
     @JavascriptInterface
     public String scanDocuments() {
+        if (!hasStoragePermission()) {
+            return "[]";
+        }
         List<File> found = new ArrayList<>();
         Set<String> seen = new HashSet<>();
 
@@ -203,7 +222,11 @@ public class NativeStorageBridge {
             String[] projection = new String[]{ MediaStore.Files.FileColumns.DATA };
             String selection = MediaStore.Files.FileColumns.DATA + " LIKE '%.pdf' OR "
                     + MediaStore.Files.FileColumns.DATA + " LIKE '%.docx' OR "
-                    + MediaStore.Files.FileColumns.DATA + " LIKE '%.txt'";
+                    + MediaStore.Files.FileColumns.DATA + " LIKE '%.doc' OR "
+                    + MediaStore.Files.FileColumns.DATA + " LIKE '%.txt' OR "
+                    + MediaStore.Files.FileColumns.DATA + " LIKE '%.md' OR "
+                    + MediaStore.Files.FileColumns.DATA + " LIKE '%.html' OR "
+                    + MediaStore.Files.FileColumns.DATA + " LIKE '%.csv'";
             Cursor cursor = activity.getContentResolver().query(uri, projection, selection, null, null);
             if (cursor != null) {
                 int dataIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
@@ -231,7 +254,7 @@ public class NativeStorageBridge {
         });
 
         JSONArray arr = new JSONArray();
-        int limit = Math.min(found.size(), 250);
+        int limit = Math.min(found.size(), 350);
         for (int i = 0; i < limit; i++) {
             File f = found.get(i);
             try {
@@ -253,7 +276,7 @@ public class NativeStorageBridge {
     }
 
     private void scanDirRecursive(File dir, List<File> out, Set<String> seen, int depth) {
-        if (depth > 5 || out.size() >= 400) return;
+        if (depth > 5 || out.size() >= 500) return;
         String dirName = dir.getName();
         if (depth > 0 && (dirName.startsWith(".") || dirName.equalsIgnoreCase("Android") || dirName.equalsIgnoreCase("MIUI"))) {
             if (!dirName.equalsIgnoreCase("Android")) return;
@@ -266,12 +289,12 @@ public class NativeStorageBridge {
         File[] children = dir.listFiles();
         if (children == null) return;
         for (File child : children) {
-            if (out.size() >= 400) break;
+            if (out.size() >= 500) break;
             if (child.isDirectory()) {
                 scanDirRecursive(child, out, seen, depth + 1);
             } else if (child.isFile() && child.length() > 0) {
                 String lower = child.getName().toLowerCase(Locale.ROOT);
-                if (lower.endsWith(".pdf") || lower.endsWith(".docx") || lower.endsWith(".txt")) {
+                if (isSupportedDoc(lower)) {
                     String abs = child.getAbsolutePath();
                     if (!seen.contains(abs)) {
                         seen.add(abs);
@@ -286,7 +309,7 @@ public class NativeStorageBridge {
     public String readFileBase64(String filePath) {
         try {
             File file = new File(filePath);
-            if (!file.exists() || !file.canRead() || file.length() > 28 * 1024 * 1024) {
+            if (!file.exists() || !file.canRead() || file.length() > 40 * 1024 * 1024) {
                 return "";
             }
             FileInputStream fis = new FileInputStream(file);
@@ -307,7 +330,7 @@ public class NativeStorageBridge {
     public String saveBase64ToDocuments(String filename, String base64Data) {
         try {
             File docs = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-            File folder = new File(docs, "GlassDoc");
+            File folder = new File(docs, "AetherX_PDF");
             if (!folder.exists()) folder.mkdirs();
             File outFile = new File(folder, filename);
             byte[] data = Base64.decode(base64Data, Base64.DEFAULT);
@@ -325,8 +348,8 @@ public class NativeStorageBridge {
   fs.writeFileSync(path.join(pkgPath, 'NativeStorageBridge.java'), nativeBridgeJava, 'utf8');
   console.log('Created NativeStorageBridge.java');
 
-  // 2. MainActivity.java with Immersive Fullscreen + Keyboard Resize support
-  const mainActivityJava = `package org.glassdoc.student;
+  // 2. MainActivity.java (Immersive Fullscreen + AdjustResize + Hardware Acceleration)
+  const mainActivityJava = `package com.aetherx.pdfreader;
 
 import android.graphics.Color;
 import android.os.Build;
@@ -413,7 +436,7 @@ public class MainActivity extends BridgeActivity {
   fs.writeFileSync(path.join(pkgPath, 'MainActivity.java'), mainActivityJava, 'utf8');
   console.log('Patched MainActivity.java');
 
-  // 3. Patch AndroidManifest.xml with storage permissions + adjustResize
+  // 3. Patch AndroidManifest.xml (Storage permissions + adjustResize + tablet resizeable)
   const manifestPath = 'android/app/src/main/AndroidManifest.xml';
   let manifest = fs.readFileSync(manifestPath, 'utf8');
   if (!manifest.includes('xmlns:tools=')) {
@@ -436,10 +459,20 @@ public class MainActivity extends BridgeActivity {
   fs.writeFileSync(manifestPath, manifest, 'utf8');
   console.log('Patched AndroidManifest.xml');
 
-  // 4. Patch android/app/build.gradle for Signed Release APK
+  // 4. Patch Adaptive Icon Background color (#050812) so custom icon blends seamlessly
+  const bgColorXmlPath = 'android/app/src/main/res/values/ic_launcher_background.xml';
+  fs.mkdirSync(path.dirname(bgColorXmlPath), { recursive: true });
+  fs.writeFileSync(
+    bgColorXmlPath,
+    '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#050812</color>\n</resources>\n',
+    'utf8'
+  );
+  console.log('Patched ic_launcher_background.xml');
+
+  // 5. Patch android/app/build.gradle for Signed Release APK
   const gradlePath = 'android/app/build.gradle';
   let gradle = fs.readFileSync(gradlePath, 'utf8');
-  if (!gradle.includes('glassdoc-release.keystore')) {
+  if (!gradle.includes('aetherx-release.keystore')) {
     gradle = gradle.replace(
       /buildTypes\s*\{\s*release\s*\{/,
       'buildTypes {\n        release {\n            signingConfig signingConfigs.release'
@@ -447,10 +480,10 @@ public class MainActivity extends BridgeActivity {
     const signingBlock = `
     signingConfigs {
         release {
-            storeFile file("glassdoc-release.keystore")
-            storePassword "GlassDoc2026"
-            keyAlias "glassdoc"
-            keyPassword "GlassDoc2026"
+            storeFile file("aetherx-release.keystore")
+            storePassword "AetherX2026"
+            keyAlias "aetherx"
+            keyPassword "AetherX2026"
         }
     }
     lint {
