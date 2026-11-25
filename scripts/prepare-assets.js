@@ -64,11 +64,13 @@ function patchAndroidNative() {
     throw new Error('Android package path not found: ' + pkgPath);
   }
 
-  // 1. NativeStorageBridge.java (PDF Auto-Scanner + True Immersive Fullscreen Control)
+  // 1. NativeStorageBridge.java (Owner SharedPreferences + Fullscreen + PDF Auto-Scanner + File Save)
   const nativeBridgeJava = `package org.glassdoc.student;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -96,9 +98,43 @@ import java.util.Set;
 
 public class NativeStorageBridge {
     private final MainActivity activity;
+    private static final String PREFS_NAME = "GlassDocOwnerPrefs";
+    private static final String KEY_OWNER_NAME = "owner_name";
 
     public NativeStorageBridge(MainActivity activity) {
         this.activity = activity;
+    }
+
+    @JavascriptInterface
+    public String getOwnerName() {
+        try {
+            SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            return prefs.getString(KEY_OWNER_NAME, "");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @JavascriptInterface
+    public void saveOwnerName(String name) {
+        try {
+            SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            prefs.edit().putString(KEY_OWNER_NAME, name != null ? name.trim() : "").apply();
+        } catch (Exception ignored) {}
+    }
+
+    @JavascriptInterface
+    public String getDeviceModel() {
+        try {
+            String m = Build.MANUFACTURER != null ? Build.MANUFACTURER : "";
+            String model = Build.MODEL != null ? Build.MODEL : "Android Device";
+            if (model.toLowerCase(Locale.ROOT).startsWith(m.toLowerCase(Locale.ROOT))) {
+                return model;
+            }
+            return (m + " " + model).trim();
+        } catch (Exception e) {
+            return "Android Device";
+        }
     }
 
     @JavascriptInterface
@@ -289,7 +325,7 @@ public class NativeStorageBridge {
   fs.writeFileSync(path.join(pkgPath, 'NativeStorageBridge.java'), nativeBridgeJava, 'utf8');
   console.log('Created NativeStorageBridge.java');
 
-  // 2. MainActivity.java with True Immersive Sticky Fullscreen (Hides Status Bar + Bottom Nav Bar)
+  // 2. MainActivity.java with Immersive Fullscreen + Keyboard Resize support
   const mainActivityJava = `package org.glassdoc.student;
 
 import android.graphics.Color;
@@ -313,6 +349,7 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         try {
             Window window = getWindow();
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
             window.setStatusBarColor(Color.parseColor("#050812"));
             window.setNavigationBarColor(Color.parseColor("#050812"));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -328,6 +365,7 @@ public class MainActivity extends BridgeActivity {
             WebSettings settings = webView.getSettings();
             settings.setAllowFileAccess(true);
             settings.setAllowContentAccess(true);
+            settings.setDomStorageEnabled(true);
         }
     }
 
@@ -373,9 +411,9 @@ public class MainActivity extends BridgeActivity {
 }
 `;
   fs.writeFileSync(path.join(pkgPath, 'MainActivity.java'), mainActivityJava, 'utf8');
-  console.log('Patched MainActivity.java with Immersive Fullscreen');
+  console.log('Patched MainActivity.java');
 
-  // 3. Patch AndroidManifest.xml with storage permissions
+  // 3. Patch AndroidManifest.xml with storage permissions + adjustResize
   const manifestPath = 'android/app/src/main/AndroidManifest.xml';
   let manifest = fs.readFileSync(manifestPath, 'utf8');
   if (!manifest.includes('xmlns:tools=')) {
@@ -392,10 +430,13 @@ public class MainActivity extends BridgeActivity {
   if (!manifest.includes('requestLegacyExternalStorage')) {
     manifest = manifest.replace('<application', '<application android:requestLegacyExternalStorage="true"');
   }
+  if (!manifest.includes('windowSoftInputMode')) {
+    manifest = manifest.replace('<activity', '<activity android:windowSoftInputMode="adjustResize"');
+  }
   fs.writeFileSync(manifestPath, manifest, 'utf8');
   console.log('Patched AndroidManifest.xml');
 
-  // 4. Patch android/app/build.gradle for Signed Release APK & clean lint
+  // 4. Patch android/app/build.gradle for Signed Release APK
   const gradlePath = 'android/app/build.gradle';
   let gradle = fs.readFileSync(gradlePath, 'utf8');
   if (!gradle.includes('glassdoc-release.keystore')) {
