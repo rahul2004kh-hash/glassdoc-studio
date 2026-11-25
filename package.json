@@ -1,7 +1,7 @@
 {
   "name": "aetherx-pdf-reader",
-  "version": "3.0.0",
-  "description": "AetherX PDF Reader - Offline, ad-free, Liquid Glass PDF & Docs studio for phones & tablets",
+  "version": "3.1.0",
+  "description": "AetherX PDF Reader v3.1 - Secure, 100% Offline, Ad-free Liquid Glass PDF & Docs Studio",
   "private": true,
   "scripts": {
     "prepare-assets": "node scripts/prepare-assets.js",

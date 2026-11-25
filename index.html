@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#050812" />
+  <!-- Strict 100% Offline Content-Security-Policy: Blocks ALL external network, CDN, and tracking requests -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' blob: data:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self' data:; connect-src 'self' blob: data:; media-src 'self' blob: data:; frame-src 'self' data: blob:; object-src 'none'; base-uri 'self';" />
   <title>AetherX PDF Reader</title>
 
   <!-- 100% Offline Bundled Bengali Fonts -->
@@ -59,23 +61,14 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     html, body {
-      margin: 0;
-      padding: 0;
-      min-height: 100%;
-      font-family: var(--font-bn);
-      color: var(--text-main);
-      background: var(--bg-base);
-      overflow-x: hidden;
+      margin: 0; padding: 0; min-height: 100%;
+      font-family: var(--font-bn); color: var(--text-main);
+      background: var(--bg-base); overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* BATTERY-OPTIMIZED Static Liquid Aurora Orbs (0% idle GPU drain!) */
     .ambient-bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-      pointer-events: none;
+      position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
       background:
         radial-gradient(circle at 12% 8%, rgba(14, 165, 233, 0.28), transparent 44%),
         radial-gradient(circle at 90% 34%, rgba(139, 92, 246, 0.25), transparent 46%),
@@ -88,291 +81,117 @@
         radial-gradient(circle at 24% 94%, rgba(16, 185, 129, 0.16), transparent 48%);
     }
 
-    /* ==================== STARTUP OVERLAYS (SPLASH, OWNERSHIP CEREMONY, BLANK PERMISSION GATE) ==================== */
+    /* ==================== STARTUP OVERLAYS ==================== */
     .startup-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 900;
-      background: #050812;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 22px;
-      overflow: hidden;
-      transition: opacity 0.44s cubic-bezier(0.22, 1, 0.36, 1), transform 0.44s cubic-bezier(0.22, 1, 0.36, 1);
+      position: fixed; inset: 0; z-index: 900; background: #050812;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      padding: 22px; overflow: hidden;
+      transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .startup-screen.show { display: flex; }
     .startup-screen.fade-out { opacity: 0; transform: scale(1.03); pointer-events: none; }
 
-    /* Blank / Minimal Permission Gate Screen (blocks file screen until user grants storage permission) */
-    #permissionGate {
-      z-index: 860;
-      background: #050812;
-    }
+    #permissionGate { z-index: 860; background: #050812; }
 
     .perm-gate-card {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 380px;
-      border-radius: 28px;
-      padding: 32px 24px 26px;
+      position: relative; z-index: 2; width: 100%; max-width: 380px; border-radius: 28px; padding: 32px 24px 26px;
       background: linear-gradient(155deg, rgba(255, 255, 255, 0.11) 0%, rgba(15, 23, 42, 0.78) 100%);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%);
       border: 1px solid rgba(255, 255, 255, 0.18);
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.28);
-      text-align: center;
-      color: #f8fafc;
-      animation: certAppear 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      text-align: center; color: #f8fafc; animation: certAppear 0.42s cubic-bezier(0.22, 1, 0.36, 1);
     }
-
     .perm-shield-ico {
-      width: 68px; height: 68px;
-      margin: 0 auto 16px;
-      border-radius: 22px;
+      width: 68px; height: 68px; margin: 0 auto 16px; border-radius: 22px;
       background: linear-gradient(135deg, rgba(14, 165, 233, 0.28), rgba(99, 102, 241, 0.28));
-      border: 1px solid rgba(56, 189, 248, 0.45);
-      color: #7dd3fc;
-      display: grid; place-items: center;
+      border: 1px solid rgba(56, 189, 248, 0.45); color: #7dd3fc; display: grid; place-items: center;
       box-shadow: 0 10px 28px rgba(14, 165, 233, 0.26);
     }
+    .perm-gate-card h2 { margin: 0 0 8px; font-size: 18px; font-weight: 700; }
+    .perm-gate-card p { margin: 0 0 22px; font-size: 13px; color: #94a3b8; line-height: 1.6; }
+    .perm-skip-link { margin-top: 14px; background: none; border: none; color: #64748b; font-family: var(--font-bn); font-size: 12px; cursor: pointer; padding: 6px 10px; }
 
-    .perm-gate-card h2 {
-      margin: 0 0 8px;
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .perm-gate-card p {
-      margin: 0 0 22px;
-      font-size: 13px;
-      color: #94a3b8;
-      line-height: 1.6;
-    }
-
-    .perm-skip-link {
-      margin-top: 14px;
-      background: none;
-      border: none;
-      color: #64748b;
-      font-family: var(--font-bn);
-      font-size: 12px;
-      cursor: pointer;
-      padding: 6px 10px;
-    }
-
-    /* Simple Splash (Every launch after first) */
-    .simple-splash-box {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 14px;
-      animation: fadeUpSoft 0.36s ease;
-    }
-    .splash-emblem {
-      width: 78px; height: 78px;
-      border-radius: 24px;
-      overflow: hidden;
-      background: linear-gradient(135deg, #0ea5e9, #6366f1);
-      display: grid; place-items: center;
-      color: #fff;
-      box-shadow: 0 14px 40px rgba(56, 189, 248, 0.40), inset 0 1.5px 1px rgba(255, 255, 255, 0.45);
-    }
+    .simple-splash-box { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; animation: fadeUpSoft 0.32s ease; }
+    .splash-emblem { width: 78px; height: 78px; border-radius: 24px; overflow: hidden; background: linear-gradient(135deg, #0ea5e9, #6366f1); display: grid; place-items: center; box-shadow: 0 14px 40px rgba(56, 189, 248, 0.40); }
     .splash-emblem img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .splash-owner-name { font-size: 20px; font-weight: 700; letter-spacing: 0.3px; color: #f8fafc; }
     .splash-sub { font-size: 12px; color: #94a3b8; margin-top: -8px; }
     .splash-bar-track { width: 170px; height: 4px; border-radius: 99px; background: rgba(255, 255, 255, 0.12); overflow: hidden; margin-top: 4px; }
-    .splash-bar-fill { width: 0%; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399); animation: simpleLoadFill 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    .splash-bar-fill { width: 0%; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399); animation: simpleLoadFill 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
     @keyframes simpleLoadFill { from { width: 0%; } to { width: 100%; } }
 
-    /* One-Time App Ownership Transfer Ceremony */
-    .ceremony-stage {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 396px;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-    }
-    .ceremony-stage.active {
-      display: flex;
-      animation: certAppear 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    @keyframes certAppear {
-      from { opacity: 0; transform: translateY(22px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    @keyframes fadeUpSoft {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .ceremony-stage { position: relative; z-index: 2; width: 100%; max-width: 396px; display: none; flex-direction: column; align-items: center; }
+    .ceremony-stage.active { display: flex; animation: certAppear 0.52s cubic-bezier(0.22, 1, 0.36, 1); }
+    @keyframes certAppear { from { opacity: 0; transform: translateY(22px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes fadeUpSoft { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     .cert-card {
-      position: relative;
-      width: 100%;
-      border-radius: 26px;
-      padding: 28px 22px 26px;
+      position: relative; width: 100%; border-radius: 26px; padding: 28px 22px 26px;
       background: linear-gradient(155deg, rgba(255, 255, 255, 0.13) 0%, rgba(15, 23, 42, 0.74) 55%, rgba(56, 189, 248, 0.10) 100%);
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      backdrop-filter: blur(28px) saturate(190%); -webkit-backdrop-filter: blur(28px) saturate(190%);
       border: 1.5px solid rgba(255, 255, 255, 0.22);
       box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 40px rgba(56, 189, 248, 0.16);
-      overflow: hidden;
-      text-align: center;
-      color: #f8fafc;
+      overflow: hidden; text-align: center; color: #f8fafc;
     }
     .cert-card.impact-shake { animation: certThump 0.34s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
-    @keyframes certThump {
-      0% { transform: scale(1); }
-      30% { transform: scale(0.975) translateY(3px); }
-      65% { transform: scale(1.01) translateY(-1px); }
-      100% { transform: scale(1); }
-    }
-
+    @keyframes certThump { 0% { transform: scale(1); } 30% { transform: scale(0.975) translateY(3px); } 65% { transform: scale(1.01) translateY(-1px); } 100% { transform: scale(1); } }
     .cert-inner-frame { position: absolute; inset: 10px; border-radius: 18px; border: 1px solid rgba(251, 191, 36, 0.28); pointer-events: none; }
-    .cert-shimmer {
-      position: absolute; top: -60%; left: -80%; width: 60%; height: 220%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), rgba(56, 189, 248, 0.18), transparent);
-      transform: rotate(24deg); pointer-events: none;
-      animation: certSweep 2.6s ease-in-out 2;
-    }
+    .cert-shimmer { position: absolute; top: -60%; left: -80%; width: 60%; height: 220%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), rgba(56, 189, 248, 0.18), transparent); transform: rotate(24deg); pointer-events: none; animation: certSweep 2.6s ease-in-out 2; }
     @keyframes certSweep { 0% { left: -80%; } 60%, 100% { left: 145%; } }
-
-    .cert-crest {
-      width: 56px; height: 56px;
-      margin: 0 auto 14px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(251, 191, 36, 0.24), rgba(56, 189, 248, 0.24));
-      border: 1px solid rgba(251, 191, 36, 0.45);
-      display: grid; place-items: center;
-      color: #fde68a;
-      box-shadow: 0 8px 24px rgba(251, 191, 36, 0.22);
-    }
-
-    .cert-kicker {
-      font-size: 10.5px;
-      font-weight: 800;
-      letter-spacing: 2.2px;
-      text-transform: uppercase;
-      color: #38bdf8;
-      margin-bottom: 6px;
-    }
-
-    .cert-heading {
-      font-size: 19px;
-      font-weight: 700;
-      margin: 0 0 18px;
-      background: linear-gradient(135deg, #ffffff 10%, #bae6fd 60%, #fde68a 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
+    .cert-crest { width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 18px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.24), rgba(56, 189, 248, 0.24)); border: 1px solid rgba(251, 191, 36, 0.45); display: grid; place-items: center; color: #fde68a; }
+    .cert-kicker { font-size: 10.5px; font-weight: 800; letter-spacing: 2.2px; text-transform: uppercase; color: #38bdf8; margin-bottom: 6px; }
+    .cert-heading { font-size: 19px; font-weight: 700; margin: 0 0 18px; background: linear-gradient(135deg, #ffffff 10%, #bae6fd 60%, #fde68a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .cert-desc { font-size: 12.5px; color: #cbd5e1; line-height: 1.55; margin: -8px 0 16px; }
 
-    .cert-scan-lines {
-      display: flex; flex-direction: column; gap: 8px;
-      margin: 12px 0 18px; text-align: left; padding: 12px;
-      border-radius: 14px; background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1); font-size: 11.5px; color: #cbd5e1;
-    }
+    .cert-scan-lines { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 18px; text-align: left; padding: 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); font-size: 11.5px; color: #cbd5e1; }
     .scan-row { display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateX(-8px); animation: scanRowIn 0.45s ease forwards; }
     .scan-row:nth-child(1) { animation-delay: 0.2s; }
     .scan-row:nth-child(2) { animation-delay: 0.9s; }
     .scan-row:nth-child(3) { animation-delay: 1.6s; }
     @keyframes scanRowIn { to { opacity: 1; transform: translateX(0); } }
     .scan-dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px #34d399; flex-shrink: 0; }
-
     .cert-progress-track { width: 100%; height: 5px; border-radius: 99px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
-    .cert-progress-fill { width: 0%; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #38bdf8, #818cf8, #fbbf24); animation: certIntroBar 2.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    .cert-progress-fill { width: 0%; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #38bdf8, #818cf8, #fbbf24); animation: certIntroBar 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
     @keyframes certIntroBar { from { width: 0%; } to { width: 100%; } }
 
-    .owner-name-input {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 16px;
-      border: 1.5px solid rgba(56, 189, 248, 0.48);
-      background: rgba(5, 10, 22, 0.72);
-      color: #ffffff;
-      font-size: 16px; font-weight: 700; letter-spacing: 0.6px;
-      text-align: center; outline: none; margin-bottom: 8px;
-    }
+    .owner-name-input { width: 100%; padding: 14px 16px; border-radius: 16px; border: 1.5px solid rgba(56, 189, 248, 0.48); background: rgba(5, 10, 22, 0.72); color: #ffffff; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-align: center; outline: none; margin-bottom: 8px; }
     .owner-name-input:focus { border-color: #38bdf8; box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.2); }
     .owner-error { font-size: 11.5px; color: #fb7185; min-height: 18px; margin-bottom: 10px; }
 
-    .cert-name-stage {
-      position: relative;
-      margin: 12px 0 16px;
-      padding: 20px 12px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.055);
-      border: 1px dashed rgba(251, 191, 36, 0.42);
-    }
+    .cert-name-stage { position: relative; margin: 12px 0 16px; padding: 20px 12px; border-radius: 16px; background: rgba(255, 255, 255, 0.055); border: 1px dashed rgba(251, 191, 36, 0.42); }
     .cert-transfer-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; }
-    .cert-owner-display { font-size: 24px; font-weight: 800; letter-spacing: 0.8px; color: #ffffff; text-shadow: 0 4px 18px rgba(56, 189, 248, 0.45); word-break: break-word; }
+    .cert-owner-display { font-size: 24px; font-weight: 800; letter-spacing: 0.6px; color: #ffffff; text-shadow: 0 4px 18px rgba(56, 189, 248, 0.45); word-break: break-word; }
 
     .cert-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; font-size: 11px; text-align: left; }
     .cert-meta-cell { padding: 8px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); }
     .cert-meta-cell span { display: block; color: #94a3b8; font-size: 10px; }
     .cert-meta-cell b { color: #f8fafc; font-weight: 700; }
 
-    .official-seal {
-      position: absolute; right: 12px; top: 50%;
-      width: 92px; height: 92px; border-radius: 50%;
-      border: 3px double #fbbf24;
-      background: radial-gradient(circle, rgba(251, 191, 36, 0.24) 0%, rgba(15, 23, 42, 0.72) 72%);
-      box-shadow: 0 0 28px rgba(251, 191, 36, 0.45), inset 0 0 14px rgba(251, 191, 36, 0.35);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      color: #fde68a; pointer-events: none; opacity: 0;
-      transform: translateY(-50%) scale(2.8) rotate(-28deg); z-index: 10;
-    }
+    .official-seal { position: absolute; right: 12px; top: 50%; width: 92px; height: 92px; border-radius: 50%; border: 3px double #fbbf24; background: radial-gradient(circle, rgba(251, 191, 36, 0.24) 0%, rgba(15, 23, 42, 0.72) 72%); box-shadow: 0 0 28px rgba(251, 191, 36, 0.45), inset 0 0 14px rgba(251, 191, 36, 0.35); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fde68a; pointer-events: none; opacity: 0; transform: translateY(-50%) scale(2.8) rotate(-28deg); z-index: 10; }
     .official-seal.stamped { animation: stampSlam 0.46s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-    @keyframes stampSlam {
-      0%   { opacity: 0; transform: translateY(-50%) scale(2.9) rotate(-30deg); }
-      65%  { opacity: 1; transform: translateY(-50%) scale(0.92) rotate(-10deg); }
-      85%  { opacity: 1; transform: translateY(-50%) scale(1.04) rotate(-14deg); }
-      100% { opacity: 0.96; transform: translateY(-50%) scale(1.0) rotate(-12deg); }
-    }
+    @keyframes stampSlam { 0% { opacity: 0; transform: translateY(-50%) scale(2.9) rotate(-30deg); } 65% { opacity: 1; transform: translateY(-50%) scale(0.92) rotate(-10deg); } 85% { opacity: 1; transform: translateY(-50%) scale(1.04) rotate(-14deg); } 100% { opacity: 0.96; transform: translateY(-50%) scale(1.0) rotate(-12deg); } }
     .seal-ring-inner { width: 76px; height: 76px; border-radius: 50%; border: 1px dashed rgba(253, 230, 138, 0.75); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
     .seal-top { font-size: 7.5px; font-weight: 800; letter-spacing: 1px; }
-    .seal-mid { font-size: 10.5px; font-weight: 900; letter-spacing: 0.7px; color: #34d399; margin: 2px 0; text-shadow: 0 0 8px rgba(52, 211, 153, 0.5); }
+    .seal-mid { font-size: 10.5px; font-weight: 900; letter-spacing: 0.7px; color: #34d399; margin: 2px 0; }
     .seal-bot { font-size: 7px; font-weight: 700; letter-spacing: 0.8px; opacity: 0.9; }
-
-    .seal-ripple {
-      position: absolute; right: 12px; top: 50%; width: 92px; height: 92px; border-radius: 50%;
-      border: 2px solid rgba(251, 191, 36, 0.8); transform: translateY(-50%) scale(0.8); opacity: 0; pointer-events: none;
-    }
+    .seal-ripple { position: absolute; right: 12px; top: 50%; width: 92px; height: 92px; border-radius: 50%; border: 2px solid rgba(251, 191, 36, 0.8); transform: translateY(-50%) scale(0.8); opacity: 0; pointer-events: none; }
     .seal-ripple.burst { animation: rippleOut 0.7s ease-out forwards; }
     @keyframes rippleOut { 0% { opacity: 0.9; transform: translateY(-50%) scale(0.9); } 100% { opacity: 0; transform: translateY(-50%) scale(2.1); } }
 
-    /* ==================== MAIN APP SHELL (PHONE + TABLET RESPONSIVE) ==================== */
+    /* ==================== MAIN APP SHELL ==================== */
     .app-shell { position: relative; z-index: 1; min-height: 100vh; }
 
     .topbar {
       position: sticky; top: 0; z-index: 40;
       padding: calc(10px + var(--safe-top)) 14px 10px;
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
-      background: var(--glass-surface-strong);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      background: var(--glass-surface-strong); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
       border-bottom: 1px solid var(--glass-border-soft);
     }
 
     .brand { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; }
-    .brand-logo {
-      width: 38px; height: 38px; border-radius: 12px; overflow: hidden;
-      background: linear-gradient(135deg, #38bdf8, #6366f1);
-      display: grid; place-items: center; color: #fff; flex-shrink: 0;
-      box-shadow: 0 5px 16px var(--accent-glow);
-    }
+    .brand-logo { width: 38px; height: 38px; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, #38bdf8, #6366f1); display: grid; place-items: center; color: #fff; flex-shrink: 0; box-shadow: 0 5px 16px var(--accent-glow); }
     .brand-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
     .brand-text { min-width: 0; flex: 1; }
     .brand-title-row { display: flex; align-items: center; gap: 5px; }
     .brand h1 { margin: 0; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -380,93 +199,62 @@
     .owner-verified-icon.show { display: inline-flex; }
     .brand small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .icon-btn {
-      width: 38px; height: 38px; border-radius: 13px;
-      border: 1px solid var(--glass-border); background: var(--glass-surface);
-      box-shadow: var(--glass-specular); color: var(--text-main);
-      display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
-      transition: transform 0.14s ease;
-    }
+    .icon-btn { width: 38px; height: 38px; border-radius: 13px; border: 1px solid var(--glass-border); background: var(--glass-surface); box-shadow: var(--glass-specular); color: var(--text-main); display: grid; place-items: center; cursor: pointer; flex-shrink: 0; transition: transform 0.14s ease; }
     .icon-btn:active { transform: scale(0.92); }
+    .icon-btn.spinning svg { animation: spin360 0.8s linear infinite; }
+    @keyframes spin360 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
     svg.ic { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
     svg.ic-sm { width: 15px; height: 15px; }
     svg.ic-lg { width: 21px; height: 21px; }
 
-    main {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 14px 13px calc(106px + var(--safe-bottom));
-    }
-
+    main { max-width: 960px; margin: 0 auto; padding: 14px 13px calc(106px + var(--safe-bottom)); }
     .view { display: none; animation: viewIn 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
     .view.active { display: block; }
     @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    .glass-card {
-      background: var(--glass-surface);
-      backdrop-filter: blur(22px) saturate(180%);
-      -webkit-backdrop-filter: blur(22px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow-glass), var(--glass-specular);
-      margin-bottom: 14px;
-    }
-
-    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .glass-card { background: var(--glass-surface); backdrop-filter: blur(22px) saturate(180%); -webkit-backdrop-filter: blur(22px) saturate(180%); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-glass), var(--glass-specular); margin-bottom: 14px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
     .section-title { margin: 0; font-size: 15.5px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
     .subtitle { margin: 0 0 12px; font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
     .badge { padding: 3px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 700; background: rgba(52, 211, 153, 0.16); color: var(--success); border: 1px solid rgba(52, 211, 153, 0.34); }
+    .badge-warn { background: rgba(251, 191, 36, 0.16); color: #fbbf24; border-color: rgba(251, 191, 36, 0.38); }
+
+    .status-strip {
+      display: none; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 10px 13px; border-radius: 14px; margin-bottom: 12px;
+      background: rgba(56, 189, 248, 0.13); border: 1px solid rgba(56, 189, 248, 0.35);
+      font-size: 12px; color: var(--text-main);
+    }
+    .status-strip.show { display: flex; }
 
     .search-wrap { position: relative; display: flex; align-items: center; margin-bottom: 10px; }
     .search-wrap svg { position: absolute; left: 13px; color: var(--text-muted); pointer-events: none; }
-    .search-input {
-      width: 100%; padding: 11px 14px 11px 40px; border-radius: 15px;
-      border: 1px solid var(--glass-border); background: var(--glass-pill);
-      color: var(--text-main); font-family: var(--font-bn); font-size: 13.5px; outline: none;
-    }
+    .search-input { width: 100%; padding: 11px 14px 11px 40px; border-radius: 15px; border: 1px solid var(--glass-border); background: var(--glass-pill); color: var(--text-main); font-family: var(--font-bn); font-size: 13.5px; outline: none; }
     .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16); }
 
     .chips-row { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
     .chips-row::-webkit-scrollbar { display: none; }
-    .chip {
-      border: 1px solid var(--glass-border-soft); background: var(--glass-pill); color: var(--text-muted);
-      border-radius: 999px; padding: 6px 13px; font-family: var(--font-bn); font-size: 12px; font-weight: 600;
-      white-space: nowrap; cursor: pointer;
-    }
+    .chip { border: 1px solid var(--glass-border-soft); background: var(--glass-pill); color: var(--text-muted); border-radius: 999px; padding: 6px 13px; font-family: var(--font-bn); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; }
     .chip.active { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; color: #fff; box-shadow: 0 4px 14px var(--accent-glow); }
 
     .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .btn {
-      border: 1px solid var(--glass-border); background: var(--glass-pill); box-shadow: var(--glass-specular);
-      color: var(--text-main); border-radius: 14px; padding: 10px 15px;
-      font-family: var(--font-bn); font-size: 13px; font-weight: 600;
-      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-      transition: transform 0.13s ease;
-    }
+    .btn { border: 1px solid var(--glass-border); background: var(--glass-pill); box-shadow: var(--glass-specular); color: var(--text-main); border-radius: 14px; padding: 10px 15px; font-family: var(--font-bn); font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px; transition: transform 0.13s ease; }
     .btn:active { transform: scale(0.95); }
     .btn-primary { background: linear-gradient(135deg, #0ea5e9, #6366f1); border-color: rgba(255,255,255,0.22); color: #fff; box-shadow: 0 8px 22px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.35); }
     .btn-success { background: linear-gradient(135deg, #10b981, #059669); border-color: rgba(255,255,255,0.22); color: #fff; }
     .btn-danger { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.36); color: var(--danger); }
     .btn-sm { padding: 7px 11px; font-size: 12px; border-radius: 11px; }
 
-    .upload-box {
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-      width: 100%; padding: 20px 14px; border-radius: 18px;
-      border: 1.5px dashed rgba(56, 189, 248, 0.55);
-      background: linear-gradient(145deg, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.06));
-      text-align: center; cursor: pointer;
-    }
+    .upload-box { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 20px 14px; border-radius: 18px; border: 1.5px dashed rgba(56, 189, 248, 0.55); background: linear-gradient(145deg, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.06)); text-align: center; cursor: pointer; }
     .upload-box .up-ico { width: 40px; height: 40px; border-radius: 13px; background: rgba(56, 189, 248, 0.18); color: var(--accent); display: grid; place-items: center; }
     .upload-box strong { font-size: 13.5px; color: var(--text-main); }
     .upload-box span { font-size: 11.5px; color: var(--text-muted); }
 
     input[type="file"] { display: none; }
 
-    /* Responsive File Library Grid (1-col Phone, 2-col Small Tablet, 3-col Large Tablet) */
+    /* Responsive File Library Grid */
     .file-list { display: grid; grid-template-columns: 1fr; gap: 9px; margin-top: 10px; }
-
     @media (min-width: 660px) {
       main { max-width: 1080px; padding: 18px 22px calc(112px + var(--safe-bottom)); }
       .file-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
@@ -477,21 +265,15 @@
     }
 
     .file-row {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 12px; border-radius: 16px;
-      background: var(--glass-pill); border: 1px solid var(--glass-border-soft);
-      cursor: pointer; min-width: 0;
-      opacity: 0; transform: translate3d(0, 24px, 0) scale(0.96);
-      transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.50s cubic-bezier(0.22, 1, 0.36, 1), background 0.18s ease, border-color 0.2s ease;
+      display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 16px;
+      background: var(--glass-pill); border: 1px solid var(--glass-border-soft); cursor: pointer; min-width: 0;
+      opacity: 0; transform: translate3d(0, 22px, 0) scale(0.96);
+      transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1), transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), background 0.18s ease, border-color 0.2s ease;
     }
     .file-row.in-view { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
     .file-row.in-view:active { transform: translate3d(0, 0, 0) scale(0.975); background: rgba(56, 189, 248, 0.16); border-color: rgba(56, 189, 248, 0.35); }
 
-    .file-badge {
-      width: 42px; height: 46px; border-radius: 13px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 9.5px; font-weight: 800; letter-spacing: 0.4px; flex-shrink: 0;
-    }
+    .file-badge { width: 42px; height: 46px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 800; letter-spacing: 0.4px; flex-shrink: 0; }
     .file-badge.pdf { background: linear-gradient(145deg, rgba(244, 63, 94, 0.28), rgba(225, 29, 72, 0.14)); border: 1px solid rgba(251, 113, 133, 0.4); color: #fda4af; }
     [data-theme="light"] .file-badge.pdf { color: #be123c; }
     .file-badge.docx { background: linear-gradient(145deg, rgba(56, 189, 248, 0.28), rgba(37, 99, 235, 0.14)); border: 1px solid rgba(56, 189, 248, 0.42); color: #7dd3fc; }
@@ -506,24 +288,14 @@
     .file-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* Editor & Forms */
-    .input, select, textarea {
-      width: 100%; padding: 11px 13px; border-radius: 14px;
-      border: 1px solid var(--glass-border); background: var(--glass-pill);
-      color: var(--text-main); font-family: var(--font-bn); font-size: 14px; outline: none;
-      user-select: text; -webkit-user-select: text;
-    }
+    .input, select, textarea { width: 100%; padding: 11px 13px; border-radius: 14px; border: 1px solid var(--glass-border); background: var(--glass-pill); color: var(--text-main); font-family: var(--font-bn); font-size: 14px; outline: none; user-select: text; -webkit-user-select: text; }
     textarea { resize: vertical; min-height: 115px; line-height: 1.65; }
 
     .editor-toolbar { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-radius: 14px; background: var(--glass-pill); border: 1px solid var(--glass-border-soft); margin-bottom: 10px; }
     .tool-btn { border: 1px solid var(--glass-border-soft); background: var(--glass-surface); color: var(--text-main); border-radius: 9px; padding: 6px 10px; font-size: 12.5px; font-weight: 700; font-family: var(--font-bn); cursor: pointer; }
     .tool-btn:active { background: var(--accent); color: #fff; }
 
-    .editor-paper {
-      background: var(--paper-bg); color: var(--paper-text); min-height: 280px;
-      padding: 20px 16px; border-radius: 16px; font-family: var(--font-bn); font-size: 15px;
-      line-height: 1.75; outline: none; word-break: break-word; overflow-x: auto;
-      user-select: text !important; -webkit-user-select: text !important; -webkit-touch-callout: default;
-    }
+    .editor-paper { background: var(--paper-bg); color: var(--paper-text); min-height: 280px; padding: 20px 16px; border-radius: 16px; font-family: var(--font-bn); font-size: 15px; line-height: 1.75; outline: none; word-break: break-word; overflow-x: auto; user-select: text !important; -webkit-user-select: text !important; }
     .editor-paper * { user-select: text !important; -webkit-user-select: text !important; }
     .editor-paper img { max-width: 100%; border-radius: 10px; margin: 8px 0; }
     .editor-paper table { width: 100%; border-collapse: collapse; margin: 10px 0; table-layout: fixed; }
@@ -531,7 +303,7 @@
 
     .item-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
     .list-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 14px; background: var(--glass-pill); border: 1px solid var(--glass-border-soft); font-size: 13px; }
-    .list-item-info { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .list-item-info { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
     .list-item-info small { display: block; color: var(--text-muted); font-size: 11px; }
 
     .thumb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; margin-top: 10px; }
@@ -539,124 +311,54 @@
     .thumb-card img { width: 100%; height: 100%; object-fit: cover; }
     .thumb-del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(225, 29, 72, 0.92); color: #fff; font-weight: 700; cursor: pointer; }
 
-    .bottom-dock-wrap {
-      position: fixed; bottom: calc(10px + var(--safe-bottom)); left: 12px; right: 12px;
-      z-index: 50; max-width: 520px; margin: 0 auto;
-      transition: transform 0.22s ease, opacity 0.22s ease;
-    }
+    .bottom-dock-wrap { position: fixed; bottom: calc(10px + var(--safe-bottom)); left: 12px; right: 12px; z-index: 50; max-width: 520px; margin: 0 auto; transition: transform 0.22s ease, opacity 0.22s ease; }
     .bottom-dock-wrap.kb-hidden { transform: translateY(150%); opacity: 0; pointer-events: none; }
-    .bottom-nav {
-      padding: 6px; border-radius: 24px;
-      background: var(--glass-surface-strong); backdrop-filter: blur(26px) saturate(200%); -webkit-backdrop-filter: blur(26px) saturate(200%);
-      border: 1px solid var(--glass-border); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), var(--glass-specular);
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
-    }
-    .nav-btn {
-      border: none; background: transparent; color: var(--text-muted); border-radius: 18px;
-      padding: 8px 4px; font-family: var(--font-bn); font-size: 11px; font-weight: 600;
-      display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer;
-    }
+    .bottom-nav { padding: 6px; border-radius: 24px; background: var(--glass-surface-strong); backdrop-filter: blur(26px) saturate(200%); -webkit-backdrop-filter: blur(26px) saturate(200%); border: 1px solid var(--glass-border); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), var(--glass-specular); display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+    .nav-btn { border: none; background: transparent; color: var(--text-muted); border-radius: 18px; padding: 8px 4px; font-family: var(--font-bn); font-size: 11px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
     .nav-btn.active { background: linear-gradient(135deg, rgba(56, 189, 248, 0.26), rgba(99, 102, 241, 0.24)); color: var(--accent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25); }
 
-    /* ==================== TRUE EDGE-TO-EDGE ULTRA-SHARP FULLSCREEN READER ==================== */
-    .fs-overlay {
-      position: fixed; inset: 0; z-index: 200; background: #060913;
-      display: none; flex-direction: column; overflow: hidden;
-      user-select: none; -webkit-user-select: none;
-    }
+    /* ==================== FULL-SCREEN READER OVERLAY ==================== */
+    .fs-overlay { position: fixed; inset: 0; z-index: 200; background: #060913; display: none; flex-direction: column; overflow: hidden; user-select: none; -webkit-user-select: none; }
     .fs-overlay.open { display: flex; }
 
-    .fs-top-hud {
-      position: absolute; top: 10px; left: 10px; right: 10px; z-index: 230;
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
-      padding: 7px 10px; border-radius: 18px;
-      background: rgba(11, 18, 34, 0.80); backdrop-filter: blur(24px) saturate(190%); -webkit-backdrop-filter: blur(24px) saturate(190%);
-      border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-      color: #f8fafc; transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
-    }
+    .fs-top-hud { position: absolute; top: 10px; left: 10px; right: 10px; z-index: 230; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 10px; border-radius: 18px; background: rgba(11, 18, 34, 0.80); backdrop-filter: blur(24px) saturate(190%); -webkit-backdrop-filter: blur(24px) saturate(190%); border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); color: #f8fafc; transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease; }
     .fs-overlay.hud-hidden .fs-top-hud { transform: translateY(-140%); opacity: 0; pointer-events: none; }
     .fs-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .hud-btn {
-      width: 34px; height: 34px; border-radius: 11px;
-      border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.08);
-      color: #f8fafc; display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
-    }
+    .hud-btn { width: 34px; height: 34px; border-radius: 11px; border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.08); color: #f8fafc; display: grid; place-items: center; cursor: pointer; flex-shrink: 0; }
     .hud-btn.active { background: var(--accent); color: #050812; border-color: transparent; }
 
-    .fs-viewport {
-      position: relative; flex: 1; width: 100%; height: 100%;
-      overflow: hidden; touch-action: none; background: #0b101d;
-    }
+    .fs-viewport { position: relative; flex: 1; width: 100%; height: 100%; overflow: hidden; touch-action: none; background: #0b101d; }
     .fs-viewport.doc-scroll-mode { overflow: auto; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; padding: 62px 10px 76px; }
 
-    .pdf-page-box {
-      position: absolute; top: 0; left: 0; background: #ffffff;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65);
-      transform-origin: 0 0; will-change: transform;
-    }
+    .pdf-page-box { position: absolute; top: 0; left: 0; background: #ffffff; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65); transform-origin: 0 0; will-change: transform; }
     .pdf-page-box.night-invert { filter: invert(0.92) hue-rotate(180deg); }
 
     #pdfCanvas { display: block; width: 100%; height: 100%; }
-
-    /* ULTRA-SHARP VISIBLE-VIEWPORT DETAIL LAYER (Razor-sharp text even at 600% zoom!) */
-    #detailCanvas {
-      position: absolute;
-      display: none;
-      pointer-events: none;
-    }
-
-    #drawCanvas {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      mix-blend-mode: multiply; pointer-events: none;
-    }
+    #detailCanvas { position: absolute; display: none; pointer-events: none; }
+    #drawCanvas { position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: multiply; pointer-events: none; }
     #drawCanvas.active { pointer-events: auto; touch-action: none; }
-
     #notesLayer { position: absolute; inset: 0; pointer-events: none; }
     #notesLayer.placing { pointer-events: auto; cursor: copy; }
 
-    .note-pin {
-      position: absolute; transform: translate(-50%, -50%);
-      width: 26px; height: 26px; border-radius: 50%;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a;
-      border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-      display: grid; place-items: center; pointer-events: auto; cursor: pointer; z-index: 15;
-    }
+    .note-pin { position: absolute; transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45); display: grid; place-items: center; pointer-events: auto; cursor: pointer; z-index: 15; }
 
-    .fs-doc-box {
-      width: 100%; max-width: 860px; background: #ffffff; color: #0f172a;
-      border-radius: 16px; padding: 22px 20px; font-size: 15.5px; line-height: 1.8;
-      margin: 0 auto; word-break: break-word; user-select: text; -webkit-user-select: text;
-    }
+    .fs-doc-box { width: 100%; max-width: 860px; background: #ffffff; color: #0f172a; border-radius: 16px; padding: 22px 20px; font-size: 15.5px; line-height: 1.8; margin: 0 auto; word-break: break-word; user-select: text; -webkit-user-select: text; }
     .fs-doc-box.night-invert { background: #111827; color: #e2e8f0; }
 
+    /* Sandboxed Isolated HTML Preview Iframe (Zero JS & Zero Native Bridge Access) */
+    .fs-sandbox-frame { width: 100%; max-width: 860px; height: calc(100vh - 135px); border: none; border-radius: 16px; background: #ffffff; display: none; margin: 0 auto; }
+
     .side-fab-wrap { position: absolute; right: 10px; bottom: 72px; z-index: 240; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-    .side-fab {
-      width: 44px; height: 44px; border-radius: 15px;
-      border: 1px solid rgba(255, 255, 255, 0.28);
-      background: linear-gradient(135deg, rgba(14, 165, 233, 0.78), rgba(99, 102, 241, 0.78));
-      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); color: #ffffff;
-      display: grid; place-items: center;
-      box-shadow: 0 10px 26px rgba(14, 165, 233, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      cursor: pointer; opacity: 0.86;
-    }
+    .side-fab { width: 44px; height: 44px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.28); background: linear-gradient(135deg, rgba(14, 165, 233, 0.78), rgba(99, 102, 241, 0.78)); backdrop-filter: blur(18px); color: #ffffff; display: grid; place-items: center; box-shadow: 0 10px 26px rgba(14, 165, 233, 0.36); cursor: pointer; opacity: 0.86; }
     .side-fab:active { transform: scale(0.92); opacity: 1; }
 
-    .side-dock {
-      display: none; flex-direction: column; gap: 9px; padding: 12px 10px; border-radius: 22px;
-      background: rgba(11, 18, 34, 0.90); backdrop-filter: blur(26px) saturate(200%); -webkit-backdrop-filter: blur(26px) saturate(200%);
-      border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6);
-      width: 178px; animation: dockPop 0.2s cubic-bezier(0.22, 1, 0.36, 1); color: #f8fafc;
-    }
+    .side-dock { display: none; flex-direction: column; gap: 9px; padding: 12px 10px; border-radius: 22px; background: rgba(11, 18, 34, 0.90); backdrop-filter: blur(26px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6); width: 178px; animation: dockPop 0.2s cubic-bezier(0.22, 1, 0.36, 1); color: #f8fafc; }
     .side-dock.open { display: flex; }
     @keyframes dockPop { from { opacity: 0; transform: translateY(12px) scale(0.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
     .dock-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-    .dock-item {
-      height: 40px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.11); background: rgba(255, 255, 255, 0.07);
-      color: #f8fafc; display: flex; align-items: center; justify-content: center; gap: 5px;
-      font-size: 11px; font-family: var(--font-bn); font-weight: 600; cursor: pointer;
-    }
+    .dock-item { height: 40px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.11); background: rgba(255, 255, 255, 0.07); color: #f8fafc; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; font-family: var(--font-bn); font-weight: 600; cursor: pointer; }
     .dock-item.active { background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; border-color: rgba(255,255,255,0.28); }
 
     .brush-panel { padding: 8px; border-radius: 14px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.09); display: flex; flex-direction: column; gap: 8px; }
@@ -673,54 +375,37 @@
     .preset-btn { border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color: #cbd5e1; border-radius: 8px; padding: 4px 0; font-size: 10.5px; font-family: var(--font-bn); font-weight: 700; cursor: pointer; }
     .preset-btn.active { background: rgba(56, 189, 248, 0.28); color: #fff; border-color: #38bdf8; }
 
-    .fs-bottom-hud {
-      position: absolute; bottom: 10px; left: 10px; right: 10px; z-index: 230;
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
-      padding: 7px 10px; border-radius: 18px;
-      background: rgba(11, 18, 34, 0.80); backdrop-filter: blur(24px) saturate(190%); -webkit-backdrop-filter: blur(24px) saturate(190%);
-      border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-      color: #f8fafc; transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
-    }
+    .fs-bottom-hud { position: absolute; bottom: 10px; left: 10px; right: 10px; z-index: 230; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 10px; border-radius: 18px; background: rgba(11, 18, 34, 0.80); backdrop-filter: blur(24px) saturate(190%); border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); color: #f8fafc; transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease; }
     .fs-overlay.hud-hidden .fs-bottom-hud { transform: translateY(150%); opacity: 0; pointer-events: none; }
 
     .zoom-pill { display: flex; align-items: center; gap: 3px; background: rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 2px 4px; }
     .zoom-pill button { width: 28px; height: 28px; border: none; border-radius: 9px; background: transparent; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
     .zoom-pill span { font-size: 11px; font-weight: 700; min-width: 38px; text-align: center; cursor: pointer; }
-
     .page-nav-pill { display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; }
     .page-nav-pill input[type="range"] { flex: 1; max-width: 180px; accent-color: #38bdf8; }
     .page-badge { font-size: 11.5px; font-weight: 700; white-space: nowrap; }
 
-    .modal-backdrop { position: fixed; inset: 0; z-index: 300; background: rgba(3, 6, 15, 0.70); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 16px; }
+    /* Modals */
+    .modal-backdrop { position: fixed; inset: 0; z-index: 320; background: rgba(3, 6, 15, 0.72); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 16px; }
     .modal-backdrop.open { display: flex; }
-    .modal-card { width: 100%; max-width: 380px; background: rgba(15, 23, 42, 0.94); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 22px; padding: 18px; color: #f8fafc; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); }
-    .modal-card h3 { margin: 0 0 10px; font-size: 15px; }
+    .modal-card { width: 100%; max-width: 390px; background: rgba(15, 23, 42, 0.96); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 22px; padding: 18px; color: #f8fafc; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); }
+    .modal-card h3 { margin: 0 0 8px; font-size: 15.5px; }
+    .modal-card p { margin: 0 0 12px; font-size: 12.5px; color: #94a3b8; line-height: 1.5; }
 
-    #toast {
-      position: fixed; left: 50%; bottom: calc(92px + var(--safe-bottom));
-      transform: translateX(-50%) translateY(18px);
-      background: rgba(11, 18, 34, 0.92); backdrop-filter: blur(16px);
-      color: #fff; border: 1px solid rgba(56, 189, 248, 0.45);
-      padding: 10px 18px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
-      opacity: 0; pointer-events: none; z-index: 960;
-      transition: all 0.24s ease; max-width: 90vw; text-align: center;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
-    }
+    #toast { position: fixed; left: 50%; bottom: calc(92px + var(--safe-bottom)); transform: translateX(-50%) translateY(18px); background: rgba(11, 18, 34, 0.94); backdrop-filter: blur(16px); color: #fff; border: 1px solid rgba(56, 189, 248, 0.45); padding: 10px 18px; border-radius: 999px; font-size: 12.5px; font-weight: 600; opacity: 0; pointer-events: none; z-index: 960; transition: all 0.24s ease; max-width: 90vw; text-align: center; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5); }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
   <div class="ambient-bg"></div>
 
-  <!-- ==================== 1. SIMPLE SPLASH (EVERY LAUNCH AFTER FIRST) ==================== -->
+  <!-- ==================== 1. SIMPLE SPLASH ==================== -->
   <div id="simpleSplash" class="startup-screen">
     <div class="ambient-bg"></div>
     <div class="simple-splash-box">
-      <div class="splash-emblem">
-        <img src="./app-icon.png" alt="AetherX" onerror="this.style.display='none'" />
-      </div>
+      <div class="splash-emblem"><img src="./app-icon.png" alt="AetherX" onerror="this.style.display='none'" /></div>
       <div class="splash-owner-name" id="splashOwnerLabel">AetherX PDF Reader</div>
-      <div class="splash-sub">অফলাইন ও বিজ্ঞাপনমুক্ত • লোড হচ্ছে...</div>
+      <div class="splash-sub">অফলাইন ও নিরাপদ • লোড হচ্ছে...</div>
       <div class="splash-bar-track"><div class="splash-bar-fill"></div></div>
     </div>
   </div>
@@ -729,7 +414,6 @@
   <div id="ownershipScreen" class="startup-screen">
     <div class="ambient-bg"></div>
 
-    <!-- Stage 1: Modern Certificate Intro -->
     <div id="ceremonyStage1" class="ceremony-stage">
       <div class="cert-card">
         <div class="cert-inner-frame"></div>
@@ -739,18 +423,15 @@
         </div>
         <div class="cert-kicker">APP OWNERSHIP TRANSFER</div>
         <h2 class="cert-heading">মালিকানা হস্তান্তর সনদ প্রস্তুত হচ্ছে</h2>
-
         <div class="cert-scan-lines">
-          <div class="scan-row"><span class="scan-dot"></span><span>AetherX অফলাইন ইঞ্জিন যাচাই সম্পন্ন</span></div>
-          <div class="scan-row"><span class="scan-dot"></span><span>বিজ্ঞাপনমুক্ত প্রিমিয়াম লাইসেন্স সক্রিয়</span></div>
+          <div class="scan-row"><span class="scan-dot"></span><span>১০০% অফলাইন সিকিউরিটি যাচাই সম্পন্ন</span></div>
+          <div class="scan-row"><span class="scan-dot"></span><span>বিজ্ঞাপনমুক্ত প্রিমিয়াম ইঞ্জিন সক্রিয়</span></div>
           <div class="scan-row"><span class="scan-dot"></span><span>অ্যাপ মালিকানা সার্টিফিকেট চালু হচ্ছে...</span></div>
         </div>
-
         <div class="cert-progress-track"><div class="cert-progress-fill"></div></div>
       </div>
     </div>
 
-    <!-- Stage 2: Clean English Name Entry (APP OWNERSHIP TRANSFER, no extra caption!) -->
     <div id="ceremonyStage2" class="ceremony-stage">
       <div class="cert-card">
         <div class="cert-inner-frame"></div>
@@ -758,11 +439,9 @@
           <svg class="ic" style="width:26px;height:26px;" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
         <div class="cert-kicker">APP OWNERSHIP TRANSFER</div>
-        <h2 class="cert-heading">আপনার নাম ইংরেজিতে লিখুন</h2>
-
-        <input type="text" id="ownerNameInput" class="owner-name-input" placeholder="Enter Name in English" maxlength="28" autocomplete="off" />
+        <h2 class="cert-heading">আপনার নাম লিখুন (English / বাংলা)</h2>
+        <input type="text" id="ownerNameInput" class="owner-name-input" placeholder="Enter Name (English / বাংলা)" maxlength="32" autocomplete="off" />
         <div id="ownerNameError" class="owner-error"></div>
-
         <button class="btn btn-primary" id="claimOwnershipBtn" style="width:100%; padding:13px;">
           <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           মালিকানা গ্রহণ করুন
@@ -770,7 +449,6 @@
       </div>
     </div>
 
-    <!-- Stage 3: Final Certificate & Official Slamming Seal -->
     <div id="ceremonyStage3" class="ceremony-stage">
       <div class="cert-card" id="finalCertCard">
         <div class="cert-inner-frame"></div>
@@ -780,11 +458,9 @@
         </div>
         <div class="cert-kicker">APP OWNERSHIP TRANSFER</div>
         <h2 class="cert-heading">মালিকানা হস্তান্তর সম্পন্ন</h2>
-
         <div class="cert-name-stage">
           <div class="cert-transfer-label">OFFICIALLY TRANSFERRED TO</div>
           <div class="cert-owner-display" id="certOwnerDisplay">OWNER NAME</div>
-
           <div id="sealRipple" class="seal-ripple"></div>
           <div id="officialSeal" class="official-seal">
             <div class="seal-ring-inner">
@@ -794,18 +470,10 @@
             </div>
           </div>
         </div>
-
         <div class="cert-meta-grid">
-          <div class="cert-meta-cell">
-            <span>অ্যাপ</span>
-            <b>AetherX PDF Reader</b>
-          </div>
-          <div class="cert-meta-cell">
-            <span>সনদ নম্বর</span>
-            <b id="certSerialVal">AX-2026-001</b>
-          </div>
+          <div class="cert-meta-cell"><span>অ্যাপ</span><b>AetherX PDF Reader</b></div>
+          <div class="cert-meta-cell"><span>সনদ নম্বর</span><b id="certSerialVal">AX-2026-001</b></div>
         </div>
-
         <p class="cert-desc" style="margin:14px 0 0; font-size:11.5px; color:#34d399; font-weight:600;" id="certStatusLine">সিল অনুমোদন করা হচ্ছে...</p>
       </div>
     </div>
@@ -819,7 +487,7 @@
         <svg class="ic" style="width:32px;height:32px;" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
       </div>
       <h2>স্টোরেজ পারমিশন প্রয়োজন</h2>
-      <p>আপনার ডিভাইসের সকল PDF, DOCX ও ডকুমেন্ট ফাইল অটোমেটিক দেখাতে স্টোরেজ অ্যাক্সেস অনুমতি দিন। আপনার কোনো ফাইল ইন্টারনেটে যায় না।</p>
+      <p>আপনার ডিভাইসের সকল PDF, DOCX, RTF ও ডকুমেন্ট ফাইল অটোমেটিক দেখাতে স্টোরেজ অ্যাক্সেস অনুমতি দিন। কোনো ফাইল ইন্টারনেটে যায় না।</p>
       <button class="btn btn-primary" id="gateGrantBtn" style="width:100%; padding:13px;">
         <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         অনুমতি দিন (Allow Access)
@@ -832,9 +500,7 @@
   <div class="app-shell">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-logo">
-          <img src="./app-icon.png" alt="AX" onerror="this.style.display='none'" />
-        </div>
+        <div class="brand-logo"><img src="./app-icon.png" alt="AX" onerror="this.style.display='none'" /></div>
         <div class="brand-text">
           <div class="brand-title-row">
             <h1 id="brandTitle">AetherX PDF Reader</h1>
@@ -842,7 +508,7 @@
               <svg class="ic ic-sm" style="fill:rgba(251,191,36,0.22);" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             </span>
           </div>
-          <small id="brandSubtitle">অফলাইন ও বিজ্ঞাপনমুক্ত • শিক্ষার্থী সংস্করণ</small>
+          <small id="brandSubtitle">১০০% অফলাইন ও নিরাপদ • v3.1</small>
         </div>
       </div>
       <div style="display:flex; gap:8px;">
@@ -856,6 +522,10 @@
     </header>
 
     <main>
+      <div id="depWarningStrip" class="status-strip" style="background:rgba(244,63,94,0.16); border-color:rgba(244,63,94,0.42);">
+        <span id="depWarningText">লোকাল লাইব্রেরি যাচাই ব্যর্থ হয়েছে।</span>
+      </div>
+
       <!-- ==================== TAB 1: AUTO LIBRARY ==================== -->
       <section id="view-reader" class="view active">
         <div class="glass-card">
@@ -868,36 +538,54 @@
               <svg class="ic ic-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               ফাইল বাছুন
             </label>
-            <input type="file" id="readerFileInput" accept=".pdf,.docx,.doc,.txt,.md,.html,.htm,.csv,image/*" />
+            <input type="file" id="readerFileInput" accept=".pdf,.docx,.doc,.rtf,.txt,.md,.html,.htm,.csv,image/*" />
+          </div>
+
+          <div id="scanProgressStrip" class="status-strip">
+            <span>ব্যাকগ্রাউন্ডে ডকুমেন্ট স্ক্যান চলছে...</span>
+            <span class="badge">অফলাইন</span>
           </div>
 
           <div class="search-wrap">
             <svg class="ic ic-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="librarySearch" class="search-input" placeholder="PDF, DOCX বা যেকোনো ফাইলের নাম খুঁজুন..." />
+            <input type="text" id="librarySearch" class="search-input" placeholder="PDF, DOCX, RTF বা যেকোনো ফাইলের নাম খুঁজুন..." />
           </div>
 
           <div class="chips-row" id="filterChips">
             <button class="chip active" data-filter="all">সব ফাইল (<span id="countAll">0</span>)</button>
             <button class="chip" data-filter="pdf">PDF</button>
             <button class="chip" data-filter="docx">DOCX / DOC</button>
+            <button class="chip" data-filter="rtf">RTF</button>
             <button class="chip" data-filter="txt">TXT / অন্যান্য</button>
           </div>
 
           <div id="autoFileList" class="file-list">
             <div style="grid-column:1/-1; text-align:center; padding:28px 10px; color:var(--text-muted); font-size:13px;">ফাইল খোঁজা হচ্ছে...</div>
           </div>
+
+          <div id="loadMoreWrap" style="display:none; text-align:center; margin-top:14px;">
+            <button class="btn btn-sm" id="loadMoreBtn">আরো ফাইল দেখুন</button>
+          </div>
         </div>
       </section>
 
       <!-- ==================== TAB 2: EDITOR ==================== -->
       <section id="view-editor" class="view">
+        <div id="recoveryStrip" class="status-strip" style="background:rgba(251,191,36,0.14); border-color:rgba(251,191,36,0.42);">
+          <span>অসম্পূর্ণ ড্রাফট রিকভারি পাওয়া গেছে।</span>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-primary btn-sm" id="restoreRecoveryBtn">রিকভার করুন</button>
+            <button class="btn btn-sm" id="dismissRecoveryBtn">বাদ দিন</button>
+          </div>
+        </div>
+
         <div class="glass-card">
           <div class="section-head">
             <h2 class="section-title">
               <svg class="ic" style="color:var(--accent);" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
               ডকুমেন্ট এডিটর ও PDF মেকার
             </h2>
-            <span class="badge">বাংলা ফন্ট</span>
+            <span class="badge" id="autoSaveBadge">অটো-সেভ চালু</span>
           </div>
 
           <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
@@ -928,7 +616,7 @@
 
           <div id="editorPaper" class="editor-paper" contenteditable="true" spellcheck="false">
             <h2 style="margin-top:0;">নতুন নোট / ডকুমেন্ট</h2>
-            <p>এখানে বাংলা বা ইংরেজিতে নির্ভুলভাবে লিখুন। লেখা শেষে নিচ থেকে সরাসরি <b>PDF</b> অথবা <b>Word (.doc)</b> তৈরি করুন।</p>
+            <p>এখানে বাংলা বা ইংরেজিতে নির্ভুলভাবে লিখুন। লেখা স্বয়ংক্রিয়ভাবে নিরাপদে সেভ হবে।</p>
           </div>
 
           <div class="btn-row">
@@ -941,23 +629,23 @@
 
         <div class="glass-card">
           <div class="section-head">
-            <h3 class="section-title">সেভ করা ড্রাফটসমূহ</h3>
+            <h3 class="section-title">সেভ করা ড্রাফটসমূহ (IndexedDB)</h3>
             <small id="draftCount" style="color:var(--text-muted); font-weight:600;">০টি</small>
           </div>
           <div id="draftList" class="item-list"></div>
         </div>
       </section>
 
-      <!-- ==================== TAB 3: PDF TOOLS ==================== -->
+      <!-- ==================== TAB 3: PDF TOOLS & OFFLINE BACKUP ==================== -->
       <section id="view-tools" class="view">
         <div class="glass-card">
           <div class="section-head">
             <h2 class="section-title">
               <svg class="ic" style="color:var(--accent);" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              ছবি থেকে PDF (Image to PDF)
+              ছবি থেকে PDF (Auto Portrait/Landscape)
             </h2>
           </div>
-          <p class="subtitle">হাতে লেখা নোট বা বইয়ের পাতার একাধিক ছবি বেছে নিয়ে মুহূর্তেই একটি পরিষ্কার PDF তৈরি করুন।</p>
+          <p class="subtitle">প্রতিটি ছবির অনুপাত বুঝে স্বয়ংক্রিয়ভাবে Portrait বা Landscape A4 পেজ সাজিয়ে পরিষ্কার PDF তৈরি করবে।</p>
           <label class="upload-box" for="imgToPdfInput">
             <div class="up-ico"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
             <strong>একাধিক ছবি নির্বাচন করুন</strong>
@@ -978,11 +666,11 @@
               একাধিক PDF জোড়া লাগান (Merge)
             </h2>
           </div>
-          <p class="subtitle">২ বা ততোধিক PDF ফাইল একসাথে জুড়ে একটি পরিষ্কার ফাইলে পরিণত করুন।</p>
+          <p class="subtitle">একাধিক PDF ফাইল পছন্দমতো ক্রমে সাজিয়ে একটি ফাইলে জুড়ে নিন (লক করা PDF হলে সতর্কবার্তা দেবে)।</p>
           <label class="upload-box" for="mergePdfInput">
             <div class="up-ico"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
             <strong>PDF ফাইলগুলো সিলেক্ট করুন</strong>
-            <span>একাধিক .pdf ফাইল একসাথে যোগ করা যাবে</span>
+            <span>উপর-নিচ বাটন দিয়ে অর্ডার বদলানো যাবে</span>
           </label>
           <input type="file" id="mergePdfInput" accept=".pdf" multiple />
           <div id="mergeFileList" class="item-list"></div>
@@ -999,7 +687,7 @@
               PDF পেজ আলাদা করুন (Split)
             </h2>
           </div>
-          <p class="subtitle">বড় PDF থেকে শুধু প্রয়োজনীয় পেজগুলো আলাদা করে নতুন PDF বানান (যেমন: 1-3, 5)।</p>
+          <p class="subtitle">শুধু প্রয়োজনীয় পেজ নম্বর দিন (যেমন: 1-3, 5)। ভুল বা উল্টো রেঞ্জ (যেমন: 8-3) অটো বাতিল হবে।</p>
           <label class="upload-box" for="splitPdfInput">
             <div class="up-ico"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
             <strong id="splitFileLabel">একটি PDF ফাইল বাছুন</strong>
@@ -1014,13 +702,20 @@
           </div>
         </div>
 
+        <!-- Offline Backup, Restore & Local Diagnostics -->
         <div class="glass-card">
           <div class="section-head">
-            <h3 class="section-title">অ্যাপ স্টোরেজ (হালকা ও নিরাপদ)</h3>
-            <span class="badge" id="storageUsedBadge">0 KB</span>
+            <h3 class="section-title">অফলাইন ডেটা ব্যাকআপ ও ডায়াগনস্টিকস</h3>
+            <span class="badge" id="storageUsedBadge">IndexedDB</span>
           </div>
-          <p class="subtitle">কোনো বিজ্ঞাপন বা গোপন ক্যাশ নেই। আপনার ড্রাফট ও PDF নোটগুলো শুধু আপনার ডিভাইসেই সংরক্ষিত থাকে।</p>
-          <button class="btn btn-danger btn-sm" id="clearAllStorageBtn">সব ড্রাফট ও নোট পরিষ্কার করুন</button>
+          <p class="subtitle">আপনার সব ড্রাফট, স্টিকি নোট ও PDF হাইলাইট-দাগ ১০০% অফলাইনে ফোনে ব্যাকআপ ও রিস্টোর করুন।</p>
+          <div class="btn-row" style="margin-top:6px;">
+            <button class="btn btn-primary btn-sm" id="exportBackupBtn">ব্যাকআপ সেভ (.json)</button>
+            <label class="btn btn-success btn-sm" for="importBackupInput" style="margin:0;">ব্যাকআপ রিস্টোর</label>
+            <input type="file" id="importBackupInput" accept=".json,application/json" />
+            <button class="btn btn-sm" id="exportErrorLogBtn">এরর লগ এক্সপোর্ট</button>
+            <button class="btn btn-danger btn-sm" id="clearAllStorageBtn">সব ডেটা মুছুন</button>
+          </div>
         </div>
       </section>
 
@@ -1034,7 +729,7 @@
             </h2>
             <span class="badge">বাক্স ফন্ট ফিক্স</span>
           </div>
-          <p class="subtitle">পুরনো বিজয় (SutonnyMJ) ফন্টে লেখা প্রশ্ন যা ফোনে বাক্স বা হিজিবিজি দেখায়, এখানে পেস্ট করে ১ ক্লিকে পরিষ্কার বাংলা করুন।</p>
+          <p class="subtitle">পুরনো বিজয় (SutonnyMJ) ফন্টে লেখা প্রশ্ন এখানে পেস্ট করে ১ ক্লিকে পরিষ্কার বাংলা করুন।</p>
           <textarea id="bijoyInput" placeholder="বিজয় ফন্টের হিজিবিজি টেক্সট এখানে পেস্ট করুন..."></textarea>
           <div class="btn-row">
             <button class="btn btn-primary" id="convertBijoyBtn">ইউনিকোড বাংলা করুন</button>
@@ -1053,7 +748,7 @@
       </section>
     </main>
 
-    <!-- Floating Frosted Glass Bottom Dock -->
+    <!-- Floating Bottom Dock -->
     <div class="bottom-dock-wrap" id="bottomDockWrap">
       <nav class="bottom-nav">
         <button class="nav-btn active" data-tab="reader">
@@ -1076,7 +771,7 @@
     </div>
   </div>
 
-  <!-- ==================== TRUE IMMERSIVE ULTRA-SHARP FULL-SCREEN READER ==================== -->
+  <!-- ==================== FULL-SCREEN READER OVERLAY ==================== -->
   <div id="fsOverlay" class="fs-overlay">
     <div class="fs-top-hud">
       <button class="hud-btn" id="fsBackBtn" title="ফিরে যান">
@@ -1103,9 +798,10 @@
         <div id="notesLayer"></div>
       </div>
       <div id="fsDocBox" class="fs-doc-box" style="display:none;"></div>
+      <!-- Isolated Sandbox for Untrusted HTML files (Zero JS execution, Zero GlassNative access) -->
+      <iframe id="fsSandboxFrame" class="fs-sandbox-frame" sandbox="" referrerpolicy="no-referrer"></iframe>
     </div>
 
-    <!-- Floating Side Glass Tool Button & Pro Brush Dock -->
     <div id="sideFabWrap" class="side-fab-wrap" style="display:none;">
       <div id="sideDock" class="side-dock">
         <div class="dock-grid">
@@ -1134,19 +830,14 @@
             <span class="color-dot" data-color="pink" style="background:#fda4af;"></span>
             <span class="color-dot" data-color="blue" style="background:#7dd3fc;"></span>
           </div>
-
           <div class="size-head">
             <span id="sizePanelLabel">সাইজ (হাইলাইট)</span>
             <span id="sizeValueLabel">12 px</span>
           </div>
-
           <div class="size-preview-box">
-            <div class="size-dot-wrap">
-              <div id="sizePreviewDot" class="size-dot" style="width:12px;height:12px;"></div>
-            </div>
+            <div class="size-dot-wrap"><div id="sizePreviewDot" class="size-dot" style="width:12px;height:12px;"></div></div>
             <input type="range" id="brushSizeSlider" class="size-slider" min="4" max="32" step="1" value="12" />
           </div>
-
           <div class="size-presets" id="sizePresets">
             <button class="preset-btn" data-size="small">ছোট</button>
             <button class="preset-btn active" data-size="medium">মাঝারি</button>
@@ -1159,9 +850,9 @@
             <svg class="ic ic-sm" viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
             <span>আনডু</span>
           </button>
-          <button class="dock-item" id="toolSavePageBtn">
-            <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            <span>সেভ</span>
+          <button class="dock-item" id="toolSavePageBtn" title="পেজ ছবি সেভ (PNG)">
+            <svg class="ic ic-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>পেজ PNG</span>
           </button>
         </div>
       </div>
@@ -1173,14 +864,10 @@
 
     <div id="fsBottomHud" class="fs-bottom-hud" style="display:none;">
       <div class="page-nav-pill">
-        <button class="hud-btn" id="prevPageBtn" style="width:30px;height:30px;">
-          <svg class="ic ic-sm" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
+        <button class="hud-btn" id="prevPageBtn" style="width:30px;height:30px;"><svg class="ic ic-sm" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <input type="range" id="pageSlider" min="1" max="1" value="1" />
         <span class="page-badge" id="pageIndicator">1 / 1</span>
-        <button class="hud-btn" id="nextPageBtn" style="width:30px;height:30px;">
-          <svg class="ic ic-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
+        <button class="hud-btn" id="nextPageBtn" style="width:30px;height:30px;"><svg class="ic ic-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
       </div>
       <div class="zoom-pill">
         <button id="zoomOutBtn">−</button>
@@ -1203,17 +890,67 @@
     </div>
   </div>
 
+  <!-- PDF Password Modal (Password is NEVER stored persistently) -->
+  <div id="pdfPassModal" class="modal-backdrop">
+    <div class="modal-card">
+      <h3>পাসওয়ার্ড-সুরক্ষিত PDF</h3>
+      <p id="pdfPassMsg">এই PDF ফাইলটি খুলতে পাসওয়ার্ড দিন। পাসওয়ার্ড কোথাও সেভ করা হয় না।</p>
+      <input type="password" id="pdfPassInput" class="input" placeholder="PDF পাসওয়ার্ড লিখুন..." autocomplete="off" />
+      <div class="btn-row" style="justify-content:flex-end;">
+        <button class="btn btn-sm" id="pdfPassCancelBtn">বাতিল</button>
+        <button class="btn btn-primary btn-sm" id="pdfPassSubmitBtn">খুলুন</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Failure / Retry Modal -->
+  <div id="saveRetryModal" class="modal-backdrop">
+    <div class="modal-card">
+      <h3>ফাইল সেভ ব্যর্থ হয়েছে</h3>
+      <p id="saveRetryReason">ফাইলটি সেভ করা যায়নি।</p>
+      <div class="btn-row" style="justify-content:flex-end;">
+        <button class="btn btn-sm" id="saveRetryCloseBtn">বন্ধ করুন</button>
+        <button class="btn btn-primary btn-sm" id="saveRetryActionBtn">আবার চেষ্টা করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backup Restore Confirmation Modal -->
+  <div id="restoreConfirmModal" class="modal-backdrop">
+    <div class="modal-card">
+      <h3>ব্যাকআপ রিস্টোর সতর্কতা</h3>
+      <p>রিস্টোর করলে বর্তমান ড্রাফট, নোট ও হাইলাইট ডেটার সাথে ব্যাকআপের ডেটা ওভাররাইট/মার্জ হবে। আপনি কি নিশ্চিত?</p>
+      <div class="btn-row" style="justify-content:flex-end;">
+        <button class="btn btn-sm" id="restoreCancelBtn">বাতিল</button>
+        <button class="btn btn-primary btn-sm" id="restoreProceedBtn">হ্যাঁ, রিস্টোর করুন</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast">বার্তা</div>
 
-  <!-- Offline Local Vendor Libraries -->
-  <script src="./vendor/pdf.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js'"></script>
-  <script src="./vendor/mammoth.browser.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js'"></script>
-  <script src="./vendor/pdf-lib.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js'"></script>
-  <script src="./vendor/jspdf.umd.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'"></script>
-  <script src="./vendor/html2canvas.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'"></script>
+  <!-- 100% STRICT OFFLINE LOCAL VENDOR LIBRARIES (ZERO CDN FALLBACKS) -->
+  <script src="./vendor/pdf.min.js"></script>
+  <script src="./vendor/mammoth.browser.min.js"></script>
+  <script src="./vendor/pdf-lib.min.js"></script>
+  <script src="./vendor/jspdf.umd.min.js"></script>
+  <script src="./vendor/html2canvas.min.js"></script>
 
   <script>
     const $ = (id) => document.getElementById(id);
+
+    // ==================== LOCAL PRIVACY-SAFE ERROR LOGGER (NO DOC CONTENT / NO PASSWORDS) ====================
+    function recordLocalError(context, err) {
+      try {
+        const logs = JSON.parse(localStorage.getItem('ax_error_log') || '[]');
+        const msg = err ? String(err.name || err.message || err).slice(0, 140) : 'Unknown error';
+        logs.unshift({ time: new Date().toISOString(), ctx: String(context).slice(0, 40), err: msg });
+        localStorage.setItem('ax_error_log', JSON.stringify(logs.slice(0, 50)));
+      } catch (e) {}
+    }
+
+    window.addEventListener('error', (ev) => recordLocalError('window_error', ev.message));
+    window.addEventListener('unhandledrejection', (ev) => recordLocalError('promise_reject', ev.reason));
 
     let toastTimer;
     function showToast(msg) {
@@ -1221,13 +958,17 @@
       el.textContent = msg;
       el.classList.add('show');
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2700);
     }
 
     function formatBytes(bytes) {
       if (!bytes) return '0 KB';
       if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
       return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     function blobToBase64(blob) {
@@ -1254,9 +995,285 @@
       } catch (e) {}
     }
 
-    // ==================== STARTUP FLOW: OWNERSHIP CEREMONY -> BLANK PERMISSION GATE -> ALL FILES ====================
+    // ==================== 1. STRICT OFFLINE DEPENDENCY VERIFICATION ====================
+    function verifyOfflineDependencies() {
+      const missing = [];
+      if (!window.pdfjsLib) missing.push('PDF.js');
+      if (!window.mammoth) missing.push('Mammoth');
+      if (!window.PDFLib) missing.push('PDF-lib');
+      if (!window.jspdf) missing.push('jsPDF');
+      if (!window.html2canvas) missing.push('html2canvas');
+      if (missing.length) {
+        $('depWarningText').textContent = 'অফলাইন লাইব্রেরি পাওয়া যায়নি: ' + missing.join(', ');
+        $('depWarningStrip').classList.add('show');
+        recordLocalError('offline_dep_check', 'Missing: ' + missing.join(','));
+      }
+      if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdf.worker.min.js';
+      }
+    }
+    window.addEventListener('load', verifyOfflineDependencies);
+
+    // ==================== 2. STRICT OFFLINE HTML SANITIZER (BLOCKS XSS / SCRIPT / SVG / BRIDGE ABUSE) ====================
+    const ALLOWED_TAGS = new Set([
+      'P', 'BR', 'B', 'STRONG', 'I', 'EM', 'U', 'S', 'SUB', 'SUP', 'SPAN', 'DIV',
+      'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'PRE', 'CODE',
+      'HR', 'TABLE', 'THEAD', 'TBODY', 'TFOOT', 'TR', 'TH', 'TD', 'IMG', 'A'
+    ]);
+    const SAFE_STYLES = new Set(['text-align', 'font-weight', 'font-style', 'text-decoration', 'border', 'padding', 'margin', 'margin-top', 'margin-bottom', 'color', 'background-color']);
+
+    function sanitizeStyleAttr(rawStyle) {
+      if (!rawStyle) return '';
+      const out = [];
+      rawStyle.split(';').forEach(rule => {
+        const idx = rule.indexOf(':');
+        if (idx < 0) return;
+        const prop = rule.slice(0, idx).trim().toLowerCase();
+        const val = rule.slice(idx + 1).trim();
+        if (!SAFE_STYLES.has(prop)) return;
+        if (/url\s*\(|expression\s*\(|javascript:|import/i.test(val)) return;
+        out.push(`${prop}:${val}`);
+      });
+      return out.join(';');
+    }
+
+    function sanitizeHtml(dirtyHtml) {
+      if (!dirtyHtml) return '';
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(String(dirtyHtml), 'text/html');
+        // Completely eliminate dangerous containers & their children first
+        doc.querySelectorAll('script,style,iframe,object,embed,applet,svg,math,form,input,button,textarea,select,meta,link,base,noscript').forEach(n => n.remove());
+
+        function cleanNode(node) {
+          const children = Array.from(node.childNodes);
+          for (const child of children) {
+            if (child.nodeType === Node.COMMENT_NODE) {
+              child.remove();
+            } else if (child.nodeType === Node.ELEMENT_NODE) {
+              if (!ALLOWED_TAGS.has(child.tagName)) {
+                // Unwrap unknown benign wrappers while preserving inner text
+                cleanNode(child);
+                while (child.firstChild) node.insertBefore(child.firstChild, child);
+                child.remove();
+                continue;
+              }
+              for (const attr of Array.from(child.attributes)) {
+                const name = attr.name.toLowerCase();
+                const val = (attr.value || '').trim();
+                if (name.startsWith('on') || name === 'srcdoc' || name === 'formaction') {
+                  child.removeAttribute(attr.name);
+                  continue;
+                }
+                if (name === 'style') {
+                  const safeCss = sanitizeStyleAttr(val);
+                  if (safeCss) child.setAttribute('style', safeCss);
+                  else child.removeAttribute('style');
+                  continue;
+                }
+                if (child.tagName === 'IMG' && name === 'src') {
+                  if (!/^data:image\/(png|jpeg|jpg|webp|gif);base64,/i.test(val) && !val.startsWith('blob:')) {
+                    child.removeAttribute('src');
+                  }
+                  continue;
+                }
+                if (child.tagName === 'A' && name === 'href') {
+                  if (!val.startsWith('#')) {
+                    child.removeAttribute('href');
+                  }
+                  continue;
+                }
+                if (!['colspan', 'rowspan', 'alt'].includes(name)) {
+                  child.removeAttribute(attr.name);
+                }
+              }
+              cleanNode(child);
+            }
+          }
+        }
+        cleanNode(doc.body);
+        return doc.body.innerHTML;
+      } catch (e) {
+        recordLocalError('sanitizeHtml', e);
+        return '<p>' + escapeHtml(dirtyHtml) + '</p>';
+      }
+    }
+
+    // ==================== 3. INDEXEDDB PERSISTENCE + SAFE AUTO-MIGRATION + BACKUP/RESTORE ====================
+    const DB_NAME = 'AetherXStudioDB';
+    const DB_VERSION = 1;
+    let dbPromise = null;
+
+    function openAppDB() {
+      if (dbPromise) return dbPromise;
+      dbPromise = new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (ev) => {
+          const db = ev.target.result;
+          if (!db.objectStoreNames.contains('annotations')) db.createObjectStore('annotations', { keyPath: 'docId' });
+          if (!db.objectStoreNames.contains('notes')) db.createObjectStore('notes', { keyPath: 'docId' });
+          if (!db.objectStoreNames.contains('drafts')) db.createObjectStore('drafts', { keyPath: 'id' });
+          if (!db.objectStoreNames.contains('recovery')) db.createObjectStore('recovery', { keyPath: 'key' });
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+      return dbPromise;
+    }
+
+    async function dbGet(store, key) {
+      const db = await openAppDB();
+      return new Promise((res, rej) => {
+        const tx = db.transaction(store, 'readonly');
+        const r = tx.objectStore(store).get(key);
+        r.onsuccess = () => res(r.result || null);
+        r.onerror = () => rej(r.error);
+      });
+    }
+
+    async function dbPut(store, val) {
+      const db = await openAppDB();
+      return new Promise((res, rej) => {
+        const tx = db.transaction(store, 'readwrite');
+        tx.objectStore(store).put(val);
+        tx.oncomplete = () => res(true);
+        tx.onerror = () => rej(tx.error);
+      });
+    }
+
+    async function dbDelete(store, key) {
+      const db = await openAppDB();
+      return new Promise((res, rej) => {
+        const tx = db.transaction(store, 'readwrite');
+        tx.objectStore(store).delete(key);
+        tx.oncomplete = () => res(true);
+        tx.onerror = () => rej(tx.error);
+      });
+    }
+
+    async function dbGetAll(store) {
+      const db = await openAppDB();
+      return new Promise((res, rej) => {
+        const tx = db.transaction(store, 'readonly');
+        const r = tx.objectStore(store).getAll();
+        r.onsuccess = () => res(r.result || []);
+        r.onerror = () => rej(r.error);
+      });
+    }
+
+    async function dbClearStore(store) {
+      const db = await openAppDB();
+      return new Promise((res, rej) => {
+        const tx = db.transaction(store, 'readwrite');
+        tx.objectStore(store).clear();
+        tx.oncomplete = () => res(true);
+        tx.onerror = () => rej(tx.error);
+      });
+    }
+
+    // Safe one-time migration from legacy localStorage -> IndexedDB (NEVER deletes old data unless commit succeeds!)
+    async function migrateLegacyStorageSafely() {
+      if (localStorage.getItem('ax_idb_migrated_v1') === 'true') return;
+      try {
+        await openAppDB();
+        const legacyDraftKeys = ['ax_drafts', 'gd_drafts'];
+        for (const dk of legacyDraftKeys) {
+          const raw = localStorage.getItem(dk);
+          if (!raw) continue;
+          const arr = JSON.parse(raw);
+          if (Array.isArray(arr)) {
+            for (let i = 0; i < arr.length; i++) {
+              const d = arr[i];
+              await dbPut('drafts', {
+                id: 'migrated_' + dk + '_' + i + '_' + Date.now(),
+                title: String(d.title || 'নোট'),
+                html: sanitizeHtml(d.html || ''),
+                date: String(d.date || new Date().toLocaleString('bn-BD')),
+                updatedAt: Date.now() - i * 1000
+              });
+            }
+          }
+        }
+        for (const k of Object.keys(localStorage)) {
+          if (k.startsWith('ax_notes_') || k.startsWith('gd_notes_')) {
+            const rawN = localStorage.getItem(k);
+            if (!rawN) continue;
+            const parsed = JSON.parse(rawN);
+            if (parsed && typeof parsed === 'object') {
+              await dbPut('notes', { docId: k, legacyKey: k, notesByPage: parsed, updatedAt: Date.now() });
+            }
+          }
+        }
+        // Only mark migrated AFTER all writes succeeded
+        localStorage.setItem('ax_idb_migrated_v1', 'true');
+      } catch (e) {
+        recordLocalError('idb_migration', e);
+      }
+    }
+
+    function computeDocId(meta) {
+      const raw = `${meta.path || meta.name || ''}|${meta.size || 0}|${meta.modified || 0}|${meta.headHash || ''}`;
+      let h1 = 0x811c9dc5, h2 = 0x9e3779b9;
+      for (let i = 0; i < raw.length; i++) {
+        const c = raw.charCodeAt(i);
+        h1 = Math.imul(h1 ^ c, 0x01000193);
+        h2 = Math.imul(h2 ^ c, 0x85ebca6b);
+      }
+      return 'doc_' + (h1 >>> 0).toString(16) + '_' + (h2 >>> 0).toString(16);
+    }
+
+    // ==================== 4. VERIFIED SAVE WITH RETRY MODAL ====================
+    let lastFailedSave = null;
+
+    async function saveOutputFile(blob, filename) {
+      try {
+        const b64 = await blobToBase64(blob);
+        if (window.GlassNative && typeof window.GlassNative.saveBase64ToDocuments === 'function') {
+          const rawRes = window.GlassNative.saveBase64ToDocuments(filename, b64);
+          let parsed = null;
+          try { parsed = JSON.parse(rawRes); } catch (e) {}
+          if (parsed && parsed.ok) {
+            showToast('সফলভাবে সেভ হয়েছে: Documents/AetherX_PDF/' + parsed.name);
+            return true;
+          }
+          const errMsg = (parsed && parsed.error) ? parsed.error : 'ডিভাইসে ফাইল সেভ করা যায়নি';
+          lastFailedSave = { blob, filename };
+          $('saveRetryReason').textContent = `${errMsg} — স্টোরেজ পারমিশন বা ফ্রি স্পেস যাচাই করে আবার চেষ্টা করুন।`;
+          $('saveRetryModal').classList.add('open');
+          recordLocalError('native_save', errMsg);
+          return false;
+        }
+        // Browser fallback (explicitly announced)
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        showToast('ব্রাউজার ডাউনলোড শুরু হয়েছে: ' + filename);
+        return true;
+      } catch (err) {
+        lastFailedSave = { blob, filename };
+        $('saveRetryReason').textContent = 'ফাইল তৈরিতে বা সেভে অপ্রত্যাশিত ত্রুটি হয়েছে।';
+        $('saveRetryModal').classList.add('open');
+        recordLocalError('saveOutputFile', err);
+        return false;
+      }
+    }
+
+    $('saveRetryCloseBtn').addEventListener('click', () => { $('saveRetryModal').classList.remove('open'); lastFailedSave = null; });
+    $('saveRetryActionBtn').addEventListener('click', async () => {
+      $('saveRetryModal').classList.remove('open');
+      if (lastFailedSave) {
+        const { blob, filename } = lastFailedSave;
+        lastFailedSave = null;
+        await saveOutputFile(blob, filename);
+      }
+    });
+
+    // ==================== 5. STARTUP FLOW (CEREMONY + PERMISSION GATE) ====================
     let startupCompleted = false;
     let permSkippedManually = false;
+    let lastKnownPerm = null;
 
     function getStoredOwner() {
       let nativeName = '';
@@ -1291,23 +1308,31 @@
       $('ownerVerifiedBadge').classList.add('show');
     }
 
-    function checkPermissionGateAndLoad() {
+    function checkPermissionGateAndLoad(forceScan = false) {
       startupCompleted = true;
       const gate = $('permissionGate');
       if (window.GlassNative && typeof window.GlassNative.hasStoragePermission === 'function') {
         const hasPerm = window.GlassNative.hasStoragePermission();
+        const permChanged = (lastKnownPerm !== hasPerm);
+        lastKnownPerm = hasPerm;
+
         if (!hasPerm && !permSkippedManually) {
           gate.classList.add('show');
           return;
         }
         if (gate.classList.contains('show')) {
           gate.classList.add('fade-out');
-          setTimeout(() => gate.classList.remove('show', 'fade-out'), 420);
+          setTimeout(() => gate.classList.remove('show', 'fade-out'), 380);
         }
-        scanDeviceDocuments();
+        if (hasPerm && (forceScan || permChanged)) {
+          triggerBackgroundScan();
+        } else if (!hasPerm) {
+          deviceFiles = [];
+          renderFileLibrary();
+        }
       } else {
         gate.classList.remove('show');
-        scanDeviceDocuments();
+        renderFileLibrary();
       }
     }
 
@@ -1322,13 +1347,17 @@
       permSkippedManually = true;
       const gate = $('permissionGate');
       gate.classList.add('fade-out');
-      setTimeout(() => gate.classList.remove('show', 'fade-out'), 380);
-      scanDeviceDocuments();
+      setTimeout(() => gate.classList.remove('show', 'fade-out'), 360);
+      renderFileLibrary();
     });
 
-    function initStartupFlow() {
-      const existingOwner = getStoredOwner();
+    async function initStartupFlow() {
+      await migrateLegacyStorageSafely();
+      await renderDrafts();
+      await checkEditorRecovery();
+      updateStorageStats();
 
+      const existingOwner = getStoredOwner();
       if (existingOwner) {
         applyOwnerBranding(existingOwner);
         $('splashOwnerLabel').textContent = existingOwner;
@@ -1338,18 +1367,14 @@
           splash.classList.add('fade-out');
           setTimeout(() => {
             splash.classList.remove('show', 'fade-out');
-            checkPermissionGateAndLoad();
-          }, 420);
-        }, 920);
+            checkPermissionGateAndLoad(true);
+          }, 380);
+        }, 760);
         return;
       }
 
-      // First-time launch ONLY: App Ownership Transfer Ceremony
       const screen = $('ownershipScreen');
-      const s1 = $('ceremonyStage1');
-      const s2 = $('ceremonyStage2');
-      const s3 = $('ceremonyStage3');
-
+      const s1 = $('ceremonyStage1'), s2 = $('ceremonyStage2'), s3 = $('ceremonyStage3');
       screen.classList.add('show');
       s1.classList.add('active');
 
@@ -1357,7 +1382,7 @@
         s1.classList.remove('active');
         s2.classList.add('active');
         setTimeout(() => $('ownerNameInput').focus(), 200);
-      }, 2700);
+      }, 2550);
 
       $('ownerNameInput').addEventListener('input', () => { $('ownerNameError').textContent = ''; });
 
@@ -1367,12 +1392,12 @@
           $('ownerNameError').textContent = 'অনুগ্রহ করে কমপক্ষে ২ অক্ষরের নাম লিখুন।';
           return;
         }
-        if (!/^[A-Za-z][A-Za-z .'-]{1,27}$/.test(raw)) {
-          $('ownerNameError').textContent = 'নামটি অবশ্যই ইংরেজি অক্ষরে (A-Z) লিখতে হবে।';
+        // Supports both English and Bengali owner names cleanly
+        if (!/^[A-Za-z\u0980-\u09FF][A-Za-z\u0980-\u09FF .'-]{1,31}$/.test(raw)) {
+          $('ownerNameError').textContent = 'শুধু ইংরেজি বা বাংলা অক্ষর ব্যবহার করুন।';
           return;
         }
-
-        const formatted = raw === raw.toLowerCase()
+        const formatted = /^[a-z .'-]+$/.test(raw)
           ? raw.replace(/\b\w/g, ch => ch.toUpperCase())
           : raw;
 
@@ -1392,92 +1417,43 @@
           $('finalCertCard').classList.add('impact-shake');
           $('certStatusLine').textContent = '✓ মালিকানা সিল অনুমোদিত! অ্যাপ চালু হচ্ছে...';
           try { if (navigator.vibrate) navigator.vibrate([35, 30, 55]); } catch (e) {}
-        }, 620);
+        }, 580);
 
         setTimeout(() => {
           screen.classList.add('fade-out');
           setTimeout(() => {
             screen.classList.remove('show', 'fade-out');
             s3.classList.remove('active');
-            checkPermissionGateAndLoad();
-          }, 460);
-        }, 3000);
+            checkPermissionGateAndLoad(true);
+          }, 420);
+        }, 2850);
       }
 
       $('claimOwnershipBtn').addEventListener('click', completeOwnershipTransfer);
-      $('ownerNameInput').addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter') completeOwnershipTransfer();
-      });
+      $('ownerNameInput').addEventListener('keydown', (ev) => { if (ev.key === 'Enter') completeOwnershipTransfer(); });
     }
 
     window.addEventListener('DOMContentLoaded', initStartupFlow);
 
-    // Re-check permission automatically when user returns from Android Settings
+    // Smart Resume Handler: ONLY rescans if storage permission actually changed (no duplicate spam scans!)
     function onAppResume() {
       if (!startupCompleted) return;
-      if ($('permissionGate').classList.contains('show')) {
-        checkPermissionGateAndLoad();
-      } else {
-        scanDeviceDocuments();
-      }
+      checkPermissionGateAndLoad(false);
     }
     document.addEventListener('visibilitychange', () => { if (!document.hidden) onAppResume(); });
-    window.addEventListener('focus', onAppResume);
 
     // ==================== AUTO-HIDE BOTTOM DOCK WHEN KEYBOARD OPENS ====================
     const bottomDockWrap = $('bottomDockWrap');
-    let baseWindowHeight = window.innerHeight;
-
+    const baseWindowHeight = window.innerHeight;
     function updateKeyboardState() {
       const active = document.activeElement;
-      const isEditing = active && (
-        active.id === 'editorPaper'
-        || active.isContentEditable
-        || active.tagName === 'INPUT'
-        || active.tagName === 'TEXTAREA'
-      );
-      const viewportShrunk = window.visualViewport
-        ? window.visualViewport.height < baseWindowHeight * 0.78
-        : window.innerHeight < baseWindowHeight * 0.78;
-      bottomDockWrap.classList.toggle('kb-hidden', !!(isEditing || viewportShrunk));
+      const isEditing = active && (active.id === 'editorPaper' || active.isContentEditable || active.tagName === 'INPUT' || active.tagName === 'TEXTAREA');
+      const shrunk = window.visualViewport ? window.visualViewport.height < baseWindowHeight * 0.78 : window.innerHeight < baseWindowHeight * 0.78;
+      bottomDockWrap.classList.toggle('kb-hidden', !!(isEditing || shrunk));
     }
-
     document.addEventListener('focusin', updateKeyboardState);
     document.addEventListener('focusout', () => setTimeout(updateKeyboardState, 120));
     if (window.visualViewport) window.visualViewport.addEventListener('resize', updateKeyboardState);
-
-    // ==================== NATIVE FILE SAVE ====================
-    async function saveOutputFile(blob, filename) {
-      try {
-        const b64 = await blobToBase64(blob);
-        if (window.GlassNative && typeof window.GlassNative.saveBase64ToDocuments === 'function') {
-          const savedPath = window.GlassNative.saveBase64ToDocuments(filename, b64);
-          if (savedPath) {
-            showToast('সেভ হয়েছে: Documents/AetherX_PDF/' + filename);
-            setTimeout(scanDeviceDocuments, 600);
-            return;
-          }
-        }
-        const cap = window.Capacitor;
-        if (cap && typeof cap.isNativePlatform === 'function' && cap.isNativePlatform()) {
-          const { Filesystem, Share } = cap.Plugins || {};
-          if (Filesystem) {
-            const cached = await Filesystem.writeFile({ path: filename, data: b64, directory: 'CACHE' });
-            if (Share) {
-              await Share.share({ title: filename, url: cached.uri, dialogTitle: 'ফাইল সেভ বা শেয়ার করুন' });
-              return;
-            }
-          }
-        }
-      } catch (err) {}
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 4000);
-      showToast('ডাউনলোড হয়েছে: ' + filename);
-    }
 
     // ==================== THEME & NAVIGATION ====================
     function applyTheme(theme) {
@@ -1485,10 +1461,7 @@
       localStorage.setItem('ax_theme', theme);
     }
     applyTheme(localStorage.getItem('ax_theme') || 'dark');
-
-    $('themeToggle').addEventListener('click', () => {
-      applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    });
+    $('themeToggle').addEventListener('click', () => applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
 
     function switchTab(tabName) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -1497,81 +1470,114 @@
       if (view) view.classList.add('active');
       const btn = document.querySelector(`.nav-btn[data-tab="${tabName}"]`);
       if (btn) btn.classList.add('active');
-      if (tabName === 'tools') updateStorageMeter();
+      if (tabName === 'tools') updateStorageStats();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
 
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-    });
-
-    function initPdfWorker() {
-      if (window.pdfjsLib) {
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdf.worker.min.js';
-      }
-    }
-    window.addEventListener('load', initPdfWorker);
-
-    // ==================== ALL-DOCUMENT LIBRARY + SCROLL REVEAL ====================
+    // ==================== 6. BACKGROUND DOCUMENT SCANNER + INCREMENTAL PAGINATION ====================
     let deviceFiles = [];
     let activeFilter = 'all';
+    let visibleLimit = 60;
+    let isScanning = false;
     let listObserver = null;
+
+    function triggerBackgroundScan() {
+      if (!window.GlassNative || typeof window.GlassNative.startBackgroundScan !== 'function') {
+        renderFileLibrary();
+        return;
+      }
+      if (isScanning) return;
+      isScanning = true;
+      $('rescanBtn').classList.add('spinning');
+      $('scanProgressStrip').classList.add('show');
+      window.GlassNative.startBackgroundScan();
+    }
+
+    window.__onNativeScanComplete = function(gen, permitted, b64Json) {
+      isScanning = false;
+      $('rescanBtn').classList.remove('spinning');
+      $('scanProgressStrip').classList.remove('show');
+      if (!permitted) {
+        lastKnownPerm = false;
+        deviceFiles = [];
+        renderFileLibrary();
+        return;
+      }
+      try {
+        const bytes = base64ToUint8Array(b64Json);
+        const text = new TextDecoder('utf-8').decode(bytes);
+        deviceFiles = JSON.parse(text || '[]');
+      } catch (e) {
+        recordLocalError('scan_parse', e);
+        deviceFiles = [];
+      }
+      visibleLimit = 60;
+      renderFileLibrary();
+    };
 
     function attachScrollReveal(container) {
       if (listObserver) listObserver.disconnect();
-      const rows = container.querySelectorAll('.file-row');
+      const rows = container.querySelectorAll('.file-row:not(.in-view)');
       if (!rows.length) return;
-
       if ('IntersectionObserver' in window) {
         listObserver = new IntersectionObserver((entries) => {
           let batch = 0;
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               const el = entry.target;
-              el.style.transitionDelay = Math.min(batch * 40, 200) + 'ms';
+              el.style.transitionDelay = Math.min(batch * 36, 180) + 'ms';
               el.classList.add('in-view');
               batch++;
               listObserver.unobserve(el);
-              setTimeout(() => { el.style.transitionDelay = '0ms'; }, 550);
+              setTimeout(() => { el.style.transitionDelay = '0ms'; }, 500);
             }
           });
-        }, { threshold: 0.05, rootMargin: '0px 0px -14px 0px' });
+        }, { threshold: 0.05, rootMargin: '0px 0px -12px 0px' });
         rows.forEach(r => listObserver.observe(r));
       } else {
         rows.forEach(r => r.classList.add('in-view'));
       }
     }
 
-    function renderFileLibrary() {
+    function getFilteredFiles() {
       const q = ($('librarySearch').value || '').trim().toLowerCase();
-      const filtered = deviceFiles.filter(f => {
+      return deviceFiles.filter(f => {
         let matchExt = true;
         if (activeFilter === 'pdf') matchExt = f.ext === 'pdf';
         else if (activeFilter === 'docx') matchExt = (f.ext === 'docx' || f.ext === 'doc');
-        else if (activeFilter === 'txt') matchExt = !['pdf', 'docx', 'doc'].includes(f.ext);
+        else if (activeFilter === 'rtf') matchExt = f.ext === 'rtf';
+        else if (activeFilter === 'txt') matchExt = !['pdf', 'docx', 'doc', 'rtf'].includes(f.ext);
         const matchQ = !q || f.name.toLowerCase().includes(q) || (f.folder || '').toLowerCase().includes(q);
         return matchExt && matchQ;
       });
+    }
+
+    function renderFileLibrary() {
+      const filtered = getFilteredFiles();
       $('countAll').textContent = deviceFiles.length;
       const container = $('autoFileList');
+      const loadWrap = $('loadMoreWrap');
 
       if (!filtered.length) {
+        loadWrap.style.display = 'none';
         container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:28px 12px; color:var(--text-muted); font-size:13px; line-height:1.6;">
           ${deviceFiles.length ? 'খোঁজার সাথে মিলে এমন কোনো ফাইল পাওয়া যায়নি।' : 'কোনো ফাইল পাওয়া যায়নি। উপরের <b>"ফাইল বাছুন"</b> বাটনে ট্যাপ করে যেকোনো ফাইল খুলতে পারেন।'}
         </div>`;
         return;
       }
 
-      container.innerHTML = filtered.map(f => {
+      const slice = filtered.slice(0, visibleLimit);
+      container.innerHTML = slice.map(f => {
         const badgeCls = f.ext === 'pdf' ? 'pdf' : ((f.ext === 'docx' || f.ext === 'doc') ? 'docx' : (f.ext === 'txt' ? 'txt' : 'other'));
         const dateStr = f.modified ? new Date(f.modified).toLocaleDateString('bn-BD') : '';
         return `
-          <div class="file-row" data-path="${encodeURIComponent(f.path)}" data-name="${encodeURIComponent(f.name)}" data-ext="${f.ext}">
-            <div class="file-badge ${badgeCls}">${f.ext.toUpperCase()}</div>
+          <div class="file-row" data-idx="${deviceFiles.indexOf(f)}">
+            <div class="file-badge ${badgeCls}">${escapeHtml(f.ext.toUpperCase())}</div>
             <div class="file-meta">
-              <div class="file-name">${f.name.replace(/</g, '&lt;')}</div>
+              <div class="file-name">${escapeHtml(f.name)}</div>
               <div class="file-sub">
-                <span>${f.folder || 'Storage'}</span><span>•</span><span>${formatBytes(f.size)}</span>
+                <span>${escapeHtml(f.folder || 'Storage')}</span><span>•</span><span>${formatBytes(f.size)}</span>
                 ${dateStr ? `<span>•</span><span>${dateStr}</span>` : ''}
               </div>
             </div>
@@ -1581,66 +1587,168 @@
 
       container.querySelectorAll('.file-row').forEach(row => {
         row.addEventListener('click', () => {
-          openDeviceFile(decodeURIComponent(row.dataset.path), decodeURIComponent(row.dataset.name), row.dataset.ext);
+          const fileObj = deviceFiles[parseInt(row.dataset.idx, 10)];
+          if (fileObj) openDeviceFile(fileObj);
         });
       });
 
+      if (filtered.length > visibleLimit) {
+        loadWrap.style.display = 'block';
+        $('loadMoreBtn').textContent = `আরো ফাইল দেখুন (${slice.length} / ${filtered.length})`;
+      } else {
+        loadWrap.style.display = 'none';
+      }
       attachScrollReveal(container);
     }
 
-    function scanDeviceDocuments() {
-      if (window.GlassNative && typeof window.GlassNative.scanDocuments === 'function') {
-        if (!window.GlassNative.hasStoragePermission()) {
-          deviceFiles = [];
-          renderFileLibrary();
-          return;
-        }
-        try { deviceFiles = JSON.parse(window.GlassNative.scanDocuments() || '[]'); }
-        catch { deviceFiles = []; }
-        renderFileLibrary();
-      } else {
-        deviceFiles = [];
-        renderFileLibrary();
-      }
-    }
-
+    $('loadMoreBtn').addEventListener('click', () => { visibleLimit += 60; renderFileLibrary(); });
     $('rescanBtn').addEventListener('click', () => {
       if (window.GlassNative && !window.GlassNative.hasStoragePermission()) {
         permSkippedManually = false;
-        checkPermissionGateAndLoad();
+        checkPermissionGateAndLoad(true);
         return;
       }
-      scanDeviceDocuments();
-      showToast('ফাইল তালিকা রিফ্রেশ হয়েছে');
+      triggerBackgroundScan();
+      showToast('ব্যাকগ্রাউন্ডে ফাইল রিফ্রেশ হচ্ছে...');
     });
-
-    $('librarySearch').addEventListener('input', renderFileLibrary);
+    $('librarySearch').addEventListener('input', () => { visibleLimit = 60; renderFileLibrary(); });
     $('filterChips').querySelectorAll('.chip').forEach(ch => {
       ch.addEventListener('click', () => {
         $('filterChips').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
         ch.classList.add('active');
         activeFilter = ch.dataset.filter;
+        visibleLimit = 60;
         renderFileLibrary();
       });
     });
 
-    async function openDeviceFile(path, name, ext) {
+    // ==================== 7. OFFLINE RTF-TO-HTML PARSER & LEGACY DOC GUARD ====================
+    function parseRtfToSafeHtml(rtfText) {
+      let s = String(rtfText || '');
+      // Strip non-content RTF header groups
+      s = s.replace(/\{\\\*\\[^}]*\}/g, '');
+      s = s.replace(/\{\\(?:fonttbl|colortbl|stylesheet|info|pict|header|footer|object)[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g, '');
+      // Decode Unicode escapes \uN? (handles Bengali Unicode cleanly!)
+      s = s.replace(/\\u(-?\d+)\??/g, (_, numStr) => {
+        let code = parseInt(numStr, 10);
+        if (code < 0) code += 65536;
+        return String.fromCharCode(code);
+      });
+      // Decode hex escapes \'hh
+      s = s.replace(/\\'([0-9a-fA-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+      // Paragraph & line breaks
+      s = s.replace(/\\par[d]?/g, '\n').replace(/\\line/g, '\n').replace(/\\tab/g, '    ');
+      // Remove remaining control words & braces
+      s = s.replace(/\\[a-zA-Z]+-?\d* ?/g, '').replace(/[{}]/g, '');
+      const lines = s.split(/\r?\n/).map(l => l.trim()).filter((l, i, arr) => l || (i > 0 && arr[i - 1]));
+      if (!lines.length) return '<p>(RTF ফাইলটি খালি)</p>';
+      return lines.map(l => `<p>${escapeHtml(l)}</p>`).join('');
+    }
+
+    // ==================== 8. UNLIMITED LARGE PDF BYTE-RANGE STREAMING TRANSPORT ====================
+    let activeNativePdfSession = null;
+
+    function createNativePdfRangeTransport(sessionId, fileLength) {
+      const RangeBase = window.pdfjsLib.PDFDataRangeTransport;
+      class NativeBridgeRangeTransport extends RangeBase {
+        constructor(len) {
+          super(len, null);
+          this.sessionId = sessionId;
+        }
+        requestDataRange(begin, end) {
+          // Run asynchronously so UI stays silky responsive
+          setTimeout(() => {
+            try {
+              if (!window.GlassNative || this.sessionId !== activeNativePdfSession) return;
+              const b64 = window.GlassNative.readPdfChunk(this.sessionId, begin, end);
+              if (b64) {
+                this.onDataRange(begin, base64ToUint8Array(b64));
+              } else {
+                this.onDataRange(begin, new Uint8Array(0));
+              }
+            } catch (e) {
+              recordLocalError('pdf_range_chunk', e);
+            }
+          }, 0);
+        }
+        abort() {
+          if (window.GlassNative && this.sessionId) {
+            try { window.GlassNative.closePdfSession(this.sessionId); } catch (e) {}
+          }
+        }
+      }
+      return new NativeBridgeRangeTransport(fileLength);
+    }
+
+    function promptPdfPassword(message) {
+      return new Promise((resolve) => {
+        $('pdfPassMsg').textContent = message || 'এই PDF ফাইলটি খুলতে পাসওয়ার্ড দিন। পাসওয়ার্ড কোথাও সেভ করা হয় না।';
+        $('pdfPassInput').value = '';
+        $('pdfPassModal').classList.add('open');
+        setTimeout(() => $('pdfPassInput').focus(), 120);
+
+        function cleanup(val) {
+          $('pdfPassModal').classList.remove('open');
+          $('pdfPassInput').value = '';
+          $('pdfPassSubmitBtn').removeEventListener('click', onOk);
+          $('pdfPassCancelBtn').removeEventListener('click', onCancel);
+          $('pdfPassInput').removeEventListener('keydown', onKey);
+          resolve(val);
+        }
+        function onOk() { cleanup($('pdfPassInput').value); }
+        function onCancel() { cleanup(null); }
+        function onKey(e) { if (e.key === 'Enter') onOk(); }
+
+        $('pdfPassSubmitBtn').addEventListener('click', onOk);
+        $('pdfPassCancelBtn').addEventListener('click', onCancel);
+        $('pdfPassInput').addEventListener('keydown', onKey);
+      });
+    }
+
+    async function openDeviceFile(fileObj) {
+      const { path, name, ext, size, modified } = fileObj;
+
+      if (ext === 'doc') {
+        showToast('পুরোনো বাইনারি .doc ফরম্যাট অফলাইনে সমর্থিত নয় — ফাইলটি .docx বা .pdf করে খুলুন।');
+        return;
+      }
+
       showToast('ফাইল খোলা হচ্ছে...');
       try {
-        let buffer = null;
-        if (window.Capacitor && typeof window.Capacitor.convertFileSrc === 'function') {
-          try {
-            const resp = await fetch(window.Capacitor.convertFileSrc(path));
-            if (resp.ok) buffer = await resp.arrayBuffer();
-          } catch (e) {}
+        // 1. LARGE / UNLIMITED PDF: Open via Native RandomAccessFile Byte-Range Streaming!
+        if (ext === 'pdf' && window.GlassNative && typeof window.GlassNative.openPdfSession === 'function') {
+          const raw = window.GlassNative.openPdfSession(path);
+          const info = JSON.parse(raw || '{}');
+          if (!info.ok) {
+            showToast('PDF খোলা যায়নি: ' + (info.error || 'অনুমতি যাচাই করুন'));
+            return;
+          }
+          activeNativePdfSession = info.sessionId;
+          const docId = computeDocId({ path, name, size: info.size || size, modified: info.modified || modified, headHash: info.headHash });
+          const transport = createNativePdfRangeTransport(info.sessionId, info.length);
+          await openPdfFromSource({
+            range: transport,
+            length: info.length,
+            rangeChunkSize: 131072, // 128 KB chunks — opens 100-500MB PDFs using minimal RAM!
+            disableAutoFetch: true,
+            disableStream: true
+          }, name, docId, { path, name, size: info.size || size, modified: info.modified || modified });
+          return;
         }
-        if (!buffer && window.GlassNative) {
-          const b64 = window.GlassNative.readFileBase64(path);
+
+        // 2. Non-PDF documents via hardened Native readSmallDocBase64
+        let buffer = null;
+        if (window.GlassNative && typeof window.GlassNative.readSmallDocBase64 === 'function') {
+          const b64 = window.GlassNative.readSmallDocBase64(path);
           if (b64) buffer = base64ToUint8Array(b64).buffer;
         }
-        if (!buffer) return showToast('ফাইলটি পড়া যায়নি, স্টোরেজ অনুমতি চেক করুন');
-        await openBufferInFullscreen(buffer, name, ext, path);
+        if (!buffer) {
+          showToast('ফাইলটি পড়া যায়নি (সাইজ ৩০ MB-এর বেশি অথবা অনুমতি নেই)');
+          return;
+        }
+        await openNonPdfBuffer(buffer, name, ext);
       } catch (err) {
+        recordLocalError('openDeviceFile', err);
         showToast('ফাইল খুলতে সমস্যা হয়েছে');
       }
     }
@@ -1649,81 +1757,75 @@
       const file = e.target.files[0];
       if (!file) return;
       const ext = file.name.split('.').pop().toLowerCase();
+      e.target.value = '';
+
+      if (ext === 'doc') {
+        showToast('পুরোনো বাইনারি .doc ফরম্যাট অফলাইনে সমর্থিত নয় — .docx বা .pdf ফাইল ব্যবহার করুন।');
+        return;
+      }
+
       try {
         if (['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext)) {
           const url = URL.createObjectURL(file);
           openFsHtml(`<img src="${url}" style="max-width:100%;border-radius:10px;display:block;margin:auto;"/>`, file.name, false);
+        } else if (ext === 'pdf') {
+          showToast('PDF লোড হচ্ছে...');
+          // Stream via Blob URL for picked files (never base64!)
+          const blobUrl = URL.createObjectURL(file);
+          const docId = computeDocId({ name: file.name, size: file.size, modified: file.lastModified });
+          await openPdfFromSource({ url: blobUrl, disableAutoFetch: true }, file.name, docId, { name: file.name, size: file.size, modified: file.lastModified }, blobUrl);
         } else {
-          await openBufferInFullscreen(await file.arrayBuffer(), file.name, ext, file.name);
+          await openNonPdfBuffer(await file.arrayBuffer(), file.name, ext);
         }
-      } catch { showToast('ফাইল পড়া যায়নি'); }
-      e.target.value = '';
-    });
-
-    // ==================== EDITOR TABLE TYPING FIX ====================
-    function normalizeEditablePaper() {
-      const paper = $('editorPaper');
-      paper.setAttribute('contenteditable', 'true');
-      paper.querySelectorAll('td, th').forEach(cell => {
-        cell.removeAttribute('contenteditable');
-        const txt = (cell.textContent || '').replace(/\u00A0/g, '').trim();
-        if (!txt && !cell.querySelector('img')) {
-          cell.innerHTML = '<p><br></p>';
-        } else if (!cell.querySelector('p, div, br') && txt) {
-          cell.innerHTML = `<p>${cell.innerHTML}</p>`;
-        }
-      });
-    }
-
-    $('editorPaper').addEventListener('click', (e) => {
-      const cell = e.target.closest('td, th');
-      if (!cell) return;
-      const txt = (cell.textContent || '').replace(/\u00A0/g, '').trim();
-      if (!txt && !cell.querySelector('img')) {
-        if (!cell.querySelector('p')) cell.innerHTML = '<p><br></p>';
-        const target = cell.querySelector('p') || cell;
-        try {
-          const range = document.createRange();
-          range.setStart(target, 0);
-          range.collapse(true);
-          const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
-        } catch (err) {}
+      } catch (err) {
+        recordLocalError('picker_open', err);
+        showToast('ফাইল পড়া যায়নি');
       }
     });
 
-    // ==================== DUAL-LAYER RAZOR-SHARP 60FPS PDF ENGINE (PHONE + TABLET) ====================
+    async function openNonPdfBuffer(arrayBuffer, name, ext) {
+      if (ext === 'docx') {
+        const res = await window.mammoth.convertToHtml({ arrayBuffer });
+        const clean = sanitizeHtml(res.value || '<p>(ফাইলটি খালি)</p>');
+        openFsHtml(clean, name, true);
+      } else if (ext === 'rtf') {
+        const text = new TextDecoder('utf-8').decode(arrayBuffer);
+        openFsHtml(parseRtfToSafeHtml(text), name, true);
+      } else if (ext === 'html' || ext === 'htm') {
+        // ISOLATED SANDBOXED PREVIEW for untrusted HTML files (Zero script & Zero GlassNative access!)
+        const rawText = new TextDecoder('utf-8').decode(arrayBuffer);
+        const safeBody = sanitizeHtml(rawText);
+        openFsSandboxedHtml(safeBody, name);
+      } else {
+        const text = new TextDecoder('utf-8').decode(arrayBuffer);
+        const safe = escapeHtml(text).replace(/\n/g, '<br>');
+        openFsHtml(safe, name, true);
+      }
+    }
+
+    // ==================== 9. FULL-SCREEN READER + PERMANENT INDEXEDDB ANNOTATIONS & NOTES ====================
     let pdfDoc = null;
+    let activeBlobUrlToRevoke = null;
     let currentPdfPage = null;
-    let currentPdfKey = '';
+    let currentDocId = '';
+    let currentDocMeta = null;
     let currentPage = 1;
-    let fitMode = 'width';      // 'width' | 'page' (handy on landscape tablets!)
+    let fitMode = 'width';
     let baseW = 360, baseH = 510;
     let scale = 1.0, tx = 0, ty = 0;
-    let baseRenderTask = null;
-    let detailRenderTask = null;
-    let detailTimer = null;
-    let resizeRefitTimer = null;
-    let animFrame = null;
+    let baseRenderTask = null, detailRenderTask = null, detailTimer = null, resizeRefitTimer = null, animFrame = null;
 
-    let activeTool = 'read';
-    let activeColor = 'yellow';
-    let highlightSize = 12;
-    let penSize = 2.5;
-    let pageStrokes = {};
-    let currentStroke = null;
-    let isDrawing = false;
+    let activeTool = 'read', activeColor = 'yellow', highlightSize = 12, penSize = 2.5;
+    let pageStrokes = {};     // Loaded & saved permanently in IndexedDB!
+    let pageNotesCache = {};  // Loaded & saved permanently in IndexedDB!
+    let currentStroke = null, isDrawing = false;
 
     const fsViewport = $('fsViewport');
     const pdfPageBox = $('pdfPageBox');
     const detailCanvas = $('detailCanvas');
 
     function getViewportSize() {
-      return {
-        vw: fsViewport.clientWidth || window.innerWidth,
-        vh: fsViewport.clientHeight || window.innerHeight
-      };
+      return { vw: fsViewport.clientWidth || window.innerWidth, vh: fsViewport.clientHeight || window.innerHeight };
     }
 
     function computeBaseDims(unscaled) {
@@ -1733,14 +1835,12 @@
         const sc = Math.min(vw / unscaled.width, vh / unscaled.height);
         return { w: Math.round(unscaled.width * sc), h: Math.round(unscaled.height * sc) };
       }
-      // Fit width cleanly (on ultra-wide landscape tablets, still fills full width nicely)
       return { w: vw, h: Math.round(vw * aspect) };
     }
 
     function clampTransform() {
       const { vw, vh } = getViewportSize();
-      const sw = baseW * scale;
-      const sh = baseH * scale;
+      const sw = baseW * scale, sh = baseH * scale;
       tx = sw <= vw ? (vw - sw) / 2 : Math.min(0, Math.max(vw - sw, tx));
       ty = sh <= vh ? (vh - sh) / 2 : Math.min(0, Math.max(vh - sh, ty));
     }
@@ -1750,14 +1850,11 @@
       $('zoomLabel').textContent = Math.round(scale * 100) + '%';
     }
 
-    function stopAnimations() {
-      if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
-    }
+    function stopAnimations() { if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; } }
 
     function animateTo(targetScale, targetTx, targetTy, duration = 210) {
       stopAnimations();
-      const s0 = scale, x0 = tx, y0 = ty;
-      const start = performance.now();
+      const s0 = scale, x0 = tx, y0 = ty, start = performance.now();
       function step(now) {
         const p = Math.min(1, (now - start) / duration);
         const ease = 1 - Math.pow(1 - p, 3);
@@ -1773,10 +1870,8 @@
 
     function zoomAroundPoint(targetScale, cx, cy, animated = true) {
       const clamped = Math.min(6.0, Math.max(1.0, targetScale));
-      const docX = (cx - tx) / scale;
-      const docY = (cy - ty) / scale;
-      let nextTx = cx - docX * clamped;
-      let nextTy = cy - docY * clamped;
+      const docX = (cx - tx) / scale, docY = (cy - ty) / scale;
+      let nextTx = cx - docX * clamped, nextTy = cy - docY * clamped;
       const { vw, vh } = getViewportSize();
       const sw = baseW * clamped, sh = baseH * clamped;
       nextTx = sw <= vw ? (vw - sw) / 2 : Math.min(0, Math.max(vw - sw, nextTx));
@@ -1794,84 +1889,169 @@
       setNativeFullscreen(true);
     }
 
-    function closeFsOverlay() {
+    async function destroyCurrentPdfResources() {
       stopAnimations();
       clearTimeout(detailTimer);
-      if (baseRenderTask) { try { baseRenderTask.cancel(); } catch (e) {} }
-      if (detailRenderTask) { try { detailRenderTask.cancel(); } catch (e) {} }
+      if (baseRenderTask) { try { baseRenderTask.cancel(); } catch (e) {} baseRenderTask = null; }
+      if (detailRenderTask) { try { detailRenderTask.cancel(); } catch (e) {} detailRenderTask = null; }
+      if (currentPdfPage) { try { currentPdfPage.cleanup(); } catch (e) {} currentPdfPage = null; }
+      if (pdfDoc) { try { await pdfDoc.destroy(); } catch (e) {} pdfDoc = null; }
+      if (activeNativePdfSession && window.GlassNative) {
+        try { window.GlassNative.closePdfSession(activeNativePdfSession); } catch (e) {}
+        activeNativePdfSession = null;
+      }
+      if (activeBlobUrlToRevoke) {
+        URL.revokeObjectURL(activeBlobUrlToRevoke);
+        activeBlobUrlToRevoke = null;
+      }
+      // Release canvas GPU backing memory explicitly
+      ['pdfCanvas', 'detailCanvas', 'drawCanvas'].forEach(id => {
+        const c = $(id);
+        if (c) { c.width = 1; c.height = 1; }
+      });
+      detailCanvas.style.display = 'none';
+    }
+
+    async function closeFsOverlay() {
+      await destroyCurrentPdfResources();
       $('fsOverlay').classList.remove('open');
       $('sideDock').classList.remove('open');
+      $('fsSandboxFrame').style.display = 'none';
+      $('fsSandboxFrame').srcdoc = '';
       document.body.style.overflow = '';
       setActiveTool('read');
-      pdfDoc = null;
-      currentPdfPage = null;
       setNativeFullscreen(false);
     }
 
     $('fsBackBtn').addEventListener('click', closeFsOverlay);
 
-    function openFsHtml(html, title, editable) {
+    function openFsHtml(safeHtml, title, editable) {
       openFsOverlay(title);
       fsViewport.classList.add('doc-scroll-mode');
       pdfPageBox.style.display = 'none';
       $('sideFabWrap').style.display = 'none';
       $('fsBottomHud').style.display = 'none';
       $('fsFitToggleBtn').style.display = 'none';
+      $('fsSandboxFrame').style.display = 'none';
       $('fsDocBox').style.display = 'block';
-      $('fsDocBox').innerHTML = html;
+      $('fsDocBox').innerHTML = safeHtml;
       $('fsEditDocBtn').style.display = editable ? 'grid' : 'none';
       $('fsBijoyFixBtn').style.display = isLikelyBijoy($('fsDocBox').innerText || '') ? 'grid' : 'none';
     }
 
-    async function openBufferInFullscreen(arrayBuffer, name, ext, keyId) {
-      if (ext === 'pdf') {
-        initPdfWorker();
-        openFsOverlay(name);
-        fsViewport.classList.remove('doc-scroll-mode');
-        $('fsDocBox').style.display = 'none';
-        $('fsEditDocBtn').style.display = 'none';
-        $('fsBijoyFixBtn').style.display = 'none';
-        $('fsFitToggleBtn').style.display = 'grid';
-        pdfPageBox.style.display = 'block';
-        $('sideFabWrap').style.display = 'flex';
-        $('fsBottomHud').style.display = 'flex';
+    function openFsSandboxedHtml(safeBodyHtml, title) {
+      openFsOverlay(title);
+      fsViewport.classList.add('doc-scroll-mode');
+      pdfPageBox.style.display = 'none';
+      $('sideFabWrap').style.display = 'none';
+      $('fsBottomHud').style.display = 'none';
+      $('fsFitToggleBtn').style.display = 'none';
+      $('fsDocBox').style.display = 'none';
+      $('fsEditDocBtn').style.display = 'none';
+      $('fsBijoyFixBtn').style.display = 'none';
+      const frame = $('fsSandboxFrame');
+      frame.style.display = 'block';
+      frame.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline';"><style>body{font-family:sans-serif;line-height:1.75;padding:18px;color:#0f172a;background:#fff;margin:0;word-wrap:break-word;}img{max-width:100%;}table{width:100%;border-collapse:collapse;}td,th{border:1px solid #cbd5e1;padding:6px;}</style></head><body>${safeBodyHtml}</body></html>`;
+    }
 
-        pdfDoc = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        currentPdfKey = 'ax_notes_' + (keyId || name).replace(/[^a-zA-Z0-9]/g, '_').slice(-48);
-        currentPage = 1;
-        fitMode = 'width';
-        pageStrokes = {};
-        setActiveTool('read');
+    async function openPdfFromSource(sourceConfig, name, docId, meta, blobUrlToCleanup = null) {
+      await destroyCurrentPdfResources();
+      activeBlobUrlToRevoke = blobUrlToCleanup;
+      if (!window.pdfjsLib) return showToast('PDF ইঞ্জিন লোড হয়নি');
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdf.worker.min.js';
 
-        $('pageSlider').max = pdfDoc.numPages;
-        $('pageSlider').value = 1;
-        setTimeout(() => loadPdfPage(currentPage), 85);
-      } else if (ext === 'docx') {
-        const res = await window.mammoth.convertToHtml({ arrayBuffer });
-        openFsHtml(res.value || '<p>(ফাইলটি খালি)</p>', name, true);
-      } else {
-        const text = new TextDecoder('utf-8').decode(arrayBuffer);
-        const safe = (ext === 'html' || ext === 'htm')
-          ? text : text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>');
-        openFsHtml(safe, name, true);
+      const loadingTask = window.pdfjsLib.getDocument(sourceConfig);
+      loadingTask.onPassword = async (updatePassword, reason) => {
+        const msg = reason === 2 ? 'ভুল পাসওয়ার্ড! অনুগ্রহ করে সঠিক পাসওয়ার্ড দিন।' : 'এই PDF ফাইলটি পাসওয়ার্ড-সুরক্ষিত। খুলতে পাসওয়ার্ড দিন:';
+        const pw = await promptPdfPassword(msg);
+        if (pw === null) {
+          loadingTask.destroy();
+          showToast('পাসওয়ার্ড দেওয়া বাতিল হয়েছে');
+        } else {
+          updatePassword(pw);
+        }
+      };
+
+      try {
+        pdfDoc = await loadingTask.promise;
+      } catch (err) {
+        await destroyCurrentPdfResources();
+        if (err && err.name !== 'PasswordException') {
+          recordLocalError('pdf_load', err);
+          showToast('PDF খোলা যায়নি (ফাইলটি ক্ষতিগ্রস্ত বা অসমর্থিত হতে পারে)');
+        }
+        return;
       }
+
+      openFsOverlay(name);
+      fsViewport.classList.remove('doc-scroll-mode');
+      $('fsDocBox').style.display = 'none';
+      $('fsSandboxFrame').style.display = 'none';
+      $('fsEditDocBtn').style.display = 'none';
+      $('fsBijoyFixBtn').style.display = 'none';
+      $('fsFitToggleBtn').style.display = 'grid';
+      pdfPageBox.style.display = 'block';
+      $('sideFabWrap').style.display = 'flex';
+      $('fsBottomHud').style.display = 'flex';
+
+      currentDocId = docId;
+      currentDocMeta = meta;
+      currentPage = 1;
+      fitMode = 'width';
+      setActiveTool('read');
+
+      // Load permanent strokes & sticky notes from IndexedDB!
+      const savedAnn = await dbGet('annotations', docId).catch(() => null);
+      pageStrokes = (savedAnn && savedAnn.strokesByPage) ? savedAnn.strokesByPage : {};
+      const savedNotes = await dbGet('notes', docId).catch(() => null);
+      pageNotesCache = (savedNotes && savedNotes.notesByPage) ? savedNotes.notesByPage : {};
+
+      $('pageSlider').max = pdfDoc.numPages;
+      $('pageSlider').value = 1;
+      setTimeout(() => loadPdfPage(currentPage, false), 85);
+    }
+
+    async function persistCurrentAnnotations() {
+      if (!currentDocId) return;
+      try {
+        await dbPut('annotations', {
+          docId: currentDocId,
+          meta: currentDocMeta,
+          strokesByPage: pageStrokes,
+          updatedAt: Date.now()
+        });
+      } catch (e) { recordLocalError('save_annotations', e); }
+    }
+
+    async function persistCurrentNotes() {
+      if (!currentDocId) return;
+      try {
+        await dbPut('notes', {
+          docId: currentDocId,
+          meta: currentDocMeta,
+          notesByPage: pageNotesCache,
+          updatedAt: Date.now()
+        });
+      } catch (e) { recordLocalError('save_notes', e); }
     }
 
     async function loadPdfPage(num, preserveView = false) {
       if (!pdfDoc) return;
       stopAnimations();
       clearTimeout(detailTimer);
+      if (baseRenderTask) { try { baseRenderTask.cancel(); } catch (e) {} }
+      if (detailRenderTask) { try { detailRenderTask.cancel(); } catch (e) {} }
       detailCanvas.style.display = 'none';
 
       const prevNormX = preserveView && baseW ? ((-tx + getViewportSize().vw / 2) / (baseW * scale)) : 0.5;
       const prevNormY = preserveView && baseH ? ((-ty + getViewportSize().vh / 2) / (baseH * scale)) : 0;
       const prevScale = preserveView ? scale : 1.0;
 
+      if (currentPdfPage) { try { currentPdfPage.cleanup(); } catch (e) {} }
       currentPdfPage = await pdfDoc.getPage(num);
       const unscaled = currentPdfPage.getViewport({ scale: 1.0 });
       const dims = computeBaseDims(unscaled);
-      baseW = dims.w;
-      baseH = dims.h;
+      baseW = dims.w; baseH = dims.h;
 
       if (preserveView) {
         const { vw, vh } = getViewportSize();
@@ -1879,9 +2059,7 @@
         tx = vw / 2 - prevNormX * baseW * scale;
         ty = vh / 2 - prevNormY * baseH * scale;
       } else {
-        scale = 1.0;
-        tx = 0;
-        ty = 0;
+        scale = 1.0; tx = 0; ty = 0;
       }
       clampTransform();
 
@@ -1902,18 +2080,13 @@
       if (scale > 1.2) scheduleSharpDetail(20);
     }
 
-    // Layer 1: High-res Full-Page Base Canvas (crisp at 1x–1.5x & instant smooth panning)
     async function renderBaseCanvas() {
       if (!currentPdfPage) return;
-      if (baseRenderTask) { try { baseRenderTask.cancel(); } catch (e) {} }
-
       const unscaled = currentPdfPage.getViewport({ scale: 1.0 });
       const fitScale = baseW / unscaled.width;
-      const dpr = Math.min(window.devicePixelRatio || 2, 2.75);
-      // Higher base clarity for both phone & tablet
-      const maxBaseDim = Math.max(window.innerWidth, window.innerHeight) >= 900 ? 3800 : 3200;
-      const desiredScale = fitScale * Math.max(dpr, 2.0);
-      const safeScale = Math.min(desiredScale, maxBaseDim / Math.max(unscaled.width, unscaled.height));
+      const dpr = Math.min(window.devicePixelRatio || 2, 2.5);
+      const maxBaseDim = Math.max(window.innerWidth, window.innerHeight) >= 900 ? 3400 : 2800;
+      const safeScale = Math.min(fitScale * Math.max(dpr, 1.9), maxBaseDim / Math.max(unscaled.width, unscaled.height));
 
       const viewport = currentPdfPage.getViewport({ scale: safeScale });
       const off = document.createElement('canvas');
@@ -1925,76 +2098,52 @@
       try {
         await baseRenderTask.promise;
         const vis = $('pdfCanvas');
-        vis.width = off.width;
-        vis.height = off.height;
+        vis.width = off.width; vis.height = off.height;
         vis.getContext('2d', { alpha: false }).drawImage(off, 0, 0);
       } catch (e) {
-        if (e && e.name !== 'RenderingCancelledException') console.error(e);
+        if (e && e.name !== 'RenderingCancelledException') recordLocalError('render_base', e);
+      } finally {
+        off.width = 0; off.height = 0;
       }
     }
 
-    // Layer 2: ULTRA-SHARP VISIBLE-VIEWPORT VECTOR DETAIL OVERLAY (Zero blur even at 600% zoom!)
     async function renderSharpDetailTile() {
       if (!currentPdfPage) return;
-      if (scale <= 1.22) {
-        detailCanvas.style.display = 'none';
-        return;
-      }
-
+      if (scale <= 1.22) { detailCanvas.style.display = 'none'; return; }
       if (detailRenderTask) { try { detailRenderTask.cancel(); } catch (e) {} }
 
       const { vw, vh } = getViewportSize();
-      const pad = 36; // small screen bleed margin for micro-pans
-      const sx0 = Math.max(tx, -pad);
-      const sy0 = Math.max(ty, -pad);
-      const sx1 = Math.min(tx + baseW * scale, vw + pad);
-      const sy1 = Math.min(ty + baseH * scale, vh + pad);
-
+      const pad = 36;
+      const sx0 = Math.max(tx, -pad), sy0 = Math.max(ty, -pad);
+      const sx1 = Math.min(tx + baseW * scale, vw + pad), sy1 = Math.min(ty + baseH * scale, vh + pad);
       if (sx1 <= sx0 || sy1 <= sy0) return;
 
-      const lx = Math.max(0, (sx0 - tx) / scale);
-      const ly = Math.max(0, (sy0 - ty) / scale);
-      const lw = Math.min(baseW - lx, (sx1 - sx0) / scale);
-      const lh = Math.min(baseH - ly, (sy1 - sy0) / scale);
-
+      const lx = Math.max(0, (sx0 - tx) / scale), ly = Math.max(0, (sy0 - ty) / scale);
+      const lw = Math.min(baseW - lx, (sx1 - sx0) / scale), lh = Math.min(baseH - ly, (sy1 - sy0) / scale);
       if (lw < 4 || lh < 4) return;
 
       const dpr = Math.min(window.devicePixelRatio || 2, 3.0);
-      const rawTileW = lw * scale * dpr;
-      const rawTileH = lh * scale * dpr;
-      const maxTileDim = 3200;
-      const dimFactor = Math.min(1, maxTileDim / Math.max(rawTileW, rawTileH, 1));
+      const dimFactor = Math.min(1, 3000 / Math.max(lw * scale * dpr, lh * scale * dpr, 1));
       const effectiveDpr = dpr * dimFactor;
-
       const tileW = Math.max(1, Math.ceil(lw * scale * effectiveDpr));
       const tileH = Math.max(1, Math.ceil(lh * scale * effectiveDpr));
 
       const unscaled = currentPdfPage.getViewport({ scale: 1.0 });
-      const fitScale = baseW / unscaled.width;
-      const fullScale = fitScale * scale * effectiveDpr;
-      const vp = currentPdfPage.getViewport({ scale: fullScale });
-
-      const offX = lx * scale * effectiveDpr;
-      const offY = ly * scale * effectiveDpr;
-
+      const vp = currentPdfPage.getViewport({ scale: (baseW / unscaled.width) * scale * effectiveDpr });
       const off = document.createElement('canvas');
-      off.width = tileW;
-      off.height = tileH;
+      off.width = tileW; off.height = tileH;
       const offCtx = off.getContext('2d', { alpha: false });
-      offCtx.fillStyle = '#ffffff';
-      offCtx.fillRect(0, 0, tileW, tileH);
+      offCtx.fillStyle = '#ffffff'; offCtx.fillRect(0, 0, tileW, tileH);
 
       detailRenderTask = currentPdfPage.render({
         canvasContext: offCtx,
         viewport: vp,
-        transform: [1, 0, 0, 1, -offX, -offY]
+        transform: [1, 0, 0, 1, -(lx * scale * effectiveDpr), -(ly * scale * effectiveDpr)]
       });
 
       try {
         await detailRenderTask.promise;
-        // Atomic swap onto visible detailCanvas aligned to exact local CSS coordinates
-        detailCanvas.width = tileW;
-        detailCanvas.height = tileH;
+        detailCanvas.width = tileW; detailCanvas.height = tileH;
         detailCanvas.getContext('2d', { alpha: false }).drawImage(off, 0, 0);
         detailCanvas.style.left = lx.toFixed(3) + 'px';
         detailCanvas.style.top = ly.toFixed(3) + 'px';
@@ -2002,106 +2151,71 @@
         detailCanvas.style.height = lh.toFixed(3) + 'px';
         detailCanvas.style.display = 'block';
       } catch (e) {
-        if (e && e.name !== 'RenderingCancelledException') console.error(e);
+        if (e && e.name !== 'RenderingCancelledException') recordLocalError('render_detail', e);
+      } finally {
+        off.width = 0; off.height = 0;
       }
     }
 
     function scheduleSharpDetail(delay = 95) {
       clearTimeout(detailTimer);
-      if (scale <= 1.22) {
-        detailCanvas.style.display = 'none';
-        return;
-      }
+      if (scale <= 1.22) { detailCanvas.style.display = 'none'; return; }
       detailTimer = setTimeout(() => renderSharpDetailTile(), delay);
     }
 
-    // TABLET & PHONE AUTO-ROTATE REFIT (Seamlessly adapts between Portrait & Landscape!)
     function handleOrientationRefit() {
       if (!pdfDoc || !$('fsOverlay').classList.contains('open')) return;
       clearTimeout(resizeRefitTimer);
-      resizeRefitTimer = setTimeout(() => {
-        if (pdfDoc && currentPdfPage) {
-          loadPdfPage(currentPage, true);
-        }
-      }, 140);
+      resizeRefitTimer = setTimeout(() => { if (pdfDoc && currentPdfPage) loadPdfPage(currentPage, true); }, 140);
     }
     window.addEventListener('resize', handleOrientationRefit);
     window.addEventListener('orientationchange', handleOrientationRefit);
 
-    $('fsFitToggleBtn').addEventListener('click', () => {
-      if (!pdfDoc) return;
-      fitMode = fitMode === 'width' ? 'page' : 'width';
-      loadPdfPage(currentPage, false);
-      showToast(fitMode === 'page' ? 'পুরো পেজ ফিট মোড' : 'প্রস্থ ফিট মোড');
-    });
-
+    $('fsFitToggleBtn').addEventListener('click', () => { if (!pdfDoc) return; fitMode = fitMode === 'width' ? 'page' : 'width'; loadPdfPage(currentPage, false); showToast(fitMode === 'page' ? 'পুরো পেজ ফিট মোড' : 'প্রস্থ ফিট মোড'); });
     $('zoomInBtn').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(scale + 0.5, vw / 2, vh / 2, true); });
     $('zoomOutBtn').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(scale - 0.5, vw / 2, vh / 2, true); });
     $('zoomLabel').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(1.0, vw / 2, vh / 2, true); });
-
     $('prevPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage > 1) { currentPage--; loadPdfPage(currentPage, false); } });
     $('nextPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage < pdfDoc.numPages) { currentPage++; loadPdfPage(currentPage, false); } });
-    $('pageSlider').addEventListener('change', (e) => {
-      const p = parseInt(e.target.value, 10);
-      if (pdfDoc && p >= 1 && p <= pdfDoc.numPages) { currentPage = p; loadPdfPage(currentPage, false); }
-    });
-
-    $('fsNightBtn').addEventListener('click', () => {
-      pdfPageBox.classList.toggle('night-invert');
-      $('fsDocBox').classList.toggle('night-invert');
-      $('fsNightBtn').classList.toggle('active');
-    });
-
+    $('pageSlider').addEventListener('change', (e) => { const p = parseInt(e.target.value, 10); if (pdfDoc && p >= 1 && p <= pdfDoc.numPages) { currentPage = p; loadPdfPage(currentPage, false); } });
+    $('fsNightBtn').addEventListener('click', () => { pdfPageBox.classList.toggle('night-invert'); $('fsDocBox').classList.toggle('night-invert'); $('fsNightBtn').classList.toggle('active'); });
     $('fsEditDocBtn').addEventListener('click', () => {
-      $('editorPaper').innerHTML = $('fsDocBox').innerHTML;
+      $('editorPaper').innerHTML = sanitizeHtml($('fsDocBox').innerHTML);
       normalizeEditablePaper();
       $('docTitleInput').value = $('fsFileTitle').textContent.replace(/\.[^.]+$/, '') + '_Edited';
-      closeFsOverlay();
-      switchTab('editor');
-      showToast('এডিটরে নেওয়া হয়েছে! যেকোনো ঘরে ট্যাপ করে লিখুন।');
+      closeFsOverlay(); switchTab('editor'); showToast('এডিটরে নেওয়া হয়েছে!');
     });
-
     $('fsBijoyFixBtn').addEventListener('click', () => {
       const fixed = convertBijoyToUnicode($('fsDocBox').innerText);
-      $('fsDocBox').innerHTML = fixed.split('\n').map(l => `<p>${l || '&nbsp;'}</p>`).join('');
+      $('fsDocBox').innerHTML = fixed.split('\n').map(l => `<p>${escapeHtml(l) || '&nbsp;'}</p>`).join('');
       $('fsBijoyFixBtn').style.display = 'none';
       showToast('বিজয় ফন্ট ইউনিকোড বাংলায় ঠিক হয়েছে!');
     });
 
-    // ==================== SILKY 60FPS TOUCH GESTURES (PAN + INERTIA + FOCAL PINCH + DOUBLE-TAP) ====================
-    let gestureMode = 'none';
-    let startX = 0, startY = 0, lastX = 0, lastY = 0, lastMoveTime = 0;
-    let velX = 0, velY = 0, totalMoved = 0;
-    let pinchStartDist = 0, pinchStartScale = 1, pinchDocX = 0, pinchDocY = 0;
-    let lastTapTime = 0, singleTapTimer = null;
-
+    // ==================== 60FPS TOUCH GESTURES ====================
+    let gestureMode = 'none', startX = 0, startY = 0, lastX = 0, lastY = 0, lastMoveTime = 0, velX = 0, velY = 0, totalMoved = 0;
+    let pinchStartDist = 0, pinchStartScale = 1, pinchDocX = 0, pinchDocY = 0, lastTapTime = 0, singleTapTimer = null;
     function touchDist(t1, t2) { return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY); }
     function touchMid(t1, t2) { return { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 }; }
 
     fsViewport.addEventListener('touchstart', (e) => {
       if (!pdfDoc) return;
       if (e.touches.length === 2) {
-        e.preventDefault();
-        stopAnimations();
-        clearTimeout(detailTimer);
-        isDrawing = false; currentStroke = null;
+        e.preventDefault(); stopAnimations(); clearTimeout(detailTimer);
+        if (isDrawing) { isDrawing = false; currentStroke = null; persistCurrentAnnotations(); }
         gestureMode = 'pinch';
         const mid = touchMid(e.touches[0], e.touches[1]);
         pinchStartDist = Math.max(touchDist(e.touches[0], e.touches[1]), 1);
         pinchStartScale = scale;
-        pinchDocX = (mid.x - tx) / scale;
-        pinchDocY = (mid.y - ty) / scale;
+        pinchDocX = (mid.x - tx) / scale; pinchDocY = (mid.y - ty) / scale;
         return;
       }
       if (activeTool !== 'read' || e.target.closest('.note-pin')) return;
       if (e.touches.length === 1) {
-        stopAnimations();
-        clearTimeout(detailTimer);
+        stopAnimations(); clearTimeout(detailTimer);
         gestureMode = 'pan';
-        startX = lastX = e.touches[0].clientX;
-        startY = lastY = e.touches[0].clientY;
-        lastMoveTime = performance.now();
-        velX = 0; velY = 0; totalMoved = 0;
+        startX = lastX = e.touches[0].clientX; startY = lastY = e.touches[0].clientY;
+        lastMoveTime = performance.now(); velX = 0; velY = 0; totalMoved = 0;
       }
     }, { passive: false });
 
@@ -2110,75 +2224,52 @@
       if (gestureMode === 'pinch' && e.touches.length === 2) {
         e.preventDefault();
         const mid = touchMid(e.touches[0], e.touches[1]);
-        const curDist = Math.max(touchDist(e.touches[0], e.touches[1]), 1);
-        scale = Math.min(6.0, Math.max(1.0, pinchStartScale * (curDist / pinchStartDist)));
-        tx = mid.x - pinchDocX * scale;
-        ty = mid.y - pinchDocY * scale;
-        clampTransform(); applyTransform();
-        return;
+        scale = Math.min(6.0, Math.max(1.0, pinchStartScale * (Math.max(touchDist(e.touches[0], e.touches[1]), 1) / pinchStartDist)));
+        tx = mid.x - pinchDocX * scale; ty = mid.y - pinchDocY * scale;
+        clampTransform(); applyTransform(); return;
       }
       if (gestureMode === 'pan' && e.touches.length === 1 && activeTool === 'read') {
         e.preventDefault();
-        const now = performance.now();
-        const cx = e.touches[0].clientX, cy = e.touches[0].clientY;
-        const dx = cx - lastX, dy = cy - lastY;
-        const dt = Math.max(now - lastMoveTime, 1);
-        tx += dx; ty += dy;
-        clampTransform(); applyTransform();
-        velX = velX * 0.42 + (dx / dt) * 0.58;
-        velY = velY * 0.42 + (dy / dt) * 0.58;
-        totalMoved += Math.hypot(dx, dy);
-        lastX = cx; lastY = cy; lastMoveTime = now;
+        const now = performance.now(), cx = e.touches[0].clientX, cy = e.touches[0].clientY;
+        const dx = cx - lastX, dy = cy - lastY, dt = Math.max(now - lastMoveTime, 1);
+        tx += dx; ty += dy; clampTransform(); applyTransform();
+        velX = velX * 0.42 + (dx / dt) * 0.58; velY = velY * 0.42 + (dy / dt) * 0.58;
+        totalMoved += Math.hypot(dx, dy); lastX = cx; lastY = cy; lastMoveTime = now;
       }
     }, { passive: false });
 
     fsViewport.addEventListener('touchend', (e) => {
       if (!pdfDoc) return;
       if (gestureMode === 'pinch' && e.touches.length < 2) {
-        gestureMode = 'none';
-        clampTransform(); applyTransform();
-        scheduleSharpDetail(70);
-        return;
+        gestureMode = 'none'; clampTransform(); applyTransform(); scheduleSharpDetail(70); return;
       }
       if (gestureMode === 'pan' && e.touches.length === 0) {
         gestureMode = 'none';
         if (totalMoved < 10) {
           const now = performance.now();
           if (now - lastTapTime < 280) {
-            clearTimeout(singleTapTimer);
-            lastTapTime = 0;
+            clearTimeout(singleTapTimer); lastTapTime = 0;
             zoomAroundPoint(scale > 1.35 ? 1.0 : 2.5, startX, startY, true);
           } else {
             lastTapTime = now;
-            singleTapTimer = setTimeout(() => {
-              $('fsOverlay').classList.toggle('hud-hidden');
-              $('sideDock').classList.remove('open');
-            }, 280);
+            singleTapTimer = setTimeout(() => { $('fsOverlay').classList.toggle('hud-hidden'); $('sideDock').classList.remove('open'); }, 280);
           }
           return;
         }
         if (Math.hypot(velX, velY) > 0.16) {
           let vx = velX * 16, vy = velY * 16;
           function glide() {
-            vx *= 0.91; vy *= 0.91;
-            tx += vx; ty += vy;
-            clampTransform(); applyTransform();
-            if (Math.hypot(vx, vy) > 0.35) {
-              animFrame = requestAnimationFrame(glide);
-            } else {
-              animFrame = null;
-              scheduleSharpDetail(60);
-            }
+            vx *= 0.91; vy *= 0.91; tx += vx; ty += vy; clampTransform(); applyTransform();
+            if (Math.hypot(vx, vy) > 0.35) animFrame = requestAnimationFrame(glide);
+            else { animFrame = null; scheduleSharpDetail(60); }
           }
           animFrame = requestAnimationFrame(glide);
-        } else {
-          scheduleSharpDetail(70);
-        }
+        } else scheduleSharpDetail(70);
       }
     });
 
-    // ==================== FLOATING SIDE DOCK + BRUSH SIZE ====================
-    $('sideFabToggle').addEventListener('click', () => { $('sideDock').classList.toggle('open'); });
+    // ==================== FLOATING SIDE DOCK + NORMALIZED PERMANENT STROKES ====================
+    $('sideFabToggle').addEventListener('click', () => $('sideDock').classList.toggle('open'));
 
     const colorMap = {
       highlight: { yellow: '#fde047', green: '#6ee7b7', pink: '#fda4af', blue: '#7dd3fc' },
@@ -2188,47 +2279,27 @@
     function syncBrushUI() {
       const isPen = activeTool === 'pen';
       const slider = $('brushSizeSlider');
-      if (isPen) {
-        slider.min = '1'; slider.max = '10'; slider.step = '0.5'; slider.value = String(penSize);
-        $('sizePanelLabel').textContent = 'সাইজ (কলম)';
-        $('sizeValueLabel').textContent = penSize + ' px';
-      } else {
-        slider.min = '4'; slider.max = '32'; slider.step = '1'; slider.value = String(highlightSize);
-        $('sizePanelLabel').textContent = 'সাইজ (হাইলাইট)';
-        $('sizeValueLabel').textContent = highlightSize + ' px';
-      }
+      if (isPen) { slider.min = '1'; slider.max = '10'; slider.step = '0.5'; slider.value = String(penSize); $('sizePanelLabel').textContent = 'সাইজ (কলম)'; $('sizeValueLabel').textContent = penSize + ' px'; }
+      else { slider.min = '4'; slider.max = '32'; slider.step = '1'; slider.value = String(highlightSize); $('sizePanelLabel').textContent = 'সাইজ (হাইলাইট)'; $('sizeValueLabel').textContent = highlightSize + ' px'; }
       const curSize = isPen ? penSize : highlightSize;
       const dotPx = Math.max(4, Math.min(20, isPen ? curSize * 1.9 : curSize * 0.62));
-      const dot = $('sizePreviewDot');
-      dot.style.width = dotPx + 'px';
-      dot.style.height = dotPx + 'px';
-      dot.style.background = colorMap[isPen ? 'pen' : 'highlight'][activeColor] || '#fde047';
-
+      $('sizePreviewDot').style.width = dotPx + 'px'; $('sizePreviewDot').style.height = dotPx + 'px';
+      $('sizePreviewDot').style.background = colorMap[isPen ? 'pen' : 'highlight'][activeColor] || '#fde047';
       const smallV = isPen ? 1.5 : 7, medV = isPen ? 3 : 13, lgV = isPen ? 6 : 22;
       $('sizePresets').querySelectorAll('.preset-btn').forEach(b => {
-        const key = b.dataset.size;
-        const match = (key === 'small' && Math.abs(curSize - smallV) <= 2)
-                   || (key === 'medium' && Math.abs(curSize - medV) <= 3)
-                   || (key === 'large' && Math.abs(curSize - lgV) <= 4);
-        b.classList.toggle('active', match);
+        const k = b.dataset.size;
+        b.classList.toggle('active', (k === 'small' && Math.abs(curSize - smallV) <= 2) || (k === 'medium' && Math.abs(curSize - medV) <= 3) || (k === 'large' && Math.abs(curSize - lgV) <= 4));
       });
     }
 
-    $('brushSizeSlider').addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      if (activeTool === 'pen') penSize = val; else highlightSize = val;
+    $('brushSizeSlider').addEventListener('input', (e) => { const v = parseFloat(e.target.value); if (activeTool === 'pen') penSize = v; else highlightSize = v; syncBrushUI(); });
+    $('sizePresets').querySelectorAll('.preset-btn').forEach(btn => btn.addEventListener('click', () => {
+      const isPen = activeTool === 'pen';
+      if (btn.dataset.size === 'small') { if (isPen) penSize = 1.5; else highlightSize = 7; }
+      if (btn.dataset.size === 'medium') { if (isPen) penSize = 3; else highlightSize = 13; }
+      if (btn.dataset.size === 'large') { if (isPen) penSize = 6; else highlightSize = 22; }
       syncBrushUI();
-    });
-
-    $('sizePresets').querySelectorAll('.preset-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const isPen = activeTool === 'pen';
-        if (btn.dataset.size === 'small') { if (isPen) penSize = 1.5; else highlightSize = 7; }
-        if (btn.dataset.size === 'medium') { if (isPen) penSize = 3; else highlightSize = 13; }
-        if (btn.dataset.size === 'large') { if (isPen) penSize = 6; else highlightSize = 22; }
-        syncBrushUI();
-      });
-    });
+    }));
 
     function setActiveTool(tool) {
       activeTool = tool;
@@ -2237,26 +2308,20 @@
       if (tool === 'highlight') $('toolHighlightBtn').classList.add('active');
       if (tool === 'pen') $('toolPenBtn').classList.add('active');
       if (tool === 'note') $('toolNoteBtn').classList.add('active');
-      const isDraw = tool === 'highlight' || tool === 'pen';
-      $('drawCanvas').classList.toggle('active', isDraw);
+      $('drawCanvas').classList.toggle('active', tool === 'highlight' || tool === 'pen');
       $('notesLayer').classList.toggle('placing', tool === 'note');
       syncBrushUI();
     }
 
     $('toolReadBtn').addEventListener('click', () => { setActiveTool('read'); $('sideDock').classList.remove('open'); showToast('পড়া ও স্মুথ জুম মোড'); });
-    $('toolHighlightBtn').addEventListener('click', () => { setActiveTool('highlight'); showToast('হাইলাইটার চালু — সাইজ ঠিক করে দাগান'); });
-    $('toolPenBtn').addEventListener('click', () => { setActiveTool('pen'); showToast('কলম চালু — সাইজ ঠিক করে লিখুন'); });
+    $('toolHighlightBtn').addEventListener('click', () => { setActiveTool('highlight'); showToast('হাইলাইটার চালু — দাগগুলো স্থায়ীভাবে সেভ হবে'); });
+    $('toolPenBtn').addEventListener('click', () => { setActiveTool('pen'); showToast('কলম চালু — দাগগুলো স্থায়ীভাবে সেভ হবে'); });
     $('toolNoteBtn').addEventListener('click', () => { setActiveTool('note'); $('sideDock').classList.remove('open'); showToast('পেজের যেখানে নোট রাখতে চান সেখানে ট্যাপ করুন'); });
 
-    $('colorPalette').querySelectorAll('.color-dot').forEach(dot => {
-      dot.addEventListener('click', () => {
-        $('colorPalette').querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-        dot.classList.add('selected');
-        activeColor = dot.dataset.color;
-        syncBrushUI();
-      });
-    });
-
+    $('colorPalette').querySelectorAll('.color-dot').forEach(dot => dot.addEventListener('click', () => {
+      $('colorPalette').querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+      dot.classList.add('selected'); activeColor = dot.dataset.color; syncBrushUI();
+    }));
     syncBrushUI();
 
     const drawCanvas = $('drawCanvas');
@@ -2266,8 +2331,8 @@
       const rect = drawCanvas.getBoundingClientRect();
       const t = ev.touches ? ev.touches[0] : ev;
       return {
-        x: (t.clientX - rect.left) / Math.max(rect.width, 1),
-        y: (t.clientY - rect.top) / Math.max(rect.height, 1)
+        x: Math.max(0, Math.min(1, (t.clientX - rect.left) / Math.max(rect.width, 1))),
+        y: Math.max(0, Math.min(1, (t.clientY - rect.top) / Math.max(rect.height, 1)))
       };
     }
 
@@ -2276,7 +2341,7 @@
       const list = pageStrokes[currentPage] || [];
       const w = drawCanvas.width, h = drawCanvas.height;
       for (const s of list) {
-        if (!s.points.length) continue;
+        if (!s.points || !s.points.length) continue;
         drawCtx.beginPath();
         drawCtx.lineCap = s.tool === 'highlight' ? 'butt' : 'round';
         drawCtx.lineJoin = 'round';
@@ -2293,8 +2358,7 @@
     function beginStroke(ev) {
       if (activeTool !== 'pen' && activeTool !== 'highlight') return;
       if (ev.touches && ev.touches.length > 1) return;
-      ev.preventDefault();
-      $('sideDock').classList.remove('open');
+      ev.preventDefault(); $('sideDock').classList.remove('open');
       isDrawing = true;
       const pt = normPoint(ev);
       if (!pageStrokes[currentPage]) pageStrokes[currentPage] = [];
@@ -2307,12 +2371,17 @@
 
     function moveStroke(ev) {
       if (!isDrawing || !currentStroke) return;
-      if (ev.touches && ev.touches.length > 1) { isDrawing = false; currentStroke = null; return; }
+      if (ev.touches && ev.touches.length > 1) { finishStroke(); return; }
       ev.preventDefault();
       currentStroke.points.push(normPoint(ev));
       redrawPageStrokes();
     }
-    function finishStroke() { isDrawing = false; currentStroke = null; }
+
+    function finishStroke() {
+      if (!isDrawing) return;
+      isDrawing = false; currentStroke = null;
+      persistCurrentAnnotations();
+    }
 
     drawCanvas.addEventListener('touchstart', beginStroke, { passive: false });
     drawCanvas.addEventListener('touchmove', moveStroke, { passive: false });
@@ -2323,8 +2392,12 @@
 
     $('toolUndoBtn').addEventListener('click', () => {
       const list = pageStrokes[currentPage];
-      if (list && list.length) { list.pop(); redrawPageStrokes(); showToast('শেষ দাগটি মুছে ফেলা হয়েছে'); }
-      else showToast('মোছার মতো কোনো দাগ নেই');
+      if (list && list.length) {
+        list.pop();
+        redrawPageStrokes();
+        persistCurrentAnnotations();
+        showToast('শেষ দাগটি মুছে ফেলা হয়েছে');
+      } else showToast('মোছার মতো কোনো দাগ নেই');
     });
 
     $('toolSavePageBtn').addEventListener('click', () => {
@@ -2337,19 +2410,20 @@
       mctx.globalCompositeOperation = 'multiply';
       mctx.drawImage(c2, 0, 0, c1.width, c1.height);
       mctx.globalCompositeOperation = 'source-over';
-      merged.toBlob((blob) => { if (blob) saveOutputFile(blob, `AetherX_Page_${currentPage}.png`); }, 'image/png');
+      merged.toBlob((blob) => {
+        merged.width = 0; merged.height = 0;
+        if (blob) saveOutputFile(blob, `AetherX_Page_${currentPage}_Image.png`);
+      }, 'image/png');
       $('sideDock').classList.remove('open');
     });
 
-    // ==================== STICKY NOTES ====================
+    // ==================== STICKY NOTES (INDEXEDDB) ====================
     let pendingNotePos = null, editingNoteIdx = -1;
-    function loadAllNotes() { if (!currentPdfKey) return {}; try { return JSON.parse(localStorage.getItem(currentPdfKey) || '{}'); } catch { return {}; } }
-    function saveAllNotes(data) { if (!currentPdfKey) return; localStorage.setItem(currentPdfKey, JSON.stringify(data)); }
 
     function renderPageNotes() {
       const layer = $('notesLayer');
       layer.innerHTML = '';
-      (loadAllNotes()[currentPage] || []).forEach((n, idx) => {
+      (pageNotesCache[currentPage] || []).forEach((n, idx) => {
         const pin = document.createElement('button');
         pin.className = 'note-pin';
         pin.style.left = (n.x * 100) + '%';
@@ -2377,20 +2451,439 @@
     }
 
     $('noteCancelBtn').addEventListener('click', () => { $('noteModal').classList.remove('open'); setActiveTool('read'); });
-    $('noteSaveBtn').addEventListener('click', () => {
+    $('noteSaveBtn').addEventListener('click', async () => {
       const txt = $('noteModalInput').value.trim();
       if (!txt) return showToast('আগে কিছু নোট লিখুন');
-      const all = loadAllNotes();
-      if (!all[currentPage]) all[currentPage] = [];
-      if (editingNoteIdx >= 0) all[currentPage][editingNoteIdx].text = txt;
-      else if (pendingNotePos) all[currentPage].push({ x: pendingNotePos.x, y: pendingNotePos.y, text: txt });
-      saveAllNotes(all); renderPageNotes();
-      $('noteModal').classList.remove('open'); setActiveTool('read'); showToast('নোট সেভ হয়েছে!');
+      if (!pageNotesCache[currentPage]) pageNotesCache[currentPage] = [];
+      if (editingNoteIdx >= 0) pageNotesCache[currentPage][editingNoteIdx].text = txt;
+      else if (pendingNotePos) pageNotesCache[currentPage].push({ x: pendingNotePos.x, y: pendingNotePos.y, text: txt });
+      await persistCurrentNotes();
+      renderPageNotes();
+      $('noteModal').classList.remove('open'); setActiveTool('read'); showToast('নোট স্থায়ীভাবে সেভ হয়েছে!');
     });
-    $('noteDeleteBtn').addEventListener('click', () => {
-      const all = loadAllNotes();
-      if (all[currentPage] && editingNoteIdx >= 0) { all[currentPage].splice(editingNoteIdx, 1); saveAllNotes(all); renderPageNotes(); }
+    $('noteDeleteBtn').addEventListener('click', async () => {
+      if (pageNotesCache[currentPage] && editingNoteIdx >= 0) {
+        pageNotesCache[currentPage].splice(editingNoteIdx, 1);
+        await persistCurrentNotes();
+        renderPageNotes();
+      }
       $('noteModal').classList.remove('open'); setActiveTool('read'); showToast('নোট মুছে ফেলা হয়েছে');
+    });
+
+    // ==================== EDITOR + AUTO-SAVE / CRASH RECOVERY + IMAGE COMPRESSION ====================
+    let autoSaveTimer = null;
+
+    function normalizeEditablePaper() {
+      const paper = $('editorPaper');
+      paper.setAttribute('contenteditable', 'true');
+      paper.querySelectorAll('td, th').forEach(cell => {
+        cell.removeAttribute('contenteditable');
+        const txt = (cell.textContent || '').replace(/\u00A0/g, '').trim();
+        if (!txt && !cell.querySelector('img')) cell.innerHTML = '<p><br></p>';
+        else if (!cell.querySelector('p, div, br') && txt) cell.innerHTML = `<p>${cell.innerHTML}</p>`;
+      });
+    }
+
+    $('editorPaper').addEventListener('click', (e) => {
+      const cell = e.target.closest('td, th');
+      if (!cell) return;
+      const txt = (cell.textContent || '').replace(/\u00A0/g, '').trim();
+      if (!txt && !cell.querySelector('img')) {
+        if (!cell.querySelector('p')) cell.innerHTML = '<p><br></p>';
+        const target = cell.querySelector('p') || cell;
+        try {
+          const range = document.createRange(); range.setStart(target, 0); range.collapse(true);
+          const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+        } catch (err) {}
+      }
+    });
+
+    function scheduleEditorAutoSave() {
+      $('autoSaveBadge').textContent = 'সেভ হচ্ছে...';
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(async () => {
+        try {
+          await dbPut('recovery', {
+            key: 'autosave_current',
+            title: $('docTitleInput').value.trim(),
+            html: sanitizeHtml($('editorPaper').innerHTML),
+            updatedAt: Date.now()
+          });
+          $('autoSaveBadge').textContent = 'অটো-সেভ সম্পন্ন';
+        } catch (e) { recordLocalError('autosave', e); }
+      }, 1800);
+    }
+
+    $('editorPaper').addEventListener('input', scheduleEditorAutoSave);
+    $('docTitleInput').addEventListener('input', scheduleEditorAutoSave);
+
+    async function checkEditorRecovery() {
+      try {
+        const rec = await dbGet('recovery', 'autosave_current');
+        if (rec && rec.html && rec.html.length > 30) {
+          $('recoveryStrip').classList.add('show');
+        }
+      } catch (e) {}
+    }
+
+    $('restoreRecoveryBtn').addEventListener('click', async () => {
+      const rec = await dbGet('recovery', 'autosave_current');
+      if (rec) {
+        $('docTitleInput').value = rec.title || '';
+        $('editorPaper').innerHTML = sanitizeHtml(rec.html || '');
+        normalizeEditablePaper();
+        showToast('আগের লেখা রিকভার করা হয়েছে!');
+      }
+      $('recoveryStrip').classList.remove('show');
+    });
+    $('dismissRecoveryBtn').addEventListener('click', async () => {
+      await dbDelete('recovery', 'autosave_current').catch(() => {});
+      $('recoveryStrip').classList.remove('show');
+    });
+
+    document.querySelectorAll('.tool-btn[data-cmd]').forEach(btn => btn.addEventListener('click', () => {
+      $('editorPaper').focus(); document.execCommand(btn.dataset.cmd, false, btn.dataset.val || null); scheduleEditorAutoSave();
+    }));
+
+    $('insertTableBtn').addEventListener('click', () => {
+      $('editorPaper').focus();
+      document.execCommand('insertHTML', false, `<table><tr><th>ক্রমিক</th><th>বিষয়</th><th>মন্তব্য</th></tr><tr><td><p>১</p></td><td><p>উদাহরণ</p></td><td><p><br></p></td></tr></table><p><br></p>`);
+      normalizeEditablePaper(); scheduleEditorAutoSave();
+    });
+
+    // Compress & resize large images before embedding in editor!
+    function compressImageFile(file, maxDim = 1400, quality = 0.82) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          let w = img.naturalWidth, h = img.naturalHeight;
+          const sc = Math.min(1, maxDim / Math.max(w, h, 1));
+          w = Math.round(w * sc); h = Math.round(h * sc);
+          const c = document.createElement('canvas'); c.width = w; c.height = h;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = c.toDataURL('image/jpeg', quality);
+          c.width = 0; c.height = 0;
+          resolve(dataUrl);
+        };
+        img.onerror = (err) => { URL.revokeObjectURL(url); reject(err); };
+        img.src = url;
+      });
+    }
+
+    $('editorImgInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      e.target.value = '';
+      try {
+        showToast('ছবি অপ্টিমাইজ করে যোগ করা হচ্ছে...');
+        const compressed = await compressImageFile(file, 1400, 0.82);
+        $('editorPaper').focus();
+        document.execCommand('insertHTML', false, `<img src="${compressed}"/><p><br></p>`);
+        scheduleEditorAutoSave();
+      } catch (err) { showToast('ছবি যোগ করা যায়নি'); }
+    });
+
+    const templates = {
+      mcq: `<h2 style="text-align:center;">বহুনির্বাচনি প্রশ্নপত্র</h2><p style="text-align:center;"><b>বিষয়:</b> তথ্য ও যোগাযোগ প্রযুক্তি &nbsp;|&nbsp; <b>পূর্ণমান:</b> ২৫</p><hr><p><b>১. বিশ্বগ্রাম (Global Village) ধারণার প্রবক্তা কে?</b><br>ক) মার্শাল ম্যাকলুহান &nbsp;&nbsp; খ) টিম বার্নার্স লি<br>গ) চার্লস ব্যাবেজ &nbsp;&nbsp; ঘ) অ্যাডা লাভলেস</p>`,
+      assignment: `<div style="text-align:center; padding:18px; border:2px solid #1e293b;"><h2>অ্যাসাইনমেন্ট কভার পেজ</h2><p><b>প্রতিষ্ঠান:</b> আপনার প্রতিষ্ঠানের নাম</p><hr><table><tr><td><b>শিক্ষার্থীর নাম</b></td><td><p><br></p></td></tr><tr><td><b>শ্রেণি / রোল</b></td><td><p><br></p></td></tr><tr><td><b>বিষয়</b></td><td><p>তথ্য ও যোগাযোগ প্রযুক্তি (ICT)</p></td></tr><tr><td><b>জমাদানের তারিখ</b></td><td><p><br></p></td></tr></table></div>`,
+      application: `<p>তারিখ: ___/___/২০২৬ খ্রি.</p><p>বরাবর,<br>অধ্যক্ষ / বিভাগীয় প্রধান,<br>আপনার প্রতিষ্ঠানের নাম।</p><p><b>বিষয়:</b> ছুটির জন্য আবেদন।</p><p>জনাব,<br>বিনীত নিবেদন এই যে, আমি আপনার প্রতিষ্ঠানের নিয়মিত শিক্ষার্থী...</p><p>বিনীত নিবেদক,<br>আপনার নাম</p>`,
+      notes: `<h2>ক্লাস নোট — অধ্যায় ০১</h2><ul><li><b>মূল পয়েন্ট ১:</b> এখানে ব্যাখ্যা লিখুন...</li><li><b>মূল পয়েন্ট ২:</b> সূত্র বা সংজ্ঞা...</li></ul>`
+    };
+
+    $('templateSelect').addEventListener('change', (e) => {
+      if (templates[e.target.value]) {
+        $('editorPaper').innerHTML = templates[e.target.value];
+        normalizeEditablePaper();
+        $('docTitleInput').value = e.target.value.toUpperCase() + '_Doc';
+        scheduleEditorAutoSave();
+        showToast('টেমপ্লেট লোড হয়েছে!');
+      }
+      e.target.value = '';
+    });
+
+    $('exportPdfBtn').addEventListener('click', async () => {
+      showToast('PDF তৈরি হচ্ছে...');
+      try {
+        const canvas = await window.html2canvas($('editorPaper'), { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const margin = 12, imgW = 210 - margin * 2, imgH = (canvas.height * imgW) / canvas.width;
+        const imgData = canvas.toDataURL('image/jpeg', 0.92);
+        canvas.width = 0; canvas.height = 0;
+        let heightLeft = imgH, pos = margin;
+        pdf.addImage(imgData, 'JPEG', margin, pos, imgW, imgH);
+        heightLeft -= (297 - margin * 2);
+        while (heightLeft > 0) {
+          pos = heightLeft - imgH + margin;
+          pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', margin, pos, imgW, imgH);
+          heightLeft -= (297 - margin * 2);
+        }
+        const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
+        await saveOutputFile(pdf.output('blob'), safeName + '.pdf');
+      } catch (err) { recordLocalError('export_pdf', err); showToast('PDF তৈরিতে সমস্যা হয়েছে'); }
+    });
+
+    $('exportWordBtn').addEventListener('click', async () => {
+      const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${sanitizeHtml($('editorPaper').innerHTML)}</body></html>`;
+      await saveOutputFile(new Blob(['\ufeff', html], { type: 'application/msword' }), safeName + '.doc');
+    });
+
+    $('exportTxtBtn').addEventListener('click', async () => {
+      const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
+      await saveOutputFile(new Blob([$('editorPaper').innerText], { type: 'text/plain;charset=utf-8' }), safeName + '.txt');
+    });
+
+    async function renderDrafts() {
+      const drafts = (await dbGetAll('drafts').catch(() => [])).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+      $('draftCount').textContent = drafts.length + 'টি';
+      $('draftList').innerHTML = drafts.length ? drafts.map((d) => `
+        <div class="list-item">
+          <div class="list-item-info"><b>${escapeHtml(d.title)}</b><small>${escapeHtml(d.date)}</small></div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-sm btn-primary" data-load-draft="${escapeHtml(d.id)}">খুলুন</button>
+            <button class="btn btn-sm btn-danger" data-del-draft="${escapeHtml(d.id)}">মুছুন</button>
+          </div>
+        </div>`).join('') : '<div style="font-size:12.5px; color:var(--text-muted);">কোনো ড্রাফট সেভ নেই।</div>';
+
+      $('draftList').querySelectorAll('[data-load-draft]').forEach(btn => btn.addEventListener('click', async () => {
+        const d = await dbGet('drafts', btn.dataset.loadDraft);
+        if (!d) return;
+        $('docTitleInput').value = d.title || '';
+        $('editorPaper').innerHTML = sanitizeHtml(d.html || '');
+        normalizeEditablePaper();
+        showToast('ড্রাফট নিরাপদে লোড হয়েছে');
+      }));
+      $('draftList').querySelectorAll('[data-del-draft]').forEach(btn => btn.addEventListener('click', async () => {
+        await dbDelete('drafts', btn.dataset.delDraft);
+        await renderDrafts();
+        showToast('ড্রাফট মুছে ফেলা হয়েছে');
+      }));
+    }
+
+    $('saveDraftBtn').addEventListener('click', async () => {
+      const existing = await dbGetAll('drafts').catch(() => []);
+      const title = $('docTitleInput').value.trim() || ('নোট ' + (existing.length + 1));
+      await dbPut('drafts', {
+        id: 'draft_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+        title,
+        html: sanitizeHtml($('editorPaper').innerHTML),
+        date: new Date().toLocaleString('bn-BD'),
+        updatedAt: Date.now()
+      });
+      await dbDelete('recovery', 'autosave_current').catch(() => {});
+      $('recoveryStrip').classList.remove('show');
+      await renderDrafts();
+      showToast('ড্রাফট IndexedDB-তে স্থায়ীভাবে সেভ হয়েছে!');
+    });
+
+    // ==================== 10. PDF TOOLS (ENHANCED VALIDATION, ORDERING, AUTO-ORIENTATION) ====================
+    let imgFiles = [];
+    function renderImgThumbs() {
+      $('imgThumbGrid').innerHTML = imgFiles.map((it, i) => `<div class="thumb-card"><img src="${it.url}"/><button class="thumb-del" data-rm-img="${i}">×</button></div>`).join('');
+      $('imgThumbGrid').querySelectorAll('[data-rm-img]').forEach(b => b.addEventListener('click', () => {
+        const i = parseInt(b.dataset.rmImg, 10);
+        URL.revokeObjectURL(imgFiles[i].url); imgFiles.splice(i, 1); renderImgThumbs();
+      }));
+    }
+    $('imgToPdfInput').addEventListener('change', (e) => { for (const f of e.target.files) imgFiles.push({ file: f, url: URL.createObjectURL(f) }); renderImgThumbs(); e.target.value = ''; });
+    $('clearImgPdfBtn').addEventListener('click', () => { imgFiles.forEach(i => URL.revokeObjectURL(i.url)); imgFiles = []; renderImgThumbs(); });
+    $('buildImgPdfBtn').addEventListener('click', async () => {
+      if (!imgFiles.length) return showToast('অন্তত ১টি ছবি বাছুন');
+      showToast('ছবি অপ্টিমাইজ করে PDF তৈরি হচ্ছে...');
+      try {
+        const { PDFDocument } = window.PDFLib;
+        const doc = await PDFDocument.create();
+        for (const item of imgFiles) {
+          const dataUrl = await compressImageFile(item.file, 2000, 0.86);
+          const jpgBytes = base64ToUint8Array(dataUrl.split(',')[1]);
+          const emb = await doc.embedJpg(jpgBytes);
+          const isLandscape = emb.width > emb.height;
+          const pageW = isLandscape ? 841.89 : 595.28;
+          const pageH = isLandscape ? 595.28 : 841.89;
+          const pad = 22;
+          const sc = Math.min((pageW - pad * 2) / emb.width, (pageH - pad * 2) / emb.height);
+          const p = doc.addPage([pageW, pageH]);
+          p.drawImage(emb, { x: (pageW - emb.width * sc) / 2, y: (pageH - emb.height * sc) / 2, width: emb.width * sc, height: emb.height * sc });
+        }
+        await saveOutputFile(new Blob([await doc.save()], { type: 'application/pdf' }), 'AetherX_Images.pdf');
+      } catch (err) { recordLocalError('img_to_pdf', err); showToast('ছবি থেকে PDF করা যায়নি'); }
+    });
+
+    // PDF Merge with Up/Down Reordering + Encrypted PDF Error Handling
+    let mergeFiles = [];
+    function renderMergeList() {
+      $('mergeFileList').innerHTML = mergeFiles.map((f, i) => `
+        <div class="list-item">
+          <div class="list-item-info"><b>${i + 1}. ${escapeHtml(f.name)}</b><small>${formatBytes(f.size)}</small></div>
+          <div style="display:flex; gap:4px;">
+            ${i > 0 ? `<button class="btn btn-sm" data-m-up="${i}" title="উপরে নিন">↑</button>` : ''}
+            ${i < mergeFiles.length - 1 ? `<button class="btn btn-sm" data-m-dn="${i}" title="নিচে নিন">↓</button>` : ''}
+            <button class="btn btn-sm btn-danger" data-m-rm="${i}">×</button>
+          </div>
+        </div>`).join('');
+
+      $('mergeFileList').querySelectorAll('[data-m-up]').forEach(b => b.addEventListener('click', () => {
+        const i = parseInt(b.dataset.mUp, 10); [mergeFiles[i - 1], mergeFiles[i]] = [mergeFiles[i], mergeFiles[i - 1]]; renderMergeList();
+      }));
+      $('mergeFileList').querySelectorAll('[data-m-dn]').forEach(b => b.addEventListener('click', () => {
+        const i = parseInt(b.dataset.mDn, 10); [mergeFiles[i + 1], mergeFiles[i]] = [mergeFiles[i], mergeFiles[i + 1]]; renderMergeList();
+      }));
+      $('mergeFileList').querySelectorAll('[data-m-rm]').forEach(b => b.addEventListener('click', () => {
+        mergeFiles.splice(parseInt(b.dataset.mRm, 10), 1); renderMergeList();
+      }));
+    }
+    $('mergePdfInput').addEventListener('change', (e) => { for (const f of e.target.files) mergeFiles.push(f); renderMergeList(); e.target.value = ''; });
+    $('clearMergeBtn').addEventListener('click', () => { mergeFiles = []; renderMergeList(); });
+    $('mergePdfBtn').addEventListener('click', async () => {
+      if (mergeFiles.length < 2) return showToast('কমপক্ষে ২টি PDF সিলেক্ট করুন');
+      showToast('PDF Merge হচ্ছে...');
+      try {
+        const { PDFDocument } = window.PDFLib;
+        const merged = await PDFDocument.create();
+        for (const f of mergeFiles) {
+          let src;
+          try {
+            src = await PDFDocument.load(await f.arrayBuffer());
+          } catch (loadErr) {
+            if (String(loadErr).toLowerCase().includes('encrypt')) {
+              return showToast(`"${f.name}" পাসওয়ার্ড-লক করা, তাই Merge করা যায়নি।`);
+            }
+            return showToast(`"${f.name}" সঠিক PDF ফাইল নয়।`);
+          }
+          (await merged.copyPages(src, src.getPageIndices())).forEach(p => merged.addPage(p));
+        }
+        const total = merged.getPageCount();
+        const ok = await saveOutputFile(new Blob([await merged.save()], { type: 'application/pdf' }), 'AetherX_Merged.pdf');
+        if (ok) showToast(`মোট ${total} পেজ একত্রে Merge হয়েছে!`);
+      } catch (err) { recordLocalError('pdf_merge', err); showToast('Merge করা যায়নি'); }
+    });
+
+    // Strict PDF Split Validation (Rejects reversed ranges like 8-3 & out-of-bounds!)
+    let splitSrcBytes = null, splitTotalPages = 0;
+    $('splitPdfInput').addEventListener('change', async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      e.target.value = '';
+      try {
+        splitSrcBytes = await f.arrayBuffer();
+        const doc = await window.PDFLib.PDFDocument.load(splitSrcBytes);
+        splitTotalPages = doc.getPageCount();
+        $('splitFileLabel').textContent = f.name;
+        $('splitPageCount').textContent = `মোট পেজ: ${splitTotalPages}টি`;
+        $('splitRangeInput').value = splitTotalPages > 1 ? `1-${Math.min(2, splitTotalPages)}` : '1';
+      } catch (err) {
+        splitSrcBytes = null;
+        showToast(String(err).toLowerCase().includes('encrypt') ? 'লক করা PDF Split করা যাবে না' : 'PDF পড়া যায়নি');
+      }
+    });
+
+    $('splitPdfBtn').addEventListener('click', async () => {
+      if (!splitSrcBytes) return showToast('আগে একটি PDF বাছুন');
+      const raw = ($('splitRangeInput').value || '').trim();
+      if (!raw) return showToast('পেজ নম্বর দিন (যেমন: 1-3, 5)');
+
+      const idx = new Set();
+      const parts = raw.split(',');
+      for (const part of parts) {
+        const p = part.trim();
+        if (!p) continue;
+        if (/^\d+\s*-\s*\d+$/.test(p)) {
+          const [a, b] = p.split('-').map(n => parseInt(n.trim(), 10));
+          if (a > b) return showToast(`ভুল রেঞ্জ (${p}): শুরু নম্বর শেষ নম্বরের বড় হতে পারবে না!`);
+          if (a < 1 || b > splitTotalPages) return showToast(`পেজ নম্বর ১ থেকে ${splitTotalPages}-এর মধ্যে হতে হবে!`);
+          for (let i = a; i <= b; i++) idx.add(i - 1);
+        } else if (/^\d+$/.test(p)) {
+          const n = parseInt(p, 10);
+          if (n < 1 || n > splitTotalPages) return showToast(`পেজ নম্বর ১ থেকে ${splitTotalPages}-এর মধ্যে হতে হবে!`);
+          idx.add(n - 1);
+        } else {
+          return showToast(`অবৈধ ফরম্যাট: "${p}" (সঠিক উদাহরণ: 1-3, 5)`);
+        }
+      }
+      const sorted = Array.from(idx).sort((a, b) => a - b);
+      if (!sorted.length) return showToast('সঠিক পেজ নম্বর দিন');
+      try {
+        const { PDFDocument } = window.PDFLib;
+        const src = await PDFDocument.load(splitSrcBytes);
+        const dest = await PDFDocument.create();
+        (await dest.copyPages(src, sorted)).forEach(p => dest.addPage(p));
+        const ok = await saveOutputFile(new Blob([await dest.save()], { type: 'application/pdf' }), 'AetherX_Split.pdf');
+        if (ok) showToast(`${dest.getPageCount()}টি পেজ আলাদা করে সেভ হয়েছে!`);
+      } catch (err) { recordLocalError('pdf_split', err); showToast('Split করা যায়নি'); }
+    });
+
+    // ==================== 11. OFFLINE BACKUP, RESTORE & LOCAL ERROR LOG ====================
+    async function updateStorageStats() {
+      try {
+        const [drafts, notes, anns] = await Promise.all([dbGetAll('drafts'), dbGetAll('notes'), dbGetAll('annotations')]);
+        $('storageUsedBadge').textContent = `${drafts.length} ড্রাফট • ${notes.length + anns.length} PDF ডেটা`;
+      } catch (e) { $('storageUsedBadge').textContent = 'IndexedDB'; }
+    }
+
+    $('exportBackupBtn').addEventListener('click', async () => {
+      try {
+        const [drafts, notes, annotations] = await Promise.all([dbGetAll('drafts'), dbGetAll('notes'), dbGetAll('annotations')]);
+        const payload = { app: 'AetherX PDF Reader', version: '3.1', exportedAt: new Date().toISOString(), drafts, notes, annotations };
+        const dStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        await saveOutputFile(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }), `AetherX_Backup_${dStr}.json`);
+      } catch (e) { recordLocalError('backup_export', e); showToast('ব্যাকআপ তৈরি করা যায়নি'); }
+    });
+
+    let pendingRestorePayload = null;
+    $('importBackupInput').addEventListener('change', async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      e.target.value = '';
+      try {
+        const parsed = JSON.parse(await f.text());
+        if (!parsed || parsed.app !== 'AetherX PDF Reader') {
+          return showToast('সঠিক AetherX ব্যাকআপ ফাইল নয়');
+        }
+        pendingRestorePayload = parsed;
+        $('restoreConfirmModal').classList.add('open');
+      } catch (err) { showToast('ব্যাকআপ ফাইলটি পড়া যায়নি'); }
+    });
+
+    $('restoreCancelBtn').addEventListener('click', () => { $('restoreConfirmModal').classList.remove('open'); pendingRestorePayload = null; });
+    $('restoreProceedBtn').addEventListener('click', async () => {
+      $('restoreConfirmModal').classList.remove('open');
+      if (!pendingRestorePayload) return;
+      try {
+        const p = pendingRestorePayload;
+        pendingRestorePayload = null;
+        if (Array.isArray(p.drafts)) {
+          for (const d of p.drafts) {
+            if (d && d.id) await dbPut('drafts', { ...d, html: sanitizeHtml(d.html || '') });
+          }
+        }
+        if (Array.isArray(p.notes)) {
+          for (const n of p.notes) if (n && n.docId) await dbPut('notes', n);
+        }
+        if (Array.isArray(p.annotations)) {
+          for (const a of p.annotations) if (a && a.docId) await dbPut('annotations', a);
+        }
+        await renderDrafts();
+        await updateStorageStats();
+        showToast('ব্যাকআপ সফলভাবে রিস্টোর হয়েছে!');
+      } catch (e) { recordLocalError('backup_restore', e); showToast('রিস্টোর ব্যর্থ হয়েছে'); }
+    });
+
+    $('exportErrorLogBtn').addEventListener('click', async () => {
+      const logs = JSON.parse(localStorage.getItem('ax_error_log') || '[]');
+      const text = logs.length
+        ? logs.map(l => `[${l.time}] (${l.ctx}) ${l.err}`).join('\n')
+        : 'No errors recorded. AetherX PDF Reader v3.1 is running cleanly.';
+      await saveOutputFile(new Blob([text], { type: 'text/plain;charset=utf-8' }), 'AetherX_ErrorLog.txt');
+    });
+
+    $('clearAllStorageBtn').addEventListener('click', async () => {
+      await Promise.all([dbClearStore('drafts'), dbClearStore('notes'), dbClearStore('annotations'), dbClearStore('recovery')]);
+      await renderDrafts();
+      await updateStorageStats();
+      showToast('সব ড্রাফট, নোট ও হাইলাইট পরিষ্কার হয়েছে!');
     });
 
     // ==================== BIJOY TO UNICODE ====================
@@ -2448,207 +2941,10 @@
     $('unicodeToEditorBtn').addEventListener('click', () => {
       const txt = $('unicodeOutput').value.trim();
       if (!txt) return showToast('আউটপুটে কোনো লেখা নেই');
-      $('editorPaper').innerHTML = txt.split('\n').map(l => `<p>${l || '<br>'}</p>`).join('');
+      $('editorPaper').innerHTML = txt.split('\n').map(l => `<p>${escapeHtml(l) || '<br>'}</p>`).join('');
       normalizeEditablePaper();
       $('docTitleInput').value = 'Converted_Bangla_Doc';
-      switchTab('editor');
-      showToast('এডিটরে লোড হয়েছে!');
-    });
-
-    // ==================== EDITOR & EXPORTS ====================
-    document.querySelectorAll('.tool-btn[data-cmd]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        $('editorPaper').focus();
-        document.execCommand(btn.dataset.cmd, false, btn.dataset.val || null);
-      });
-    });
-
-    $('insertTableBtn').addEventListener('click', () => {
-      $('editorPaper').focus();
-      document.execCommand('insertHTML', false, `<table><tr><th>ক্রমিক</th><th>বিষয়</th><th>মন্তব্য</th></tr><tr><td><p>১</p></td><td><p>উদাহরণ</p></td><td><p><br></p></td></tr></table><p><br></p>`);
-      normalizeEditablePaper();
-    });
-
-    $('editorImgInput').addEventListener('change', (e) => {
-      const file = e.target.files[0]; if (!file) return;
-      const r = new FileReader();
-      r.onload = () => { $('editorPaper').focus(); document.execCommand('insertHTML', false, `<img src="${r.result}"/><p><br></p>`); };
-      r.readAsDataURL(file);
-      e.target.value = '';
-    });
-
-    const templates = {
-      mcq: `<h2 style="text-align:center;">বহুনির্বাচনি প্রশ্নপত্র</h2><p style="text-align:center;"><b>বিষয়:</b> তথ্য ও যোগাযোগ প্রযুক্তি &nbsp;|&nbsp; <b>পূর্ণমান:</b> ২৫</p><hr><p><b>১. বিশ্বগ্রাম (Global Village) ধারণার প্রবক্তা কে?</b><br>ক) মার্শাল ম্যাকলুহান &nbsp;&nbsp; খ) টিম বার্নার্স লি<br>গ) চার্লস ব্যাবেজ &nbsp;&nbsp; ঘ) অ্যাডা লাভলেস</p>`,
-      assignment: `<div style="text-align:center; padding:18px; border:2px solid #1e293b;"><h2>অ্যাসাইনমেন্ট কভার পেজ</h2><p><b>প্রতিষ্ঠান:</b> আপনার প্রতিষ্ঠানের নাম</p><hr><table><tr><td><b>শিক্ষার্থীর নাম</b></td><td><p><br></p></td></tr><tr><td><b>শ্রেণি / রোল</b></td><td><p><br></p></td></tr><tr><td><b>বিষয়</b></td><td><p>তথ্য ও যোগাযোগ প্রযুক্তি (ICT)</p></td></tr><tr><td><b>জমাদানের তারিখ</b></td><td><p><br></p></td></tr></table></div>`,
-      application: `<p>তারিখ: ___/___/২০২৬ খ্রি.</p><p>বরাবর,<br>অধ্যক্ষ / বিভাগীয় প্রধান,<br>আপনার প্রতিষ্ঠানের নাম।</p><p><b>বিষয়:</b> ছুটির জন্য আবেদন।</p><p>জনাব,<br>বিনীত নিবেদন এই যে, আমি আপনার প্রতিষ্ঠানের নিয়মিত শিক্ষার্থী...</p><p>বিনীত নিবেদক,<br>আপনার নাম</p>`,
-      notes: `<h2>ক্লাস নোট — অধ্যায় ০১</h2><ul><li><b>মূল পয়েন্ট ১:</b> এখানে ব্যাখ্যা লিখুন...</li><li><b>মূল পয়েন্ট ২:</b> সূত্র বা সংজ্ঞা...</li></ul>`
-    };
-
-    $('templateSelect').addEventListener('change', (e) => {
-      if (templates[e.target.value]) {
-        $('editorPaper').innerHTML = templates[e.target.value];
-        normalizeEditablePaper();
-        $('docTitleInput').value = e.target.value.toUpperCase() + '_Doc';
-        showToast('টেমপ্লেট লোড হয়েছে!');
-      }
-      e.target.value = '';
-    });
-
-    $('exportPdfBtn').addEventListener('click', async () => {
-      showToast('PDF তৈরি হচ্ছে...');
-      try {
-        const canvas = await window.html2canvas($('editorPaper'), { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const margin = 12, imgW = 210 - margin * 2, imgH = (canvas.height * imgW) / canvas.width;
-        const imgData = canvas.toDataURL('image/jpeg', 0.94);
-        let heightLeft = imgH, pos = margin;
-        pdf.addImage(imgData, 'JPEG', margin, pos, imgW, imgH);
-        heightLeft -= (297 - margin * 2);
-        while (heightLeft > 0) {
-          pos = heightLeft - imgH + margin;
-          pdf.addPage();
-          pdf.addImage(imgData, 'JPEG', margin, pos, imgW, imgH);
-          heightLeft -= (297 - margin * 2);
-        }
-        const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
-        await saveOutputFile(pdf.output('blob'), safeName + '.pdf');
-      } catch { showToast('PDF তৈরিতে সমস্যা হয়েছে'); }
-    });
-
-    $('exportWordBtn').addEventListener('click', async () => {
-      const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
-      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${$('editorPaper').innerHTML}</body></html>`;
-      await saveOutputFile(new Blob(['\ufeff', html], { type: 'application/msword' }), safeName + '.doc');
-    });
-
-    $('exportTxtBtn').addEventListener('click', async () => {
-      const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
-      await saveOutputFile(new Blob([$('editorPaper').innerText], { type: 'text/plain;charset=utf-8' }), safeName + '.txt');
-    });
-
-    function getDrafts() { try { return JSON.parse(localStorage.getItem('ax_drafts') || '[]'); } catch { return []; } }
-    function renderDrafts() {
-      const drafts = getDrafts();
-      $('draftCount').textContent = drafts.length + 'টি';
-      $('draftList').innerHTML = drafts.length ? drafts.map((d, i) => `
-        <div class="list-item">
-          <div class="list-item-info"><b>${d.title}</b><small>${d.date}</small></div>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-sm btn-primary" onclick="loadDraft(${i})">খুলুন</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteDraft(${i})">মুছুন</button>
-          </div>
-        </div>`).join('') : '<div style="font-size:12.5px; color:var(--text-muted);">কোনো ড্রাফট সেভ নেই।</div>';
-    }
-    window.loadDraft = (i) => { const d = getDrafts()[i]; if (!d) return; $('docTitleInput').value = d.title; $('editorPaper').innerHTML = d.html; normalizeEditablePaper(); showToast('ড্রাফট লোড হয়েছে'); };
-    window.deleteDraft = (i) => { const d = getDrafts(); d.splice(i, 1); localStorage.setItem('ax_drafts', JSON.stringify(d)); renderDrafts(); };
-    $('saveDraftBtn').addEventListener('click', () => {
-      const d = getDrafts();
-      d.unshift({ title: $('docTitleInput').value.trim() || ('নোট ' + (d.length + 1)), html: $('editorPaper').innerHTML, date: new Date().toLocaleString('bn-BD') });
-      localStorage.setItem('ax_drafts', JSON.stringify(d.slice(0, 30)));
-      renderDrafts(); showToast('ড্রাফট সেভ হয়েছে!');
-    });
-    renderDrafts();
-
-    // ==================== PDF TOOLS ====================
-    let imgFiles = [];
-    function renderImgThumbs() {
-      $('imgThumbGrid').innerHTML = imgFiles.map((it, i) => `<div class="thumb-card"><img src="${it.url}"/><button class="thumb-del" onclick="removeImg(${i})">×</button></div>`).join('');
-    }
-    window.removeImg = (i) => { URL.revokeObjectURL(imgFiles[i].url); imgFiles.splice(i, 1); renderImgThumbs(); };
-    $('imgToPdfInput').addEventListener('change', (e) => { for (const f of e.target.files) imgFiles.push({ file: f, url: URL.createObjectURL(f) }); renderImgThumbs(); e.target.value = ''; });
-    $('clearImgPdfBtn').addEventListener('click', () => { imgFiles.forEach(i => URL.revokeObjectURL(i.url)); imgFiles = []; renderImgThumbs(); });
-    $('buildImgPdfBtn').addEventListener('click', async () => {
-      if (!imgFiles.length) return showToast('অন্তত ১টি ছবি বাছুন');
-      showToast('ছবি থেকে PDF হচ্ছে...');
-      try {
-        const { PDFDocument } = window.PDFLib;
-        const doc = await PDFDocument.create();
-        for (const item of imgFiles) {
-          const img = new Image(); img.src = item.url;
-          await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
-          const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
-          const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(img, 0, 0);
-          const jpgBytes = await fetch(c.toDataURL('image/jpeg', 0.88)).then(r => r.arrayBuffer());
-          const emb = await doc.embedJpg(jpgBytes);
-          const a4W = 595.28, a4H = 841.89, pad = 24;
-          const sc = Math.min((a4W - pad * 2) / emb.width, (a4H - pad * 2) / emb.height);
-          const p = doc.addPage([a4W, a4H]);
-          p.drawImage(emb, { x: (a4W - emb.width * sc) / 2, y: (a4H - emb.height * sc) / 2, width: emb.width * sc, height: emb.height * sc });
-        }
-        await saveOutputFile(new Blob([await doc.save()], { type: 'application/pdf' }), 'AetherX_Images.pdf');
-      } catch { showToast('ছবি থেকে PDF করা যায়নি'); }
-    });
-
-    let mergeFiles = [];
-    function renderMergeList() {
-      $('mergeFileList').innerHTML = mergeFiles.map((f, i) => `<div class="list-item"><div class="list-item-info"><b>${i + 1}. ${f.name}</b><small>${formatBytes(f.size)}</small></div><button class="btn btn-sm btn-danger" onclick="removeMergeFile(${i})">×</button></div>`).join('');
-    }
-    window.removeMergeFile = (i) => { mergeFiles.splice(i, 1); renderMergeList(); };
-    $('mergePdfInput').addEventListener('change', (e) => { for (const f of e.target.files) mergeFiles.push(f); renderMergeList(); e.target.value = ''; });
-    $('clearMergeBtn').addEventListener('click', () => { mergeFiles = []; renderMergeList(); });
-    $('mergePdfBtn').addEventListener('click', async () => {
-      if (mergeFiles.length < 2) return showToast('কমপক্ষে ২টি PDF সিলেক্ট করুন');
-      showToast('PDF Merge হচ্ছে...');
-      try {
-        const { PDFDocument } = window.PDFLib;
-        const merged = await PDFDocument.create();
-        for (const f of mergeFiles) {
-          const src = await PDFDocument.load(await f.arrayBuffer());
-          (await merged.copyPages(src, src.getPageIndices())).forEach(p => merged.addPage(p));
-        }
-        await saveOutputFile(new Blob([await merged.save()], { type: 'application/pdf' }), 'AetherX_Merged.pdf');
-      } catch { showToast('Merge করা যায়নি'); }
-    });
-
-    let splitSrcBytes = null, splitTotalPages = 0;
-    $('splitPdfInput').addEventListener('change', async (e) => {
-      const f = e.target.files[0]; if (!f) return;
-      try {
-        splitSrcBytes = await f.arrayBuffer();
-        const doc = await window.PDFLib.PDFDocument.load(splitSrcBytes);
-        splitTotalPages = doc.getPageCount();
-        $('splitFileLabel').textContent = f.name;
-        $('splitPageCount').textContent = `মোট পেজ: ${splitTotalPages}টি`;
-        $('splitRangeInput').value = splitTotalPages > 1 ? `1-${Math.min(2, splitTotalPages)}` : '1';
-      } catch { showToast('PDF পড়া যায়নি'); }
-      e.target.value = '';
-    });
-
-    $('splitPdfBtn').addEventListener('click', async () => {
-      if (!splitSrcBytes) return showToast('আগে একটি PDF বাছুন');
-      const idx = new Set();
-      $('splitRangeInput').value.split(',').forEach(part => {
-        const p = part.trim();
-        if (p.includes('-')) {
-          const [a, b] = p.split('-').map(n => parseInt(n, 10));
-          for (let i = Math.max(1, a); i <= Math.min(splitTotalPages, b); i++) idx.add(i - 1);
-        } else {
-          const n = parseInt(p, 10);
-          if (n >= 1 && n <= splitTotalPages) idx.add(n - 1);
-        }
-      });
-      const sorted = Array.from(idx).sort((a, b) => a - b);
-      if (!sorted.length) return showToast('সঠিক পেজ নম্বর দিন');
-      try {
-        const { PDFDocument } = window.PDFLib;
-        const src = await PDFDocument.load(splitSrcBytes);
-        const dest = await PDFDocument.create();
-        (await dest.copyPages(src, sorted)).forEach(p => dest.addPage(p));
-        await saveOutputFile(new Blob([await dest.save()], { type: 'application/pdf' }), 'AetherX_Split.pdf');
-      } catch { showToast('Split করা যায়নি'); }
-    });
-
-    function updateStorageMeter() {
-      let bytes = 0;
-      for (const k in localStorage) if (Object.prototype.hasOwnProperty.call(localStorage, k)) bytes += (localStorage[k].length + k.length) * 2;
-      $('storageUsedBadge').textContent = (bytes / 1024).toFixed(1) + ' KB';
-    }
-    updateStorageMeter();
-
-    $('clearAllStorageBtn').addEventListener('click', () => {
-      Object.keys(localStorage).forEach(k => { if (k.startsWith('ax_drafts') || k.startsWith('ax_notes_')) localStorage.removeItem(k); });
-      renderDrafts(); updateStorageMeter(); showToast('সব ড্রাফট ও নোট পরিষ্কার হয়েছে!');
+      switchTab('editor'); showToast('এডিটরে লোড হয়েছে!');
     });
   </script>
 </body>
