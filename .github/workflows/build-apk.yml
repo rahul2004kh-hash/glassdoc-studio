@@ -1,0 +1,57 @@
+name: Build GlassDoc Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Java 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Bundle offline libraries and Bengali fonts
+        run: npm run prepare-assets
+
+      - name: Add Android platform & sync assets
+        run: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+          npx cap sync android
+
+      - name: Build Installable APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Prepare APK for download
+        run: |
+          mkdir -p release
+          cp android/app/build/outputs/apk/debug/app-debug.apk release/GlassDoc-Studio-v1.0.apk
+          ls -lh release/GlassDoc-Studio-v1.0.apk
+
+      - name: Upload GlassDoc APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GlassDoc-Studio-APK
+          path: release/GlassDoc-Studio-v1.0.apk
+          retention-days: 30
