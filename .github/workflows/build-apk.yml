@@ -1,4 +1,4 @@
-name: Build AetherX PDF Reader v3.1.1 Fast APK
+name: Build AetherX PDF Reader v3.2 Final APK
 
 on:
   push:
@@ -37,10 +37,10 @@ jobs:
           fi
           npx cap sync android
 
-      - name: Patch Native Security, Fast Scanner & Streaming PDF Engine
+      - name: Patch Native Security, Print-to-PDF, Splash & Streaming Engine
         run: node scripts/prepare-assets.js --patch-android
 
-      - name: Apply Custom AetherX App Icons (All Densities + Adaptive)
+      - name: Apply Custom AetherX Icons & Overwrite Default Capacitor Splash PNGs
         run: |
           python3 -m pip install --quiet pillow
           python3 - << 'PYEOF'
@@ -76,7 +76,7 @@ jobs:
               out_dir = os.path.join(res_root, folder)
               os.makedirs(out_dir, exist_ok=True)
               fg = Image.new("RGBA", (sz, sz), (0, 0, 0, 0))
-              inner_sz = int(sz * 0.72)
+              inner_sz = int(sz * 0.68)
               inner = src.resize((inner_sz, inner_sz), Image.Resampling.LANCZOS)
               r = int(inner_sz * 0.22)
               mask = Image.new("L", (inner_sz, inner_sz), 0)
@@ -85,7 +85,26 @@ jobs:
               fg.paste(inner, (offset, offset), mask)
               fg.save(os.path.join(out_dir, "ic_launcher_foreground.png"), "PNG", optimize=True)
 
-          print("All custom AetherX launcher icons generated successfully!")
+          for root, dirs, files in os.walk(res_root):
+              for fn in files:
+                  if fn.lower() == "splash.png":
+                      p = os.path.join(root, fn)
+                      try:
+                          old = Image.open(p)
+                          w, h = old.size
+                          old.close()
+                      except Exception:
+                          w, h = 480, 800
+                      bg = Image.new("RGBA", (w, h), (5, 8, 18, 255))
+                      emblem_sz = max(96, int(min(w, h) * 0.24))
+                      emb = src.resize((emblem_sz, emblem_sz), Image.Resampling.LANCZOS)
+                      r = int(emblem_sz * 0.24)
+                      m = Image.new("L", (emblem_sz, emblem_sz), 0)
+                      ImageDraw.Draw(m).rounded_rectangle((0, 0, emblem_sz - 1, emblem_sz - 1), radius=r, fill=255)
+                      bg.paste(emb, ((w - emblem_sz) // 2, (h - emblem_sz) // 2), m)
+                      bg.save(p, "PNG", optimize=True)
+
+          print("All custom AetherX launcher icons & splash screens generated successfully!")
           PYEOF
 
       - name: Prepare Secure Signing Keystore (GitHub Secrets or Ephemeral Random Key)
@@ -107,7 +126,12 @@ jobs:
             ALIAS_VAL="${SECRET_KEY_ALIAS:-aetherx}"
             PASS_VAL="${SECRET_KS_PASS:-$RAND_PASS}"
             KPASS_VAL="${SECRET_KEY_PASS:-$PASS_VAL}"
-            keytool -genkeypair -noprompt               -keystore "$KS_FILE"               -alias "$ALIAS_VAL"               -keyalg RSA -keysize 2048 -validity 10000               -storepass "$PASS_VAL" -keypass "$KPASS_VAL"               -dname "CN=AetherX PDF Reader, OU=Personal Offline Studio, O=AetherX, C=BD"
+            keytool -genkeypair -noprompt \
+              -keystore "$KS_FILE" \
+              -alias "$ALIAS_VAL" \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$PASS_VAL" -keypass "$KPASS_VAL" \
+              -dname "CN=AetherX PDF Reader, OU=Personal Offline Studio, O=AetherX, C=BD"
             echo "KEYSTORE_PATH=$KS_FILE" >> "$GITHUB_ENV"
             echo "KEYSTORE_PASS=$PASS_VAL" >> "$GITHUB_ENV"
             echo "KEY_ALIAS=$ALIAS_VAL" >> "$GITHUB_ENV"
@@ -123,12 +147,12 @@ jobs:
       - name: Prepare Signed APK for download
         run: |
           mkdir -p release
-          cp android/app/build/outputs/apk/release/app-release.apk release/AetherX-PDF-Reader-v3.1.1-Fast.apk
-          ls -lh release/AetherX-PDF-Reader-v3.1.1-Fast.apk
+          cp android/app/build/outputs/apk/release/app-release.apk release/AetherX-PDF-Reader-v3.2-Final.apk
+          ls -lh release/AetherX-PDF-Reader-v3.2-Final.apk
 
-      - name: Upload AetherX v3.1.1 APK Artifact
+      - name: Upload AetherX v3.2 Final APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AetherX-PDF-Reader-v3.1.1-APK
-          path: release/AetherX-PDF-Reader-v3.1.1-Fast.apk
+          name: AetherX-PDF-Reader-v3.2-Final-APK
+          path: release/AetherX-PDF-Reader-v3.2-Final.apk
           retention-days: 30
