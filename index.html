@@ -508,6 +508,34 @@
       background: rgba(56, 189, 248, 0.18); color: var(--accent);
     }
 
+  
+    /* ==================== v3.2.2 QUICK SAVE PILL & ERASER ==================== */
+    .side-fab-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .quick-save-pill {
+      display: none; align-items: center; gap: 6px;
+      height: 36px; padding: 0 13px; border-radius: 999px;
+      border: 1px solid rgba(52, 211, 153, 0.55);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.90), rgba(5, 150, 105, 0.90));
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      color: #ffffff; font-family: var(--font-bn); font-size: 12px; font-weight: 700;
+      box-shadow: 0 8px 22px rgba(16, 185, 129, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+      cursor: pointer; white-space: nowrap;
+      animation: dockPop 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: transform 0.12s ease, opacity 0.2s ease;
+    }
+    .quick-save-pill.show { display: inline-flex; }
+    .quick-save-pill:active { transform: scale(0.93); }
+    .quick-save-pill.saved-state {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.92), rgba(99, 102, 241, 0.92));
+      border-color: rgba(125, 211, 252, 0.6);
+    }
+    .size-dot.eraser-mode {
+      background: rgba(255, 255, 255, 0.9) !important;
+      border: 1.5px dashed #fb7185;
+    }
+
   </style>
 </head>
 <body>
@@ -983,9 +1011,17 @@
             <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             <span data-i18n="tool_pen">কলম</span>
           </button>
+          <button class="dock-item" id="toolEraserBtn">
+            <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
+            <span data-i18n="tool_eraser">রাবার</span>
+          </button>
           <button class="dock-item" id="toolNoteBtn">
             <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             <span data-i18n="tool_note">নোট</span>
+          </button>
+          <button class="dock-item" id="toolUndoBtn">
+            <svg class="ic ic-sm" viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+            <span data-i18n="tool_undo">আনডু</span>
           </button>
         </div>
 
@@ -1012,24 +1048,26 @@
         </div>
 
         <div class="dock-grid">
-          <button class="dock-item" id="toolUndoBtn">
-            <svg class="ic ic-sm" viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-            <span data-i18n="tool_undo">আনডু</span>
-          </button>
           <button class="dock-item" id="toolSavePageBtn" title="Page PNG">
             <svg class="ic ic-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             <span data-i18n="tool_png">পেজ PNG</span>
           </button>
+          <button class="dock-item active" id="toolSaveAnnotatedPdfBtn" title="Save Annotated PDF">
+            <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span data-i18n="tool_save_short">PDF সেভ</span>
+          </button>
         </div>
-        <button class="dock-item active" id="toolSaveAnnotatedPdfBtn" style="width:100%; height:38px;">
-          <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          <span data-i18n="tool_save_pdf">দাগানো PDF সেভ</span>
-        </button>
       </div>
 
-      <button id="sideFabToggle" class="side-fab" title="হাইলাইট, কলম ও নোট">
-        <svg class="ic ic-lg" viewBox="0 0 24 24"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
-      </button>
+      <div class="side-fab-row">
+        <button id="quickSavePill" class="quick-save-pill" title="Save Annotated PDF">
+          <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span id="quickSaveLabel" data-i18n="quick_save">সেভ</span>
+        </button>
+        <button id="sideFabToggle" class="side-fab" title="হাইলাইট, কলম, রাবার ও নোট">
+          <svg class="ic ic-lg" viewBox="0 0 24 24"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
+        </button>
+      </div>
     </div>
 
     <div id="fsBottomHud" class="fs-bottom-hud" style="display:none;">
@@ -1156,8 +1194,8 @@
         bijoy_in_ph: 'বিজয় ফন্টের হিজিবিজি টেক্সট এখানে পেস্ট করুন...', bijoy_conv_btn: 'ইউনিকোড বাংলা করুন',
         btn_clear: 'মুছুন', bijoy_out_title: 'পরিষ্কার ইউনিকোড বাংলা আউটপুট',
         bijoy_out_ph: 'রূপান্তরিত বাংলা লেখা এখানে দেখাবে...', btn_copy: 'কপি করুন', btn_to_editor: 'এডিটরে নিয়ে PDF বানান',
-        tool_read: 'পড়া', tool_hl: 'হাইলাইট', tool_pen: 'কলম', tool_note: 'নোট',
-        tool_undo: 'আনডু', tool_png: 'পেজ PNG', tool_save_pdf: 'দাগানো PDF সেভ',
+        tool_read: 'পড়া', tool_hl: 'হাইলাইট', tool_pen: 'কলম', tool_eraser: 'রাবার', tool_note: 'নোট',
+        tool_undo: 'আনডু', tool_png: 'পেজ PNG', tool_save_short: 'PDF সেভ', quick_save: 'সেভ', quick_saved: 'সেভড ✓',
         sound_on: 'পাতা উল্টানোর শব্দ চালু', sound_off: 'পাতা উল্টানোর শব্দ বন্ধ',
         print_hint: 'প্রিন্ট স্ক্রিন থেকে "Save as PDF" সিলেক্ট করে সেভ করুন',
         docx_saved: 'আসল DOCX ফাইল তৈরি হয়েছে!'
@@ -1210,8 +1248,8 @@
         bijoy_in_ph: 'Paste legacy Bijoy text here...', bijoy_conv_btn: 'Convert to Unicode Bangla',
         btn_clear: 'Clear', bijoy_out_title: 'Clean Unicode Bangla Output',
         bijoy_out_ph: 'Converted Bangla text appears here...', btn_copy: 'Copy Text', btn_to_editor: 'Open in Editor & Make PDF',
-        tool_read: 'Read', tool_hl: 'Highlight', tool_pen: 'Pen', tool_note: 'Note',
-        tool_undo: 'Undo', tool_png: 'Page PNG', tool_save_pdf: 'Save Annotated PDF',
+        tool_read: 'Read', tool_hl: 'Highlight', tool_pen: 'Pen', tool_eraser: 'Eraser', tool_note: 'Note',
+        tool_undo: 'Undo', tool_png: 'Page PNG', tool_save_short: 'Save PDF', quick_save: 'Save', quick_saved: 'Saved ✓',
         sound_on: 'Page turn sound ON', sound_off: 'Page turn sound OFF',
         print_hint: 'Choose "Save as PDF" in the Android print screen',
         docx_saved: 'Genuine DOCX file created!'
@@ -1239,6 +1277,7 @@
       if ($('brandSubtitle')) {
         $('brandSubtitle').textContent = getStoredOwner() ? t('owner_sub') : t('subtitle');
       }
+      if (typeof syncBrushUI === 'function') syncBrushUI();
     }
 
     function showAxLoader(title, sub) {
@@ -1555,12 +1594,24 @@
       const existingOwner = getStoredOwner();
       if (existingOwner) {
         applyOwnerBranding(existingOwner);
+        const hasPending = !!(window.GlassNative && typeof window.GlassNative.hasPendingOpenFile === 'function' && window.GlassNative.hasPendingOpenFile());
+        if (hasPending) {
+          // Opened via "Open With" (WhatsApp / Telegram / File Manager) -> open document immediately!
+          startupCompleted = true;
+          checkPermissionGateAndLoad(true);
+          checkPendingExternalFile();
+          return;
+        }
         $('splashOwnerLabel').textContent = existingOwner;
         const splash = $('simpleSplash');
         splash.classList.add('show');
         setTimeout(() => {
           splash.classList.add('fade-out');
-          setTimeout(() => { splash.classList.remove('show', 'fade-out'); checkPermissionGateAndLoad(true); }, 340);
+          setTimeout(() => {
+            splash.classList.remove('show', 'fade-out');
+            checkPermissionGateAndLoad(true);
+            checkPendingExternalFile();
+          }, 340);
         }, 580);
         return;
       }
@@ -1586,7 +1637,7 @@
         }, 580);
         setTimeout(() => {
           screen.classList.add('fade-out');
-          setTimeout(() => { screen.classList.remove('show', 'fade-out'); s3.classList.remove('active'); checkPermissionGateAndLoad(true); }, 380);
+          setTimeout(() => { screen.classList.remove('show', 'fade-out'); s3.classList.remove('active'); checkPermissionGateAndLoad(true); checkPendingExternalFile(); }, 380);
         }, 2800);
       }
       $('claimOwnershipBtn').addEventListener('click', completeOwnershipTransfer);
@@ -1594,7 +1645,7 @@
     }
     window.addEventListener('DOMContentLoaded', initStartupFlow);
 
-    document.addEventListener('visibilitychange', () => { if (!document.hidden && startupCompleted) checkPermissionGateAndLoad(false); });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && startupCompleted) { checkPermissionGateAndLoad(false); checkPendingExternalFile(); } });
 
     // ==================== AUTO-HIDE BOTTOM DOCK WHEN KEYBOARD OPENS ====================
     const bottomDockWrap = $('bottomDockWrap'), baseWindowHeight = window.innerHeight;
@@ -1863,7 +1914,7 @@
 
           // Fast path for <= 35MB via Capacitor local stream (instant load!), with seamless Byte-Range fallback for huge PDFs (50-500MB+) & special filenames!
           let opened = false;
-          if (info.length <= 35 * 1024 * 1024 && window.Capacitor && typeof window.Capacitor.convertFileSrc === 'function') {
+          if (!fileObj.fromIntent && info.length <= 35 * 1024 * 1024 && window.Capacitor && typeof window.Capacitor.convertFileSrc === 'function') {
             try {
               const resp = await fetch(window.Capacitor.convertFileSrc(path));
               if (resp.ok) {
@@ -1947,8 +1998,8 @@
     let pdfDoc = null, activeBlobUrlToRevoke = null, currentPdfPage = null, currentDocId = '', currentDocMeta = null;
     let currentPage = 1, fitMode = 'width', baseW = 360, baseH = 510, scale = 1.0, tx = 0, ty = 0;
     let baseRenderTask = null, detailRenderTask = null, detailTimer = null, resizeRefitTimer = null, animFrame = null;
-    let activeTool = 'read', activeColor = 'yellow', highlightSize = 12, penSize = 2.5;
-    let pageStrokes = {}, pageNotesCache = {}, currentStroke = null, isDrawing = false;
+    let activeTool = 'read', activeColor = 'yellow', highlightSize = 12, penSize = 2.5, eraserSize = 18;
+    let pageStrokes = {}, pageUndoHistory = {}, pageNotesCache = {}, currentStroke = null, isDrawing = false, isErasing = false, erasedSomething = false;
 
     const fsViewport = $('fsViewport'), pdfPageBox = $('pdfPageBox'), detailCanvas = $('detailCanvas');
 
@@ -2014,7 +2065,7 @@
       await destroyCurrentPdfResources();
       $('fsOverlay').classList.remove('open'); $('sideDock').classList.remove('open');
       $('fsSandboxFrame').style.display = 'none'; $('fsSandboxFrame').srcdoc = '';
-      document.body.style.overflow = ''; setActiveTool('read'); setNativeFullscreen(false);
+      document.body.style.overflow = ''; setActiveTool('read'); hideQuickSavePill(); setNativeFullscreen(false);
     }
     $('fsBackBtn').addEventListener('click', closeFsOverlay);
 
@@ -2078,6 +2129,7 @@
         dbGet('notes', docId).catch(() => null)
       ]);
       pageStrokes = (savedAnn && savedAnn.strokesByPage) ? savedAnn.strokesByPage : {};
+      pageUndoHistory = {}; hideQuickSavePill();
       pageNotesCache = (savedNotes && savedNotes.notesByPage) ? savedNotes.notesByPage : {};
 
       $('pageSlider').max = pdfDoc.numPages; $('pageSlider').value = 1;
@@ -2275,43 +2327,101 @@
       }
     });
 
-    // ==================== FLOATING SIDE DOCK + PERMANENT STROKES ====================
+    // ==================== FLOATING SIDE DOCK + PERMANENT STROKES + RUBBER ERASER + QUICK SAVE ====================
     $('sideFabToggle').addEventListener('click', () => $('sideDock').classList.toggle('open'));
     const colorMap = { highlight: { yellow: '#fde047', green: '#6ee7b7', pink: '#fda4af', blue: '#7dd3fc' }, pen: { yellow: '#d97706', green: '#059669', pink: '#e11d48', blue: '#2563eb' } };
 
-    function syncBrushUI() {
-      const isPen = activeTool === 'pen', slider = $('brushSizeSlider');
-      if (isPen) { slider.min = '1'; slider.max = '10'; slider.step = '0.5'; slider.value = String(penSize); $('sizePanelLabel').textContent = 'সাইজ (কলম)'; $('sizeValueLabel').textContent = penSize + ' px'; }
-      else { slider.min = '4'; slider.max = '32'; slider.step = '1'; slider.value = String(highlightSize); $('sizePanelLabel').textContent = 'সাইজ (হাইলাইট)'; $('sizeValueLabel').textContent = highlightSize + ' px'; }
-      const curSize = isPen ? penSize : highlightSize, dotPx = Math.max(4, Math.min(20, isPen ? curSize * 1.9 : curSize * 0.62));
-      $('sizePreviewDot').style.width = dotPx + 'px'; $('sizePreviewDot').style.height = dotPx + 'px';
-      $('sizePreviewDot').style.background = colorMap[isPen ? 'pen' : 'highlight'][activeColor] || '#fde047';
-      const smallV = isPen ? 1.5 : 7, medV = isPen ? 3 : 13, lgV = isPen ? 6 : 22;
-      $('sizePresets').querySelectorAll('.preset-btn').forEach(b => { const k = b.dataset.size; b.classList.toggle('active', (k === 'small' && Math.abs(curSize - smallV) <= 2) || (k === 'medium' && Math.abs(curSize - medV) <= 3) || (k === 'large' && Math.abs(curSize - lgV) <= 4)); });
+    let quickSaveHideTimer = null;
+    function showQuickSavePill() {
+      clearTimeout(quickSaveHideTimer);
+      const pill = $('quickSavePill');
+      if (!pill) return;
+      pill.classList.remove('saved-state');
+      $('quickSaveLabel').textContent = t('quick_save');
+      pill.classList.add('show');
     }
-    $('brushSizeSlider').addEventListener('input', (e) => { const v = parseFloat(e.target.value); if (activeTool === 'pen') penSize = v; else highlightSize = v; syncBrushUI(); });
+    function hideQuickSavePill() {
+      clearTimeout(quickSaveHideTimer);
+      const pill = $('quickSavePill');
+      if (pill) pill.classList.remove('show', 'saved-state');
+    }
+    function markQuickSaveDone() {
+      const pill = $('quickSavePill');
+      if (!pill) return;
+      pill.classList.add('show', 'saved-state');
+      $('quickSaveLabel').textContent = t('quick_saved');
+      clearTimeout(quickSaveHideTimer);
+      quickSaveHideTimer = setTimeout(() => hideQuickSavePill(), 1700);
+    }
+
+    function pushUndoSnapshot() {
+      if (!pageUndoHistory[currentPage]) pageUndoHistory[currentPage] = [];
+      const snap = JSON.parse(JSON.stringify(pageStrokes[currentPage] || []));
+      pageUndoHistory[currentPage].push(snap);
+      if (pageUndoHistory[currentPage].length > 25) pageUndoHistory[currentPage].shift();
+    }
+
+    function syncBrushUI() {
+      const isPen = activeTool === 'pen', isEraser = activeTool === 'eraser', slider = $('brushSizeSlider');
+      const dot = $('sizePreviewDot');
+      dot.classList.toggle('eraser-mode', isEraser);
+      if (isEraser) {
+        slider.min = '10'; slider.max = '44'; slider.step = '2'; slider.value = String(eraserSize);
+        $('sizePanelLabel').textContent = currentLang === 'en' ? 'Size (Eraser)' : 'সাইজ (রাবার)';
+        $('sizeValueLabel').textContent = eraserSize + ' px';
+      } else if (isPen) {
+        slider.min = '1'; slider.max = '10'; slider.step = '0.5'; slider.value = String(penSize);
+        $('sizePanelLabel').textContent = currentLang === 'en' ? 'Size (Pen)' : 'সাইজ (কলম)';
+        $('sizeValueLabel').textContent = penSize + ' px';
+      } else {
+        slider.min = '4'; slider.max = '32'; slider.step = '1'; slider.value = String(highlightSize);
+        $('sizePanelLabel').textContent = currentLang === 'en' ? 'Size (Highlight)' : 'সাইজ (হাইলাইট)';
+        $('sizeValueLabel').textContent = highlightSize + ' px';
+      }
+      const curSize = isEraser ? eraserSize : (isPen ? penSize : highlightSize);
+      const dotPx = Math.max(4, Math.min(20, isEraser ? curSize * 0.48 : (isPen ? curSize * 1.9 : curSize * 0.62)));
+      dot.style.width = dotPx + 'px'; dot.style.height = dotPx + 'px';
+      if (!isEraser) dot.style.background = colorMap[isPen ? 'pen' : 'highlight'][activeColor] || '#fde047';
+      const smallV = isEraser ? 12 : (isPen ? 1.5 : 7);
+      const medV   = isEraser ? 20 : (isPen ? 3 : 13);
+      const lgV    = isEraser ? 34 : (isPen ? 6 : 22);
+      $('sizePresets').querySelectorAll('.preset-btn').forEach(b => {
+        const k = b.dataset.size;
+        b.classList.toggle('active', (k === 'small' && Math.abs(curSize - smallV) <= 3) || (k === 'medium' && Math.abs(curSize - medV) <= 4) || (k === 'large' && Math.abs(curSize - lgV) <= 6));
+      });
+    }
+    $('brushSizeSlider').addEventListener('input', (e) => {
+      const v = parseFloat(e.target.value);
+      if (activeTool === 'eraser') eraserSize = v;
+      else if (activeTool === 'pen') penSize = v;
+      else highlightSize = v;
+      syncBrushUI();
+    });
     $('sizePresets').querySelectorAll('.preset-btn').forEach(btn => btn.addEventListener('click', () => {
-      const isPen = activeTool === 'pen';
-      if (btn.dataset.size === 'small') { if (isPen) penSize = 1.5; else highlightSize = 7; }
-      if (btn.dataset.size === 'medium') { if (isPen) penSize = 3; else highlightSize = 13; }
-      if (btn.dataset.size === 'large') { if (isPen) penSize = 6; else highlightSize = 22; }
+      const isPen = activeTool === 'pen', isEraser = activeTool === 'eraser';
+      if (btn.dataset.size === 'small')  { if (isEraser) eraserSize = 12; else if (isPen) penSize = 1.5; else highlightSize = 7; }
+      if (btn.dataset.size === 'medium') { if (isEraser) eraserSize = 20; else if (isPen) penSize = 3;   else highlightSize = 13; }
+      if (btn.dataset.size === 'large')  { if (isEraser) eraserSize = 34; else if (isPen) penSize = 6;   else highlightSize = 22; }
       syncBrushUI();
     }));
 
     function setActiveTool(tool) {
       activeTool = tool;
-      ['toolReadBtn', 'toolHighlightBtn', 'toolPenBtn', 'toolNoteBtn'].forEach(id => $(id).classList.remove('active'));
+      ['toolReadBtn', 'toolHighlightBtn', 'toolPenBtn', 'toolEraserBtn', 'toolNoteBtn'].forEach(id => { if ($(id)) $(id).classList.remove('active'); });
       if (tool === 'read') $('toolReadBtn').classList.add('active');
       if (tool === 'highlight') $('toolHighlightBtn').classList.add('active');
       if (tool === 'pen') $('toolPenBtn').classList.add('active');
+      if (tool === 'eraser') $('toolEraserBtn').classList.add('active');
       if (tool === 'note') $('toolNoteBtn').classList.add('active');
-      $('drawCanvas').classList.toggle('active', tool === 'highlight' || tool === 'pen');
-      $('notesLayer').classList.toggle('placing', tool === 'note'); syncBrushUI();
+      $('drawCanvas').classList.toggle('active', tool === 'highlight' || tool === 'pen' || tool === 'eraser');
+      $('notesLayer').classList.toggle('placing', tool === 'note');
+      syncBrushUI();
     }
-    $('toolReadBtn').addEventListener('click', () => { setActiveTool('read'); $('sideDock').classList.remove('open'); showToast('পড়া ও স্মুথ জুম মোড'); });
-    $('toolHighlightBtn').addEventListener('click', () => { setActiveTool('highlight'); showToast('হাইলাইটার চালু — দাগগুলো স্থায়ীভাবে সেভ হবে'); });
-    $('toolPenBtn').addEventListener('click', () => { setActiveTool('pen'); showToast('কলম চালু — দাগগুলো স্থায়ীভাবে সেভ হবে'); });
-    $('toolNoteBtn').addEventListener('click', () => { setActiveTool('note'); $('sideDock').classList.remove('open'); showToast('পেজের যেখানে নোট রাখতে চান সেখানে ট্যাপ করুন'); });
+    $('toolReadBtn').addEventListener('click', () => { setActiveTool('read'); $('sideDock').classList.remove('open'); showToast(currentLang === 'en' ? 'Read & Smooth Zoom Mode' : 'পড়া ও স্মুথ জুম মোড'); });
+    $('toolHighlightBtn').addEventListener('click', () => { setActiveTool('highlight'); showToast(currentLang === 'en' ? 'Highlighter ON — drag over text' : 'হাইলাইটার চালু — লাইনের ওপর আঙুল টানুন'); });
+    $('toolPenBtn').addEventListener('click', () => { setActiveTool('pen'); showToast(currentLang === 'en' ? 'Pen ON — draw anywhere' : 'কলম চালু — যেকোনো জায়গায় লিখুন'); });
+    $('toolEraserBtn').addEventListener('click', () => { setActiveTool('eraser'); showToast(currentLang === 'en' ? 'Rubber ON — rub over highlights or pen marks to erase' : 'রাবার চালু — হাইলাইট বা কলমের দাগের ওপর ঘষে মুছুন'); });
+    $('toolNoteBtn').addEventListener('click', () => { setActiveTool('note'); $('sideDock').classList.remove('open'); showToast(currentLang === 'en' ? 'Tap on page to place a note' : 'পেজের যেখানে নোট রাখতে চান সেখানে ট্যাপ করুন'); });
     $('colorPalette').querySelectorAll('.color-dot').forEach(dot => dot.addEventListener('click', () => { $('colorPalette').querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected')); dot.classList.add('selected'); activeColor = dot.dataset.color; syncBrushUI(); }));
     syncBrushUI();
 
@@ -2332,17 +2442,132 @@
       drawCtx.globalAlpha = 1.0;
     }
 
+    // Densify stroke points so partial rubber erasing cuts highlights cleanly right under your finger
+    function densifyPoints(pts) {
+      if (pts.length < 2) return pts;
+      const out = [pts[0]];
+      const maxStep = 0.012;
+      for (let i = 1; i < pts.length; i++) {
+        const a = pts[i - 1], b = pts[i];
+        const dist = Math.hypot(b.x - a.x, b.y - a.y);
+        if (dist > maxStep) {
+          const steps = Math.min(40, Math.ceil(dist / maxStep));
+          for (let k = 1; k < steps; k++) {
+            const f = k / steps;
+            out.push({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f });
+          }
+        }
+        out.push(b);
+      }
+      return out;
+    }
+
+    function applyRubberAt(pt) {
+      const list = pageStrokes[currentPage];
+      if (!list || !list.length) return false;
+      const radiusPx = (eraserSize * 0.65) / Math.max(scale, 1);
+      const rx = radiusPx / Math.max(baseW, 200);
+      const ry = radiusPx / Math.max(baseH, 200);
+      const nextList = [];
+      let changed = false;
+
+      for (const s of list) {
+        if (!s.points || s.points.length < 2) continue;
+        // Quick bounding check before densifying
+        const padX = rx + (s.widthRatio || 0.01) * 0.55;
+        const padY = ry + ((s.widthRatio || 0.01) * (baseW / Math.max(baseH, 1))) * 0.55;
+        let hitAny = false;
+        const dense = densifyPoints(s.points);
+        for (let i = 0; i < dense.length; i++) {
+          const dx = (dense[i].x - pt.x) / Math.max(padX, 0.004);
+          const dy = (dense[i].y - pt.y) / Math.max(padY, 0.004);
+          if (dx * dx + dy * dy <= 1) { hitAny = true; break; }
+        }
+        if (!hitAny) {
+          nextList.push(s);
+          continue;
+        }
+        changed = true;
+        let segment = [];
+        for (let i = 0; i < dense.length; i++) {
+          const dx = (dense[i].x - pt.x) / Math.max(padX, 0.004);
+          const dy = (dense[i].y - pt.y) / Math.max(padY, 0.004);
+          if (dx * dx + dy * dy <= 1) {
+            if (segment.length >= 2) {
+              nextList.push({ tool: s.tool, color: s.color, widthRatio: s.widthRatio, points: segment });
+            }
+            segment = [];
+          } else {
+            segment.push(dense[i]);
+          }
+        }
+        if (segment.length >= 2) {
+          nextList.push({ tool: s.tool, color: s.color, widthRatio: s.widthRatio, points: segment });
+        }
+      }
+
+      if (changed) {
+        pageStrokes[currentPage] = nextList;
+        redrawPageStrokes();
+      }
+      return changed;
+    }
+
     function beginStroke(ev) {
-      if (activeTool !== 'pen' && activeTool !== 'highlight') return;
+      if (activeTool !== 'pen' && activeTool !== 'highlight' && activeTool !== 'eraser') return;
       if (ev.touches && ev.touches.length > 1) return;
-      ev.preventDefault(); $('sideDock').classList.remove('open'); isDrawing = true;
-      const pt = normPoint(ev); if (!pageStrokes[currentPage]) pageStrokes[currentPage] = [];
+      ev.preventDefault(); $('sideDock').classList.remove('open');
+      const pt = normPoint(ev);
+
+      if (activeTool === 'eraser') {
+        isErasing = true;
+        erasedSomething = false;
+        if (pageStrokes[currentPage] && pageStrokes[currentPage].length) {
+          pushUndoSnapshot();
+          if (applyRubberAt(pt)) erasedSomething = true;
+        }
+        return;
+      }
+
+      pushUndoSnapshot();
+      isDrawing = true;
+      if (!pageStrokes[currentPage]) pageStrokes[currentPage] = [];
       const widthRatio = ((activeTool === 'highlight' ? highlightSize : penSize) / Math.max(scale, 1)) / Math.max(baseW, 300);
       currentStroke = { tool: activeTool, color: activeColor, widthRatio, points: [pt] };
       pageStrokes[currentPage].push(currentStroke); redrawPageStrokes();
     }
-    function moveStroke(ev) { if (!isDrawing || !currentStroke) return; if (ev.touches && ev.touches.length > 1) { finishStroke(); return; } ev.preventDefault(); currentStroke.points.push(normPoint(ev)); redrawPageStrokes(); }
-    function finishStroke() { if (!isDrawing) return; isDrawing = false; currentStroke = null; persistCurrentAnnotations(); }
+
+    function moveStroke(ev) {
+      if (ev.touches && ev.touches.length > 1) { finishStroke(); return; }
+      if (isErasing) {
+        ev.preventDefault();
+        if (applyRubberAt(normPoint(ev))) erasedSomething = true;
+        return;
+      }
+      if (!isDrawing || !currentStroke) return;
+      ev.preventDefault();
+      currentStroke.points.push(normPoint(ev));
+      redrawPageStrokes();
+    }
+
+    function finishStroke() {
+      if (isErasing) {
+        isErasing = false;
+        if (erasedSomething) {
+          erasedSomething = false;
+          persistCurrentAnnotations();
+          showQuickSavePill();
+        } else if (pageUndoHistory[currentPage] && pageUndoHistory[currentPage].length) {
+          // Nothing was erased during this touch, drop unused snapshot
+          pageUndoHistory[currentPage].pop();
+        }
+        return;
+      }
+      if (!isDrawing) return;
+      isDrawing = false; currentStroke = null;
+      persistCurrentAnnotations();
+      showQuickSavePill();
+    }
 
     drawCanvas.addEventListener('touchstart', beginStroke, { passive: false });
     drawCanvas.addEventListener('touchmove', moveStroke, { passive: false });
@@ -2351,7 +2576,27 @@
     drawCanvas.addEventListener('mousemove', moveStroke);
     window.addEventListener('mouseup', finishStroke);
 
-    $('toolUndoBtn').addEventListener('click', () => { const list = pageStrokes[currentPage]; if (list && list.length) { list.pop(); redrawPageStrokes(); persistCurrentAnnotations(); showToast('শেষ দাগটি মুছে ফেলা হয়েছে'); } else showToast('মোছার মতো কোনো দাগ নেই'); });
+    $('toolUndoBtn').addEventListener('click', () => {
+      const hist = pageUndoHistory[currentPage];
+      if (hist && hist.length) {
+        pageStrokes[currentPage] = hist.pop();
+        redrawPageStrokes();
+        persistCurrentAnnotations();
+        showQuickSavePill();
+        showToast(currentLang === 'en' ? 'Undone!' : 'আগের অবস্থায় ফেরানো হয়েছে');
+        return;
+      }
+      const list = pageStrokes[currentPage];
+      if (list && list.length) {
+        list.pop();
+        redrawPageStrokes();
+        persistCurrentAnnotations();
+        showQuickSavePill();
+        showToast(currentLang === 'en' ? 'Last stroke removed' : 'শেষ দাগটি মুছে ফেলা হয়েছে');
+      } else {
+        showToast(currentLang === 'en' ? 'Nothing to undo' : 'মোছার মতো কোনো দাগ নেই');
+      }
+    });
     $('toolSavePageBtn').addEventListener('click', () => {
       const c1 = $('pdfCanvas'), c2 = $('drawCanvas'); if (!c1.width) return;
       const merged = document.createElement('canvas'); merged.width = c1.width; merged.height = c1.height;
@@ -2738,7 +2983,7 @@
     }
 
     // Permanent Annotated PDF Export (Original PDF stays untouched!)
-    $('toolSaveAnnotatedPdfBtn').addEventListener('click', async () => {
+    async function exportAnnotatedPdfCopy() {
       $('sideDock').classList.remove('open');
       if (!pdfDoc || !currentDocMeta || !window.PDFLib) return showToast('PDF ইঞ্জিন প্রস্তুত নয়');
       showAxLoader('Annotated PDF', t('exporting_pdf'));
@@ -2788,13 +3033,16 @@
         const outBytes = await doc.save();
         const baseName = (currentDocMeta.name || 'Document').replace(/\.pdf$/i, '');
         hideAxLoader();
-        await saveOutputFile(new Blob([outBytes], { type: 'application/pdf' }), baseName + '_Annotated.pdf');
+        const savedOk = await saveOutputFile(new Blob([outBytes], { type: 'application/pdf' }), baseName + '_Annotated.pdf');
+        if (savedOk) markQuickSaveDone();
       } catch (err) {
         hideAxLoader();
         recordLocalError('annotated_pdf_export', err);
         showToast(currentLang === 'en' ? 'Cannot export annotated copy for this PDF.' : 'লক করা বা অসমর্থিত PDF-এ Annotated Copy তৈরি করা যায়নি।');
       }
-    });
+    }
+    $('toolSaveAnnotatedPdfBtn').addEventListener('click', exportAnnotatedPdfCopy);
+    $('quickSavePill').addEventListener('click', exportAnnotatedPdfCopy);
 
     // Genuine 100% Offline OpenXML .docx Export (Pure-JS ZIP + WordprocessingML)
     function buildMinimalZip(entries) {
@@ -2987,6 +3235,28 @@
         showToast('পরিবর্তিত PDF সেভ করা যায়নি');
       }
     });
+
+  
+    // ==================== 13. "OPEN WITH" EXTERNAL INTENT HANDLER (WHATSAPP / TELEGRAM / FILE MANAGER) ====================
+    function checkPendingExternalFile() {
+      try {
+        if (!window.GlassNative || typeof window.GlassNative.consumePendingOpenFile !== 'function') return;
+        const raw = window.GlassNative.consumePendingOpenFile();
+        if (!raw || !raw.trim()) return;
+        const fileObj = JSON.parse(raw);
+        if (fileObj && fileObj.path) {
+          // Dismiss splash/permission gate visually so user sees the opened document directly
+          $('simpleSplash').classList.remove('show');
+          $('permissionGate').classList.remove('show');
+          openDeviceFile(fileObj);
+        }
+      } catch (e) {
+        recordLocalError('open_with_intent', e);
+      }
+    }
+    window.__onNativeOpenExternalFile = function() {
+      checkPendingExternalFile();
+    };
 
   </script>
 </body>
