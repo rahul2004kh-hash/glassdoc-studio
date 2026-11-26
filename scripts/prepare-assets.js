@@ -77,6 +77,7 @@ function patchAndroidNative() {
     throw new Error('Android package path not found: ' + pkgPath);
   }
 
+  // 1. NativeStorageBridge.java (Includes "Open With" Content/File URI Handler + Print-to-PDF + Byte-Range Streaming)
   const nativeBridgeJava = `package com.aetherx.pdfreader;
 
 import android.Manifest;
@@ -92,6 +93,7 @@ import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.provider.Settings;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
@@ -105,6 +107,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -126,9 +129,11 @@ public class NativeStorageBridge {
     private static final String PREFS_NAME = "AetherXOwnerPrefs";
     private static final String KEY_OWNER_NAME = "owner_name";
     private final ExecutorService scanExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService intentExecutor = Executors.newSingleThreadExecutor();
     private final AtomicInteger scanGeneration = new AtomicInteger(0);
     private final ConcurrentHashMap<String, RandomAccessFile> pdfSessions = new ConcurrentHashMap<>();
     private volatile String lastScanJson = "[]";
+    private volatile String pendingExternalFileJson = "";
     private WebView activePrintWebView = null;
 
     private static final Set<String> SKIP_DIRS = new HashSet<>(Arrays.asList(
@@ -146,24 +151,40 @@ public class NativeStorageBridge {
     public void cleanup() {
         closeAllPdfSessions();
         scanExecutor.shutdownNow();
+        intentExecutor.shutdownNow();
     }
 
-    private File validateExternalFile(String rawPath, boolean mustExist) {
+    private File getIncomingCacheDir() {
+        File dir = new File(activity.getCacheDir(), "incoming_docs");
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return dir;
+    }
+
+    // Validates external storage files (with permission) OR explicit incoming "Open With" cached files
+    private File validateReadableFile(String rawPath) {
         if (rawPath == null || rawPath.trim().isEmpty()) return null;
         if (rawPath.contains("\\0")) return null;
         try {
+            File target = new File(rawPath);
+            if (!target.exists() || !target.isFile() || !target.canRead()) return null;
+            String targetCanon = target.getCanonicalPath();
+
+            File incomingDir = getIncomingCacheDir();
+            String incomingCanon = incomingDir.getCanonicalPath();
+            if (targetCanon.startsWith(incomingCanon + File.separator)) {
+                return target;
+            }
+
+            if (!hasStoragePermission()) return null;
             File extRoot = Environment.getExternalStorageDirectory();
             if (extRoot == null) return null;
             String rootCanon = extRoot.getCanonicalPath();
-            File target = new File(rawPath);
-            String targetCanon = target.getCanonicalPath();
-            if (!targetCanon.equals(rootCanon) && !targetCanon.startsWith(rootCanon + File.separator)) {
-                return null;
+            if (targetCanon.equals(rootCanon) || targetCanon.startsWith(rootCanon + File.separator)) {
+                return target;
             }
-            if (mustExist && (!target.exists() || !target.isFile() || !target.canRead())) {
-                return null;
-            }
-            return target;
+            return null;
         } catch (Exception e) {
             return null;
         }
@@ -178,6 +199,173 @@ public class NativeStorageBridge {
         if (clean.isEmpty() || clean.equals(".")) clean = "AetherX_File";
         if (clean.length() > 140) clean = clean.substring(0, 140);
         return clean;
+    }
+
+    private String inferExtension(String displayName, String mimeType) {
+        if (displayName != null) {
+            int dot = displayName.lastIndexOf('.');
+            if (dot >= 0 && dot < displayName.length() - 1) {
+                String ext = displayName.substring(dot + 1).toLowerCase(Locale.ROOT);
+                if (isSupportedDoc("x." + ext)) return ext;
+            }
+        }
+        if (mimeType != null) {
+            String m = mimeType.toLowerCase(Locale.ROOT);
+            if (m.contains("pdf")) return "pdf";
+            if (m.contains("wordprocessingml")) return "docx";
+            if (m.contains("msword")) return "doc";
+            if (m.contains("rtf")) return "rtf";
+            if (m.contains("html")) return "html";
+            if (m.contains("csv")) return "csv";
+            if (m.contains("text")) return "txt";
+        }
+        return "pdf";
+    }
+
+    private String resolveDisplayName(Uri uri) {
+        String name = null;
+        try {
+            if ("content".equalsIgnoreCase(uri.getScheme())) {
+                Cursor cursor = activity.getContentResolver().query(
+                    uri,
+                    new String[]{ OpenableColumns.DISPLAY_NAME },
+                    null, null, null
+                );
+                if (cursor != null) {
+                    if (cursor.moveToFirst()) {
+                        int idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                        if (idx >= 0) name = cursor.getString(idx);
+                    }
+                    cursor.close();
+                }
+            }
+        } catch (Exception ignored) {}
+        if (name == null || name.trim().isEmpty()) {
+            String seg = uri.getLastPathSegment();
+            if (seg != null && !seg.trim().isEmpty()) {
+                int slash = seg.lastIndexOf('/');
+                name = slash >= 0 ? seg.substring(slash + 1) : seg;
+            }
+        }
+        return sanitizeFilename(name != null ? name : "Shared_Document");
+    }
+
+    private void cleanupOldIncomingFiles(File keepFile) {
+        try {
+            File dir = getIncomingCacheDir();
+            File[] files = dir.listFiles();
+            if (files == null || files.length <= 2) return;
+            Arrays.sort(files, new Comparator<File>() {
+                @Override
+                public int compare(File a, File b) {
+                    return Long.compare(b.lastModified(), a.lastModified());
+                }
+            });
+            String keepCanon = keepFile.getCanonicalPath();
+            for (int i = 2; i < files.length; i++) {
+                if (!files[i].getCanonicalPath().equals(keepCanon)) {
+                    files[i].delete();
+                }
+            }
+        } catch (Exception ignored) {}
+    }
+
+    // ==================== "OPEN WITH" (WHATSAPP / TELEGRAM / FILE MANAGER) ====================
+    public void handleIncomingUri(final Uri uri, final String intentMime) {
+        if (uri == null) return;
+        intentExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String mime = intentMime;
+                    if (mime == null || mime.isEmpty() || "*/*".equals(mime)) {
+                        try {
+                            mime = activity.getContentResolver().getType(uri);
+                        } catch (Exception ignored) {}
+                    }
+
+                    String displayName = resolveDisplayName(uri);
+                    String ext = inferExtension(displayName, mime);
+                    if (!displayName.toLowerCase(Locale.ROOT).endsWith("." + ext)) {
+                        displayName = displayName + "." + ext;
+                    }
+
+                    // Fast direct path if file:// URI inside external storage and accessible
+                    File targetFile = null;
+                    if ("file".equalsIgnoreCase(uri.getScheme()) && uri.getPath() != null) {
+                        File direct = validateReadableFile(uri.getPath());
+                        if (direct != null) {
+                            targetFile = direct;
+                        }
+                    }
+
+                    // For ALL content:// URIs (WhatsApp, Telegram, Gmail, Files): stream-copy safely into app cache
+                    if (targetFile == null) {
+                        InputStream is = activity.getContentResolver().openInputStream(uri);
+                        if (is == null) return;
+
+                        File cacheDir = getIncomingCacheDir();
+                        String tempName = System.currentTimeMillis() + "_" + sanitizeFilename(displayName);
+                        File outFile = new File(cacheDir, tempName);
+
+                        FileOutputStream fos = new FileOutputStream(outFile);
+                        byte[] buf = new byte[65536];
+                        int n;
+                        long totalBytes = 0;
+                        while ((n = is.read(buf)) != -1) {
+                            fos.write(buf, 0, n);
+                            totalBytes += n;
+                        }
+                        fos.flush();
+                        fos.close();
+                        is.close();
+
+                        if (totalBytes <= 0) {
+                            outFile.delete();
+                            return;
+                        }
+                        targetFile = outFile;
+                        cleanupOldIncomingFiles(outFile);
+                    }
+
+                    JSONObject obj = new JSONObject();
+                    obj.put("name", displayName);
+                    obj.put("path", targetFile.getCanonicalPath());
+                    obj.put("folder", "Open With");
+                    obj.put("size", targetFile.length());
+                    obj.put("modified", targetFile.lastModified());
+                    obj.put("ext", ext);
+                    obj.put("fromIntent", true);
+
+                    pendingExternalFileJson = obj.toString();
+
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (activity.getBridge() != null && activity.getBridge().getWebView() != null) {
+                                WebView wv = activity.getBridge().getWebView();
+                                wv.evaluateJavascript(
+                                    "window.__onNativeOpenExternalFile && window.__onNativeOpenExternalFile();",
+                                    null
+                                );
+                            }
+                        }
+                    });
+                } catch (Exception ignored) {}
+            }
+        });
+    }
+
+    @JavascriptInterface
+    public boolean hasPendingOpenFile() {
+        return pendingExternalFileJson != null && !pendingExternalFileJson.isEmpty();
+    }
+
+    @JavascriptInterface
+    public synchronized String consumePendingOpenFile() {
+        String out = pendingExternalFileJson;
+        pendingExternalFileJson = "";
+        return out != null ? out : "";
     }
 
     @JavascriptInterface
@@ -479,15 +667,10 @@ public class NativeStorageBridge {
     public String openPdfSession(String filePath) {
         JSONObject res = new JSONObject();
         try {
-            if (!hasStoragePermission()) {
-                res.put("ok", false);
-                res.put("error", "Storage permission required");
-                return res.toString();
-            }
-            File f = validateExternalFile(filePath, true);
+            File f = validateReadableFile(filePath);
             if (f == null || !f.getName().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
                 res.put("ok", false);
-                res.put("error", "Invalid or inaccessible PDF path");
+                res.put("error", hasStoragePermission() ? "Invalid or inaccessible PDF path" : "Storage permission required");
                 return res.toString();
             }
             closeAllPdfSessions();
@@ -574,8 +757,7 @@ public class NativeStorageBridge {
     @JavascriptInterface
     public String readSmallDocBase64(String filePath) {
         try {
-            if (!hasStoragePermission()) return "";
-            File file = validateExternalFile(filePath, true);
+            File file = validateReadableFile(filePath);
             if (file == null || file.length() > 55 * 1024 * 1024) return "";
             String lower = file.getName().toLowerCase(Locale.ROOT);
             if (!isSupportedDoc(lower)) return "";
@@ -646,9 +828,12 @@ public class NativeStorageBridge {
 `;
   fs.writeFileSync(path.join(pkgPath, 'NativeStorageBridge.java'), nativeBridgeJava, 'utf8');
 
+  // 2. MainActivity.java (Captures ACTION_VIEW on BOTH Cold Start onCreate & Warm Start onNewIntent!)
   const mainActivityJava = `package com.aetherx.pdfreader;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -689,6 +874,26 @@ public class MainActivity extends BridgeActivity {
             settings.setAllowFileAccess(false);
             settings.setAllowContentAccess(true);
             settings.setDomStorageEnabled(true);
+        }
+
+        handleIncomingIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIncomingIntent(intent);
+    }
+
+    private void handleIncomingIntent(Intent intent) {
+        if (intent == null || storageBridge == null) return;
+        String action = intent.getAction();
+        if (Intent.ACTION_VIEW.equals(action)) {
+            Uri data = intent.getData();
+            if (data != null) {
+                storageBridge.handleIncomingUri(data, intent.getType());
+            }
         }
     }
 
@@ -743,6 +948,7 @@ public class MainActivity extends BridgeActivity {
 `;
   fs.writeFileSync(path.join(pkgPath, 'MainActivity.java'), mainActivityJava, 'utf8');
 
+  // 3. Patch AndroidManifest.xml with ACTION_VIEW "Open With" Intent Filters!
   const manifestPath = 'android/app/src/main/AndroidManifest.xml';
   let manifest = fs.readFileSync(manifestPath, 'utf8');
   if (!manifest.includes('xmlns:tools=')) {
@@ -762,8 +968,55 @@ public class MainActivity extends BridgeActivity {
   if (!manifest.includes('windowSoftInputMode')) {
     manifest = manifest.replace('<activity', '<activity android:windowSoftInputMode="adjustResize"');
   }
+
+  // Inject ACTION_VIEW intent-filters for PDF, DOCX, RTF, TXT, HTML (WhatsApp, Telegram, Gmail, File Managers)
+  const viewIntentFilters = `
+            <!-- Open With: PDF from WhatsApp, Telegram, Gmail, File Managers -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+
+            <!-- Open With: DOCX, RTF, TXT, HTML Documents -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+                <data android:mimeType="application/rtf" />
+                <data android:mimeType="text/rtf" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="text/html" />
+            </intent-filter>
+
+            <!-- Fallback for file managers sending generic MIME type for .pdf -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="file" android:host="*" android:mimeType="*/*" android:pathPattern=".*\\.pdf" />
+                <data android:scheme="file" android:host="*" android:mimeType="*/*" android:pathPattern=".*\\.PDF" />
+            </intent-filter>`;
+
+  if (!manifest.includes('android.intent.action.VIEW')) {
+    manifest = manifest.replace(
+      /(<category\s+android:name="android\.intent\.category\.LAUNCHER"\s*\/>\s*<\/intent-filter>)/,
+      '$1\n' + viewIntentFilters
+    );
+    if (!manifest.includes('android.intent.action.VIEW')) {
+      manifest = manifest.replace('</activity>', viewIntentFilters + '\n        </activity>');
+    }
+    console.log('Added ACTION_VIEW (Open With) intent-filters to AndroidManifest.xml!');
+  }
   fs.writeFileSync(manifestPath, manifest, 'utf8');
 
+  // 4. Custom AetherX Dark Splash Themes (No Capacitor Default Logo)
   const bgColorXmlPath = 'android/app/src/main/res/values/ic_launcher_background.xml';
   fs.mkdirSync(path.dirname(bgColorXmlPath), { recursive: true });
   fs.writeFileSync(
@@ -814,10 +1067,11 @@ public class MainActivity extends BridgeActivity {
 `;
   fs.writeFileSync(path.join(v31Dir, 'styles.xml'), stylesV31Xml, 'utf8');
 
+  // 5. Bump versionCode=33, versionName="3.2.1" & Env Signing
   const gradlePath = 'android/app/build.gradle';
   let gradle = fs.readFileSync(gradlePath, 'utf8');
-  gradle = gradle.replace(/versionCode\s+\d+/, 'versionCode 32');
-  gradle = gradle.replace(/versionName\s+"[^"]+"/, 'versionName "3.2.0"');
+  gradle = gradle.replace(/versionCode\s+\d+/, 'versionCode 33');
+  gradle = gradle.replace(/versionName\s+"[^"]+"/, 'versionName "3.2.1"');
 
   if (!gradle.includes('System.getenv("KEYSTORE_PASS")')) {
     gradle = gradle.replace(
@@ -844,7 +1098,7 @@ public class MainActivity extends BridgeActivity {
     gradle = gradle.replace('buildTypes {', signingBlock);
   }
   fs.writeFileSync(gradlePath, gradle, 'utf8');
-  console.log('Patched Android v3.2 native bridge, Print-to-PDF, custom splash & env signing!');
+  console.log('Patched Android v3.2.1 with Open With (ACTION_VIEW), Print-to-PDF, custom splash & env signing!');
 }
 
 if (process.argv.includes('--patch-android')) {
