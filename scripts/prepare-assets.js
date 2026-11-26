@@ -824,6 +824,80 @@ public class NativeStorageBridge {
             return res.toString();
         }
     }
+
+    @JavascriptInterface
+    public String deleteDeviceFile(String filePath) {
+        JSONObject res = new JSONObject();
+        try {
+            if (!hasStoragePermission()) {
+                res.put("ok", false);
+                res.put("error", "Storage permission required");
+                return res.toString();
+            }
+            if (filePath == null || filePath.trim().isEmpty() || filePath.contains("\0")) {
+                res.put("ok", false);
+                res.put("error", "Invalid file path");
+                return res.toString();
+            }
+            File extRoot = Environment.getExternalStorageDirectory();
+            if (extRoot == null) {
+                res.put("ok", false);
+                res.put("error", "Storage unavailable");
+                return res.toString();
+            }
+            String rootCanon = extRoot.getCanonicalPath();
+            File target = new File(filePath);
+            String targetCanon = target.getCanonicalPath();
+            if (!targetCanon.startsWith(rootCanon + File.separator) || targetCanon.equals(rootCanon)) {
+                res.put("ok", false);
+                res.put("error", "Outside storage directory");
+                return res.toString();
+            }
+            if (!target.exists() || !target.isFile()) {
+                res.put("ok", false);
+                res.put("error", "File not found");
+                return res.toString();
+            }
+
+            closeAllPdfSessions();
+            String fileName = target.getName();
+            boolean deleted = target.delete();
+
+            if (!deleted) {
+                try {
+                    int rows = activity.getContentResolver().delete(
+                        MediaStore.Files.getContentUri("external"),
+                        MediaStore.Files.FileColumns.DATA + "=?",
+                        new String[]{ targetCanon }
+                    );
+                    deleted = (rows > 0) || !target.exists();
+                } catch (Exception ignored) {}
+            } else {
+                try {
+                    activity.getContentResolver().delete(
+                        MediaStore.Files.getContentUri("external"),
+                        MediaStore.Files.FileColumns.DATA + "=?",
+                        new String[]{ targetCanon }
+                    );
+                } catch (Exception ignored) {}
+            }
+
+            if (deleted || !target.exists()) {
+                res.put("ok", true);
+                res.put("name", fileName);
+                return res.toString();
+            }
+            res.put("ok", false);
+            res.put("error", "Could not delete file (system protected)");
+            return res.toString();
+        } catch (Exception e) {
+            try {
+                res.put("ok", false);
+                res.put("error", e.getMessage() != null ? e.getMessage() : "Delete failed");
+            } catch (Exception ignored) {}
+            return res.toString();
+        }
+    }
 }
 `;
   fs.writeFileSync(path.join(pkgPath, 'NativeStorageBridge.java'), nativeBridgeJava, 'utf8');
@@ -1070,8 +1144,8 @@ public class MainActivity extends BridgeActivity {
   // 5. Bump versionCode=33, versionName="3.2.1" & Env Signing
   const gradlePath = 'android/app/build.gradle';
   let gradle = fs.readFileSync(gradlePath, 'utf8');
-  gradle = gradle.replace(/versionCode\s+\d+/, 'versionCode 33');
-  gradle = gradle.replace(/versionName\s+"[^"]+"/, 'versionName "3.2.1"');
+  gradle = gradle.replace(/versionCode\s+\d+/, 'versionCode 34');
+  gradle = gradle.replace(/versionName\s+"[^"]+"/, 'versionName "3.2.2"');
 
   if (!gradle.includes('System.getenv("KEYSTORE_PASS")')) {
     gradle = gradle.replace(
@@ -1098,7 +1172,7 @@ public class MainActivity extends BridgeActivity {
     gradle = gradle.replace('buildTypes {', signingBlock);
   }
   fs.writeFileSync(gradlePath, gradle, 'utf8');
-  console.log('Patched Android v3.2.1 with Open With (ACTION_VIEW), Print-to-PDF, custom splash & env signing!');
+  console.log('Patched Android v3.2.2 with Open With (ACTION_VIEW), Print-to-PDF, custom splash & env signing!');
 }
 
 if (process.argv.includes('--patch-android')) {
