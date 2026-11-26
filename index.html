@@ -392,18 +392,147 @@
 
     #toast { position: fixed; left: 50%; bottom: calc(92px + var(--safe-bottom)); transform: translateX(-50%) translateY(18px); background: rgba(11, 18, 34, 0.94); color: #fff; border: 1px solid rgba(56, 189, 248, 0.45); padding: 10px 18px; border-radius: 999px; font-size: 12.5px; font-weight: 600; opacity: 0; pointer-events: none; z-index: 960; transition: all 0.22s ease; max-width: 90vw; text-align: center; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5); }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  
+    /* ==================== v3.2 UNIQUE AETHERX GLASS LOADER & SPLASH ==================== */
+    .splash-orb-wrap {
+      position: relative; width: 92px; height: 92px;
+      display: grid; place-items: center; margin-bottom: 4px;
+    }
+    .splash-orb-ring {
+      position: absolute; inset: 0; border-radius: 28px;
+      border: 2px solid rgba(56, 189, 248, 0.20);
+      border-top-color: #38bdf8; border-right-color: #818cf8;
+      box-shadow: 0 0 28px rgba(56, 189, 248, 0.35), inset 0 0 18px rgba(129, 140, 248, 0.20);
+      animation: axOrbSpin 1.15s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+    }
+    @keyframes axOrbSpin { to { transform: rotate(360deg); } }
+
+    .ax-loader-overlay {
+      position: fixed; inset: 0; z-index: 940;
+      background: rgba(5, 8, 18, 0.80);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px; opacity: 0;
+      transition: opacity 0.22s ease;
+    }
+    .ax-loader-overlay.open { display: flex; opacity: 1; }
+    .ax-loader-card {
+      width: 100%; max-width: 280px; padding: 26px 24px 22px;
+      border-radius: 26px; text-align: center; color: #f8fafc;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(15, 23, 42, 0.84) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 22px 54px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+      animation: certAppear 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .ax-loader-orb {
+      position: relative; width: 68px; height: 68px; margin: 0 auto 14px;
+      display: grid; place-items: center;
+    }
+    .ax-loader-orb::before {
+      content: ""; position: absolute; inset: 0; border-radius: 50%;
+      border: 2.5px solid rgba(56, 189, 248, 0.18);
+      border-top-color: #38bdf8; border-right-color: #a78bfa;
+      animation: axOrbSpin 0.85s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+    }
+    .ax-loader-orb::after {
+      content: ""; position: absolute; inset: 7px; border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.10);
+      border-bottom-color: #34d399;
+      animation: axOrbSpin 1.45s linear infinite reverse;
+    }
+    .ax-loader-crest {
+      font-size: 16px; font-weight: 800; letter-spacing: 1px;
+      background: linear-gradient(135deg, #ffffff 10%, #38bdf8 60%, #c4b5fd 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .ax-loader-title {
+      font-size: 13.5px; font-weight: 700; color: #f8fafc;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ax-loader-sub { font-size: 11.5px; color: #94a3b8; margin-top: 4px; }
+    .ax-loader-shimmer {
+      height: 3px; width: 100%; border-radius: 99px; margin-top: 14px;
+      background: rgba(255, 255, 255, 0.10); overflow: hidden; position: relative;
+    }
+    .ax-loader-shimmer::after {
+      content: ""; position: absolute; top: 0; left: -45%; width: 45%; height: 100%;
+      border-radius: 99px; background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, transparent);
+      animation: axLoadSweep 1.1s ease-in-out infinite;
+    }
+    @keyframes axLoadSweep { 0% { left: -45%; } 100% { left: 105%; } }
+
+    /* ==================== v3.2 SMOOTH SCROLL & PAGE TRANSITIONS ==================== */
+    html { scroll-behavior: smooth; }
+    .file-row {
+      opacity: 0; transform: translate3d(0, 22px, 0) scale(0.975);
+      transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  background 0.16s ease, border-color 0.18s ease;
+      will-change: transform, opacity;
+    }
+    .file-row.in-view { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    .file-row.in-view:active { transform: translate3d(0, 0, 0) scale(0.975); background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.36); }
+
+    @keyframes pageFlipNext {
+      from { opacity: 0.40; filter: brightness(1.06); }
+      to   { opacity: 1;    filter: brightness(1); }
+    }
+    @keyframes pageFlipPrev {
+      from { opacity: 0.40; filter: brightness(0.95); }
+      to   { opacity: 1;    filter: brightness(1); }
+    }
+    .pdf-page-box.flip-next { animation: pageFlipNext 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
+    .pdf-page-box.flip-prev { animation: pageFlipPrev 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
+
+    /* Language Pill Button */
+    .lang-pill-btn {
+      height: 38px; min-width: 44px; padding: 0 11px; border-radius: 13px;
+      border: 1px solid var(--glass-border); background: var(--glass-surface);
+      box-shadow: var(--glass-specular); color: var(--accent);
+      font-family: var(--font-bn); font-size: 12px; font-weight: 800;
+      cursor: pointer; display: grid; place-items: center; flex-shrink: 0;
+      transition: transform 0.12s ease, background 0.16s ease;
+    }
+    .lang-pill-btn:active { transform: scale(0.92); background: rgba(56, 189, 248, 0.20); }
+
+    /* PDF Page Manager List */
+    .pm-list { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; max-height: 280px; overflow-y: auto; padding-right: 2px; }
+    .pm-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 8px 11px; border-radius: 13px;
+      background: var(--glass-pill); border: 1px solid var(--glass-border-soft);
+      font-size: 12.5px;
+    }
+    .pm-rot-badge {
+      padding: 2px 7px; border-radius: 99px; font-size: 10.5px; font-weight: 700;
+      background: rgba(56, 189, 248, 0.18); color: var(--accent);
+    }
+
   </style>
 </head>
 <body>
   <div class="ambient-bg"></div>
 
-  <!-- ==================== 1. SIMPLE SPLASH ==================== -->
+  <!-- ==================== 0. UNIQUE AETHERX GLASS LOADER ==================== -->
+  <div id="axLoader" class="ax-loader-overlay">
+    <div class="ax-loader-card">
+      <div class="ax-loader-orb"><span class="ax-loader-crest">AX</span></div>
+      <div class="ax-loader-title" id="axLoaderTitle">AetherX PDF Reader</div>
+      <div class="ax-loader-sub" id="axLoaderSub" data-i18n="loading">লোড হচ্ছে...</div>
+      <div class="ax-loader-shimmer"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 1. UNIQUE AETHERX GLASS STARTUP SPLASH ==================== -->
   <div id="simpleSplash" class="startup-screen">
     <div class="ambient-bg"></div>
     <div class="simple-splash-box">
-      <div class="splash-emblem"><img src="./app-icon.png" alt="AetherX" onerror="this.style.display='none'" /></div>
+      <div class="splash-orb-wrap">
+        <div class="splash-orb-ring"></div>
+        <div class="splash-emblem"><img src="./app-icon.png" alt="AetherX" onerror="this.style.display='none'" /></div>
+      </div>
       <div class="splash-owner-name" id="splashOwnerLabel">AetherX PDF Reader</div>
-      <div class="splash-sub">অফলাইন ও নিরাপদ • লোড হচ্ছে...</div>
+      <div class="splash-sub" data-i18n="splash_sub">১০০% অফলাইন • গ্লাস ইঞ্জিন প্রস্তুত হচ্ছে...</div>
       <div class="splash-bar-track"><div class="splash-bar-fill"></div></div>
     </div>
   </div>
@@ -484,13 +613,13 @@
       <div class="perm-shield-ico">
         <svg class="ic" style="width:32px;height:32px;" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
       </div>
-      <h2>স্টোরেজ পারমিশন প্রয়োজন</h2>
-      <p>আপনার ডিভাইসের সকল PDF, DOCX, RTF ও ডকুমেন্ট ফাইল অটোমেটিক দেখাতে স্টোরেজ অ্যাক্সেস অনুমতি দিন। কোনো ফাইল ইন্টারনেটে যায় না।</p>
+      <h2 data-i18n="perm_title">স্টোরেজ পারমিশন প্রয়োজন</h2>
+      <p data-i18n="perm_desc">আপনার ডিভাইসের সকল PDF, DOCX, RTF ও ডকুমেন্ট ফাইল অটোমেটিক দেখাতে স্টোরেজ অ্যাক্সেস অনুমতি দিন। কোনো ফাইল ইন্টারনেটে যায় না।</p>
       <button class="btn btn-primary" id="gateGrantBtn" style="width:100%; padding:13px;">
         <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        অনুমতি দিন (Allow Access)
+        <span data-i18n="perm_allow">অনুমতি দিন (Allow Access)</span>
       </button>
-      <button class="perm-skip-link" id="gateManualSkipBtn">পরে দেব • ম্যানুয়ালি ফাইল বাছুন</button>
+      <button class="perm-skip-link" id="gateManualSkipBtn" data-i18n="perm_skip">পরে দেব • ম্যানুয়ালি ফাইল বাছুন</button>
     </div>
   </div>
 
@@ -506,11 +635,12 @@
               <svg class="ic ic-sm" style="fill:rgba(251,191,36,0.22);" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             </span>
           </div>
-          <small id="brandSubtitle">১০০% অফলাইন ও নিরাপদ • v3.1.1</small>
+          <small id="brandSubtitle" data-i18n="subtitle">১০০% অফলাইন ও নিরাপদ • v3.2</small>
         </div>
       </div>
-      <div style="display:flex; gap:8px;">
-        <button class="icon-btn" id="rescanBtn" title="ফাইল রিফ্রেশ">
+      <div style="display:flex; gap:7px; align-items:center;">
+        <button class="lang-pill-btn" id="langToggleBtn" title="Switch Language">EN</button>
+        <button class="icon-btn" id="rescanBtn" title="Refresh Files">
           <svg class="ic" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         </button>
         <button class="icon-btn" id="themeToggle" title="থিম বদলান">
@@ -530,31 +660,31 @@
           <div class="section-head">
             <h2 class="section-title">
               <svg class="ic" style="color:var(--accent);" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-              আমার ফাইল লাইব্রেরি
+              <span data-i18n="lib_title">আমার ফাইল লাইব্রেরি</span>
             </h2>
             <label class="btn btn-primary btn-sm" for="readerFileInput" style="margin:0;">
               <svg class="ic ic-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              ফাইল বাছুন
+              <span data-i18n="pick_file">ফাইল বাছুন</span>
             </label>
             <input type="file" id="readerFileInput" accept=".pdf,.docx,.doc,.rtf,.txt,.md,.html,.htm,.csv,image/*" />
           </div>
 
           <div id="scanProgressStrip" class="status-strip">
-            <span>ব্যাকগ্রাউন্ডে ডকুমেন্ট স্ক্যান চলছে...</span>
+            <span data-i18n="scanning_bg">ব্যাকগ্রাউন্ডে ডকুমেন্ট স্ক্যান চলছে...</span>
             <span class="badge">অফলাইন</span>
           </div>
 
           <div class="search-wrap">
             <svg class="ic ic-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="librarySearch" class="search-input" placeholder="PDF, DOCX, RTF বা যেকোনো ফাইলের নাম খুঁজুন..." />
+            <input type="text" id="librarySearch" class="search-input" data-i18n-ph="search_ph" placeholder="PDF, DOCX, RTF বা যেকোনো ফাইলের নাম খুঁজুন..." />
           </div>
 
           <div class="chips-row" id="filterChips">
-            <button class="chip active" data-filter="all">সব ফাইল (<span id="countAll">0</span>)</button>
+            <button class="chip active" data-filter="all"><span data-i18n="chip_all">সব ফাইল</span> (<span id="countAll">0</span>)</button>
             <button class="chip" data-filter="pdf">PDF</button>
             <button class="chip" data-filter="docx">DOCX / DOC</button>
             <button class="chip" data-filter="rtf">RTF</button>
-            <button class="chip" data-filter="txt">TXT / অন্যান্য</button>
+            <button class="chip" data-filter="txt" data-i18n="chip_other">TXT / অন্যান্য</button>
           </div>
 
           <div id="autoFileList" class="file-list">
@@ -570,10 +700,10 @@
       <!-- ==================== TAB 2: EDITOR ==================== -->
       <section id="view-editor" class="view">
         <div id="recoveryStrip" class="status-strip" style="background:rgba(251,191,36,0.14); border-color:rgba(251,191,36,0.42);">
-          <span>অসম্পূর্ণ ড্রাফট রিকভারি পাওয়া গেছে।</span>
+          <span data-i18n="recovery_found">অসম্পূর্ণ ড্রাফট রিকভারি পাওয়া গেছে।</span>
           <div style="display:flex; gap:6px;">
-            <button class="btn btn-primary btn-sm" id="restoreRecoveryBtn">রিকভার করুন</button>
-            <button class="btn btn-sm" id="dismissRecoveryBtn">বাদ দিন</button>
+            <button class="btn btn-primary btn-sm" id="restoreRecoveryBtn" data-i18n="btn_recover">রিকভার করুন</button>
+            <button class="btn btn-sm" id="dismissRecoveryBtn" data-i18n="btn_dismiss">বাদ দিন</button>
           </div>
         </div>
 
@@ -581,19 +711,24 @@
           <div class="section-head">
             <h2 class="section-title">
               <svg class="ic" style="color:var(--accent);" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              ডকুমেন্ট এডিটর ও PDF মেকার
+              <span data-i18n="editor_title">ডকুমেন্ট এডিটর ও PDF মেকার</span>
             </h2>
-            <span class="badge" id="autoSaveBadge">অটো-সেভ চালু</span>
+            <span class="badge" id="autoSaveBadge" data-i18n="autosave_on">অটো-সেভ চালু</span>
           </div>
 
           <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
-            <input type="text" id="docTitleInput" class="input" placeholder="ডকুমেন্টের নাম (যেমন: BCS_Note)" style="flex:1; min-width:170px;" />
-            <select id="templateSelect" style="width:auto; min-width:140px;">
-              <option value="">টেমপ্লেট বাছুন...</option>
-              <option value="mcq">MCQ প্রশ্নপত্র</option>
-              <option value="assignment">অ্যাসাইনমেন্ট কভার</option>
-              <option value="application">বাংলা আবেদনপত্র</option>
-              <option value="notes">ক্লাস নোট</option>
+            <input type="text" id="docTitleInput" class="input" data-i18n-ph="doc_name_ph" placeholder="ডকুমেন্টের নাম (যেমন: BCS_Note)" style="flex:1; min-width:155px;" />
+            <select id="editorFontSelect" style="width:auto; min-width:130px;">
+              <option value="noto">Noto Sans Bengali</option>
+              <option value="hind">Hind Siliguri</option>
+              <option value="system">System Font</option>
+            </select>
+            <select id="templateSelect" style="width:auto; min-width:135px;">
+              <option value="" data-i18n="tpl_choose">টেমপ্লেট বাছুন...</option>
+              <option value="mcq" data-i18n="tpl_mcq">MCQ প্রশ্নপত্র</option>
+              <option value="assignment" data-i18n="tpl_assign">অ্যাসাইনমেন্ট কভার</option>
+              <option value="application" data-i18n="tpl_app">বাংলা আবেদনপত্র</option>
+              <option value="notes" data-i18n="tpl_notes">ক্লাস নোট</option>
             </select>
           </div>
 
@@ -603,12 +738,12 @@
             <button class="tool-btn" data-cmd="underline"><u>U</u></button>
             <button class="tool-btn" data-cmd="formatBlock" data-val="H2">H2</button>
             <button class="tool-btn" data-cmd="formatBlock" data-val="P">P</button>
-            <button class="tool-btn" data-cmd="insertUnorderedList">তালিকা</button>
-            <button class="tool-btn" data-cmd="insertOrderedList">ক্রম</button>
-            <button class="tool-btn" data-cmd="justifyLeft">বামে</button>
-            <button class="tool-btn" data-cmd="justifyCenter">মাঝে</button>
-            <button class="tool-btn" id="insertTableBtn">টেবিল</button>
-            <label class="tool-btn" for="editorImgInput" style="margin:0;">ছবি</label>
+            <button class="tool-btn" data-cmd="insertUnorderedList" data-i18n="ed_list">তালিকা</button>
+            <button class="tool-btn" data-cmd="insertOrderedList" data-i18n="ed_num">ক্রম</button>
+            <button class="tool-btn" data-cmd="justifyLeft" data-i18n="ed_left">বামে</button>
+            <button class="tool-btn" data-cmd="justifyCenter" data-i18n="ed_center">মাঝে</button>
+            <button class="tool-btn" id="insertTableBtn" data-i18n="ed_table">টেবিল</button>
+            <label class="tool-btn" for="editorImgInput" style="margin:0;" data-i18n="ed_img">ছবি</label>
             <input type="file" id="editorImgInput" accept="image/*" />
           </div>
 
@@ -618,42 +753,66 @@
           </div>
 
           <div class="btn-row">
-            <button class="btn btn-primary" id="exportPdfBtn">PDF বানান</button>
-            <button class="btn btn-success" id="exportWordBtn">Word (.doc)</button>
+            <button class="btn btn-primary" id="exportSearchablePdfBtn" data-i18n="btn_pdf_vec">সার্চেবল PDF</button>
+            <button class="btn" id="exportPdfBtn" data-i18n="btn_pdf_img">ইমেজ PDF</button>
+            <button class="btn btn-success" id="exportWordBtn" data-i18n="btn_docx">আসল DOCX</button>
             <button class="btn" id="exportTxtBtn">TXT</button>
-            <button class="btn" id="saveDraftBtn">ড্রাফট সেভ</button>
+            <button class="btn" id="saveDraftBtn" data-i18n="btn_draft">ড্রাফট সেভ</button>
           </div>
         </div>
 
         <div class="glass-card">
           <div class="section-head">
-            <h3 class="section-title">সেভ করা ড্রাফটসমূহ (IndexedDB)</h3>
-            <small id="draftCount" style="color:var(--text-muted); font-weight:600;">০টি</small>
+            <h3 class="section-title" data-i18n="saved_drafts_title">সেভ করা ড্রাফটসমূহ (IndexedDB)</h3>
+            <small id="draftCount" style="color:var(--text-muted); font-weight:600;">0</small>
           </div>
           <div id="draftList" class="item-list"></div>
         </div>
       </section>
 
-      <!-- ==================== TAB 3: PDF TOOLS & OFFLINE BACKUP ==================== -->
+      <!-- ==================== TAB 3: PDF TOOLS, PAGE MANAGER & SETTINGS ==================== -->
       <section id="view-tools" class="view">
+        <!-- PDF Page Manager (Rotate / Reorder / Delete) -->
+        <div class="glass-card">
+          <div class="section-head">
+            <h2 class="section-title">
+              <svg class="ic" style="color:var(--accent);" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              <span data-i18n="pm_title">PDF পেজ ম্যানেজার (Rotate / Reorder / Delete)</span>
+            </h2>
+            <span class="badge">v3.2</span>
+          </div>
+          <p class="subtitle" data-i18n="pm_desc">বাঁকা পেজ ৯০° ঘোরান, পেজের ক্রম বদলান বা অপ্রয়োজনীয় পেজ বাদ দিয়ে মূল PDF অক্ষত রেখে নতুন কপি সেভ করুন।</p>
+          <label class="upload-box" for="pmPdfInput">
+            <div class="up-ico"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <strong id="pmFileLabel" data-i18n="pm_pick">একটি PDF ফাইল নির্বাচন করুন</strong>
+            <span id="pmPageInfo" data-i18n="pm_hint">পেজ তালিকা এখানে দেখাবে</span>
+          </label>
+          <input type="file" id="pmPdfInput" accept=".pdf" />
+          <div id="pmPageList" class="pm-list"></div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="pmExportBtn" data-i18n="pm_export">পরিবর্তিত কপি সেভ করুন</button>
+            <button class="btn" id="pmResetBtn" data-i18n="pm_reset">রিসেট</button>
+          </div>
+        </div>
+
         <div class="glass-card">
           <div class="section-head">
             <h2 class="section-title">
               <svg class="ic" style="color:var(--accent);" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              ছবি থেকে PDF (Auto Portrait/Landscape)
+              <span data-i18n="img_pdf_title">ছবি থেকে PDF (Auto Portrait/Landscape)</span>
             </h2>
           </div>
-          <p class="subtitle">প্রতিটি ছবির অনুপাত বুঝে স্বয়ংক্রিয়ভাবে Portrait বা Landscape A4 পেজ সাজিয়ে পরিষ্কার PDF তৈরি করবে।</p>
+          <p class="subtitle" data-i18n="img_pdf_desc">প্রতিটি ছবির অনুপাত বুঝে স্বয়ংক্রিয়ভাবে Portrait বা Landscape A4 পেজ সাজিয়ে পরিষ্কার PDF তৈরি করবে।</p>
           <label class="upload-box" for="imgToPdfInput">
             <div class="up-ico"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-            <strong>একাধিক ছবি নির্বাচন করুন</strong>
-            <span>JPG, PNG বা WebP ফরম্যাট</span>
+            <strong data-i18n="img_pdf_pick">একাধিক ছবি নির্বাচন করুন</strong>
+            <span>JPG, PNG, WebP</span>
           </label>
           <input type="file" id="imgToPdfInput" accept="image/*" multiple />
           <div id="imgThumbGrid" class="thumb-grid"></div>
           <div class="btn-row">
-            <button class="btn btn-primary" id="buildImgPdfBtn">ছবিগুলো PDF করুন</button>
-            <button class="btn btn-danger" id="clearImgPdfBtn">সব মুছুন</button>
+            <button class="btn btn-primary" id="buildImgPdfBtn" data-i18n="img_pdf_btn">ছবিগুলো PDF করুন</button>
+            <button class="btn btn-danger" id="clearImgPdfBtn" data-i18n="btn_clear_all">সব মুছুন</button>
           </div>
         </div>
 
@@ -661,20 +820,20 @@
           <div class="section-head">
             <h2 class="section-title">
               <svg class="ic" style="color:var(--accent);" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              একাধিক PDF জোড়া লাগান (Merge)
+              <span data-i18n="merge_title">একাধিক PDF জোড়া লাগান (Merge)</span>
             </h2>
           </div>
-          <p class="subtitle">একাধিক PDF ফাইল পছন্দমতো ক্রমে সাজিয়ে একটি ফাইলে জুড়ে নিন (লক করা PDF হলে সতর্কবার্তা দেবে)।</p>
+          <p class="subtitle" data-i18n="merge_desc">একাধিক PDF ফাইল পছন্দমতো ক্রমে সাজিয়ে একটি ফাইলে জুড়ে নিন (লক করা PDF হলে সতর্কবার্তা দেবে)।</p>
           <label class="upload-box" for="mergePdfInput">
             <div class="up-ico"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
-            <strong>PDF ফাইলগুলো সিলেক্ট করুন</strong>
-            <span>উপর-নিচ বাটন দিয়ে অর্ডার বদলানো যাবে</span>
+            <strong data-i18n="merge_pick">PDF ফাইলগুলো সিলেক্ট করুন</strong>
+            <span data-i18n="merge_hint">উপর-নিচ বাটন দিয়ে অর্ডার বদলানো যাবে</span>
           </label>
           <input type="file" id="mergePdfInput" accept=".pdf" multiple />
           <div id="mergeFileList" class="item-list"></div>
           <div class="btn-row">
-            <button class="btn btn-primary" id="mergePdfBtn">Merge করে সেভ করুন</button>
-            <button class="btn btn-danger" id="clearMergeBtn">তালিকা মুছুন</button>
+            <button class="btn btn-primary" id="mergePdfBtn" data-i18n="merge_btn">Merge করে সেভ করুন</button>
+            <button class="btn btn-danger" id="clearMergeBtn" data-i18n="btn_clear_list">তালিকা মুছুন</button>
           </div>
         </div>
 
@@ -682,36 +841,44 @@
           <div class="section-head">
             <h2 class="section-title">
               <svg class="ic" style="color:var(--accent);" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
-              PDF পেজ আলাদা করুন (Split)
+              <span data-i18n="split_title">PDF পেজ আলাদা করুন (Split)</span>
             </h2>
           </div>
-          <p class="subtitle">শুধু প্রয়োজনীয় পেজ নম্বর দিন (যেমন: 1-3, 5)। ভুল বা উল্টো রেঞ্জ (যেমন: 8-3) অটো বাতিল হবে।</p>
+          <p class="subtitle" data-i18n="split_desc">শুধু প্রয়োজনীয় পেজ নম্বর দিন (যেমন: 1-3, 5)। ভুল বা উল্টো রেঞ্জ (যেমন: 8-3) অটো বাতিল হবে।</p>
           <label class="upload-box" for="splitPdfInput">
             <div class="up-ico"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-            <strong id="splitFileLabel">একটি PDF ফাইল বাছুন</strong>
-            <span id="splitPageCount">পেজ সংখ্যা এখানে দেখাবে</span>
+            <strong id="splitFileLabel" data-i18n="split_pick">একটি PDF ফাইল বাছুন</strong>
+            <span id="splitPageCount" data-i18n="split_hint">পেজ সংখ্যা এখানে দেখাবে</span>
           </label>
           <input type="file" id="splitPdfInput" accept=".pdf" />
           <div style="margin-top:10px;">
-            <input type="text" id="splitRangeInput" class="input" placeholder="পেজ নম্বর লিখুন (যেমন: 1-3, 5, 7-8)" />
+            <input type="text" id="splitRangeInput" class="input" data-i18n-ph="split_ph" placeholder="পেজ নম্বর লিখুন (যেমন: 1-3, 5, 7-8)" />
           </div>
           <div class="btn-row">
-            <button class="btn btn-primary" id="splitPdfBtn">আলাদা PDF বানান</button>
+            <button class="btn btn-primary" id="splitPdfBtn" data-i18n="split_btn">আলাদা PDF বানান</button>
           </div>
         </div>
 
+        <!-- Settings, Language Selector, Offline Backup & Diagnostics -->
         <div class="glass-card">
           <div class="section-head">
-            <h3 class="section-title">অফলাইন ডেটা ব্যাকআপ ও ডায়াগনস্টিকস</h3>
+            <h3 class="section-title" data-i18n="settings_title">সেটিংস, ভাষা ও অফলাইন ব্যাকআপ</h3>
             <span class="badge" id="storageUsedBadge">IndexedDB</span>
           </div>
-          <p class="subtitle">আপনার সব ড্রাফট, স্টিকি নোট ও PDF হাইলাইট-দাগ ১০০% অফলাইনে ফোনে ব্যাকআপ ও রিস্টোর করুন।</p>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border-radius:14px; background:var(--glass-pill); border:1px solid var(--glass-border-soft); margin-bottom:10px;">
+            <span style="font-size:13px; font-weight:600;" data-i18n="lang_label">অ্যাপের ভাষা (App Language)</span>
+            <select id="settingsLangSelect" style="width:auto; min-width:130px; padding:7px 10px;">
+              <option value="bn">বাংলা (Bangla)</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <p class="subtitle" data-i18n="backup_desc">আপনার সব ড্রাফট, স্টিকি নোট ও PDF হাইলাইট-দাগ ১০০% অফলাইনে ফোনে ব্যাকআপ ও রিস্টোর করুন।</p>
           <div class="btn-row" style="margin-top:6px;">
-            <button class="btn btn-primary btn-sm" id="exportBackupBtn">ব্যাকআপ সেভ (.json)</button>
-            <label class="btn btn-success btn-sm" for="importBackupInput" style="margin:0;">ব্যাকআপ রিস্টোর</label>
+            <button class="btn btn-primary btn-sm" id="exportBackupBtn" data-i18n="btn_backup_save">ব্যাকআপ সেভ (.json)</button>
+            <label class="btn btn-success btn-sm" for="importBackupInput" style="margin:0;" data-i18n="btn_backup_restore">ব্যাকআপ রিস্টোর</label>
             <input type="file" id="importBackupInput" accept=".json,application/json" />
-            <button class="btn btn-sm" id="exportErrorLogBtn">এরর লগ এক্সপোর্ট</button>
-            <button class="btn btn-danger btn-sm" id="clearAllStorageBtn">সব ডেটা মুছুন</button>
+            <button class="btn btn-sm" id="exportErrorLogBtn" data-i18n="btn_err_log">এরর লগ এক্সপোর্ট</button>
+            <button class="btn btn-danger btn-sm" id="clearAllStorageBtn" data-i18n="btn_clear_storage">সব ডেটা মুছুন</button>
           </div>
         </div>
       </section>
@@ -722,24 +889,24 @@
           <div class="section-head">
             <h2 class="section-title">
               <svg class="ic" style="color:var(--accent);" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
-              বিজয় → ইউনিকোড বাংলা কনভার্টার
+              <span data-i18n="bijoy_title">বিজয় → ইউনিকোড বাংলা কনভার্টার</span>
             </h2>
-            <span class="badge">বাক্স ফন্ট ফিক্স</span>
+            <span class="badge" data-i18n="bijoy_badge">বাক্স ফন্ট ফিক্স</span>
           </div>
-          <p class="subtitle">পুরনো বিজয় (SutonnyMJ) ফন্টে লেখা প্রশ্ন এখানে পেস্ট করে ১ ক্লিকে পরিষ্কার বাংলা করুন।</p>
-          <textarea id="bijoyInput" placeholder="বিজয় ফন্টের হিজিবিজি টেক্সট এখানে পেস্ট করুন..."></textarea>
+          <p class="subtitle" data-i18n="bijoy_desc">পুরনো বিজয় (SutonnyMJ) ফন্টে লেখা প্রশ্ন এখানে পেস্ট করে ১ ক্লিকে পরিষ্কার বাংলা করুন।</p>
+          <textarea id="bijoyInput" data-i18n-ph="bijoy_in_ph" placeholder="বিজয় ফন্টের হিজিবিজি টেক্সট এখানে পেস্ট করুন..."></textarea>
           <div class="btn-row">
-            <button class="btn btn-primary" id="convertBijoyBtn">ইউনিকোড বাংলা করুন</button>
-            <button class="btn" id="clearBijoyBtn">মুছুন</button>
+            <button class="btn btn-primary" id="convertBijoyBtn" data-i18n="bijoy_conv_btn">ইউনিকোড বাংলা করুন</button>
+            <button class="btn" id="clearBijoyBtn" data-i18n="btn_clear">মুছুন</button>
           </div>
         </div>
 
         <div class="glass-card">
-          <div class="section-head"><h3 class="section-title">পরিষ্কার ইউনিকোড বাংলা আউটপুট</h3></div>
-          <textarea id="unicodeOutput" placeholder="রূপান্তরিত বাংলা লেখা এখানে দেখাবে..."></textarea>
+          <div class="section-head"><h3 class="section-title" data-i18n="bijoy_out_title">পরিষ্কার ইউনিকোড বাংলা আউটপুট</h3></div>
+          <textarea id="unicodeOutput" data-i18n-ph="bijoy_out_ph" placeholder="রূপান্তরিত বাংলা লেখা এখানে দেখাবে..."></textarea>
           <div class="btn-row">
-            <button class="btn btn-success" id="copyUnicodeBtn">কপি করুন</button>
-            <button class="btn btn-primary" id="unicodeToEditorBtn">এডিটরে নিয়ে PDF বানান</button>
+            <button class="btn btn-success" id="copyUnicodeBtn" data-i18n="btn_copy">কপি করুন</button>
+            <button class="btn btn-primary" id="unicodeToEditorBtn" data-i18n="btn_to_editor">এডিটরে নিয়ে PDF বানান</button>
           </div>
         </div>
       </section>
@@ -750,19 +917,19 @@
       <nav class="bottom-nav">
         <button class="nav-btn active" data-tab="reader">
           <svg class="ic" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          <span>লাইব্রেরি</span>
+          <span data-i18n="tab_reader">লাইব্রেরি</span>
         </button>
         <button class="nav-btn" data-tab="editor">
           <svg class="ic" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-          <span>এডিটর</span>
+          <span data-i18n="tab_editor">এডিটর</span>
         </button>
         <button class="nav-btn" data-tab="tools">
           <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
-          <span>PDF টুলস</span>
+          <span data-i18n="tab_tools">PDF টুলস</span>
         </button>
         <button class="nav-btn" data-tab="bijoy">
           <svg class="ic" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
-          <span>বিজয় ফিক্স</span>
+          <span data-i18n="tab_bijoy">বিজয় ফিক্স</span>
         </button>
       </nav>
     </div>
@@ -782,7 +949,10 @@
         <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
       </button>
       <button class="hud-btn" id="fsBijoyFixBtn" style="display:none; width:auto; padding:0 10px; font-size:11px; font-weight:700;">বাংলা ফিক্স</button>
-      <button class="hud-btn" id="fsNightBtn" title="নাইট মোড">
+      <button class="hud-btn" id="fsSoundBtn" style="display:none;" title="Page Turn Sound">
+        <svg class="ic ic-sm" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      </button>
+      <button class="hud-btn" id="fsNightBtn" title="Night Mode">
         <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
     </div>
@@ -803,19 +973,19 @@
         <div class="dock-grid">
           <button class="dock-item active" id="toolReadBtn">
             <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
-            <span>পড়া</span>
+            <span data-i18n="tool_read">পড়া</span>
           </button>
           <button class="dock-item" id="toolHighlightBtn">
             <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
-            <span>হাইলাইট</span>
+            <span data-i18n="tool_hl">হাইলাইট</span>
           </button>
           <button class="dock-item" id="toolPenBtn">
             <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            <span>কলম</span>
+            <span data-i18n="tool_pen">কলম</span>
           </button>
           <button class="dock-item" id="toolNoteBtn">
             <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <span>নোট</span>
+            <span data-i18n="tool_note">নোট</span>
           </button>
         </div>
 
@@ -844,13 +1014,17 @@
         <div class="dock-grid">
           <button class="dock-item" id="toolUndoBtn">
             <svg class="ic ic-sm" viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-            <span>আনডু</span>
+            <span data-i18n="tool_undo">আনডু</span>
           </button>
-          <button class="dock-item" id="toolSavePageBtn" title="পেজ ছবি সেভ (PNG)">
+          <button class="dock-item" id="toolSavePageBtn" title="Page PNG">
             <svg class="ic ic-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span>পেজ PNG</span>
+            <span data-i18n="tool_png">পেজ PNG</span>
           </button>
         </div>
+        <button class="dock-item active" id="toolSaveAnnotatedPdfBtn" style="width:100%; height:38px;">
+          <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span data-i18n="tool_save_pdf">দাগানো PDF সেভ</span>
+        </button>
       </div>
 
       <button id="sideFabToggle" class="side-fab" title="হাইলাইট, কলম ও নোট">
@@ -931,6 +1105,151 @@
 
   <script>
     const $ = (id) => document.getElementById(id);
+
+    // ==================== v3.2 CENTRALIZED BANGLA & ENGLISH LOCALIZATION (BN / EN) ====================
+    const I18N = {
+      bn: {
+        subtitle: '১০০% অফলাইন ও নিরাপদ • v3.2',
+        owner_sub: 'AetherX PDF Reader • Official Owner',
+        splash_sub: '১০০% অফলাইন • গ্লাস ইঞ্জিন প্রস্তুত হচ্ছে...',
+        loading: 'লোড হচ্ছে...', opening_pdf: 'PDF প্রস্তুত হচ্ছে...', exporting_pdf: 'PDF তৈরি হচ্ছে...',
+        perm_title: 'স্টোরেজ পারমিশন প্রয়োজন',
+        perm_desc: 'আপনার ডিভাইসের সকল PDF, DOCX, RTF ও ডকুমেন্ট ফাইল অটোমেটিক দেখাতে স্টোরেজ অ্যাক্সেস অনুমতি দিন। কোনো ফাইল ইন্টারনেটে যায় না।',
+        perm_allow: 'অনুমতি দিন (Allow Access)', perm_skip: 'পরে দেব • ম্যানুয়ালি ফাইল বাছুন',
+        tab_reader: 'লাইব্রেরি', tab_editor: 'এডিটর', tab_tools: 'PDF টুলস', tab_bijoy: 'বিজয় ফিক্স',
+        lib_title: 'আমার ফাইল লাইব্রেরি', pick_file: 'ফাইল বাছুন',
+        scanning_bg: 'ব্যাকগ্রাউন্ডে ডকুমেন্ট স্ক্যান চলছে...',
+        search_ph: 'PDF, DOCX, RTF বা যেকোনো ফাইলের নাম খুঁজুন...',
+        chip_all: 'সব ফাইল', chip_other: 'TXT / অন্যান্য',
+        load_more: 'আরো ফাইল দেখুন',
+        no_match: 'খোঁজার সাথে মিলে এমন কোনো ফাইল পাওয়া যায়নি।',
+        no_files: 'কোনো ফাইল পাওয়া যায়নি। উপরের <b>"ফাইল বাছুন"</b> বাটনে ট্যাপ করে যেকোনো ফাইল খুলতে পারেন।',
+        recovery_found: 'অসম্পূর্ণ ড্রাফট রিকভারি পাওয়া গেছে।',
+        btn_recover: 'রিকভার করুন', btn_dismiss: 'বাদ দিন',
+        editor_title: 'ডকুমেন্ট এডিটর ও PDF মেকার', autosave_on: 'অটো-সেভ চালু', autosave_saving: 'সেভ হচ্ছে...', autosave_done: 'অটো-সেভ সম্পন্ন',
+        doc_name_ph: 'ডকুমেন্টের নাম (যেমন: BCS_Note)',
+        tpl_choose: 'টেমপ্লেট বাছুন...', tpl_mcq: 'MCQ প্রশ্নপত্র', tpl_assign: 'অ্যাসাইনমেন্ট কভার', tpl_app: 'বাংলা আবেদনপত্র', tpl_notes: 'ক্লাস নোট',
+        ed_list: 'তালিকা', ed_num: 'ক্রম', ed_left: 'বামে', ed_center: 'মাঝে', ed_table: 'টেবিল', ed_img: 'ছবি',
+        btn_pdf_vec: 'সার্চেবল PDF', btn_pdf_img: 'ইমেজ PDF', btn_docx: 'আসল DOCX', btn_draft: 'ড্রাফট সেভ',
+        saved_drafts_title: 'সেভ করা ড্রাফটসমূহ (IndexedDB)',
+        pm_title: 'PDF পেজ ম্যানেজার (Rotate / Reorder / Delete)',
+        pm_desc: 'বাঁকা পেজ ৯০° ঘোরান, পেজের ক্রম বদলান বা অপ্রয়োজনীয় পেজ বাদ দিয়ে মূল PDF অক্ষত রেখে নতুন কপি সেভ করুন।',
+        pm_pick: 'একটি PDF ফাইল নির্বাচন করুন', pm_hint: 'পেজ তালিকা এখানে দেখাবে',
+        pm_export: 'পরিবর্তিত কপি সেভ করুন', pm_reset: 'রিসেট',
+        img_pdf_title: 'ছবি থেকে PDF (Auto Portrait/Landscape)',
+        img_pdf_desc: 'প্রতিটি ছবির অনুপাত বুঝে স্বয়ংক্রিয়ভাবে Portrait বা Landscape A4 পেজ সাজিয়ে পরিষ্কার PDF তৈরি করবে।',
+        img_pdf_pick: 'একাধিক ছবি নির্বাচন করুন', img_pdf_btn: 'ছবিগুলো PDF করুন', btn_clear_all: 'সব মুছুন',
+        merge_title: 'একাধিক PDF জোড়া লাগান (Merge)',
+        merge_desc: 'একাধিক PDF ফাইল পছন্দমতো ক্রমে সাজিয়ে একটি ফাইলে জুড়ে নিন (লক করা PDF হলে সতর্কবার্তা দেবে)।',
+        merge_pick: 'PDF ফাইলগুলো সিলেক্ট করুন', merge_hint: 'উপর-নিচ বাটন দিয়ে অর্ডার বদলানো যাবে',
+        merge_btn: 'Merge করে সেভ করুন', btn_clear_list: 'তালিকা মুছুন',
+        split_title: 'PDF পেজ আলাদা করুন (Split)',
+        split_desc: 'শুধু প্রয়োজনীয় পেজ নম্বর দিন (যেমন: 1-3, 5)। ভুল বা উল্টো রেঞ্জ (যেমন: 8-3) অটো বাতিল হবে।',
+        split_pick: 'একটি PDF ফাইল বাছুন', split_hint: 'পেজ সংখ্যা এখানে দেখাবে',
+        split_ph: 'পেজ নম্বর লিখুন (যেমন: 1-3, 5, 7-8)', split_btn: 'আলাদা PDF বানান',
+        settings_title: 'সেটিংস, ভাষা ও অফলাইন ব্যাকআপ', lang_label: 'অ্যাপের ভাষা (App Language)',
+        backup_desc: 'আপনার সব ড্রাফট, স্টিকি নোট ও PDF হাইলাইট-দাগ ১০০% অফলাইনে ফোনে ব্যাকআপ ও রিস্টোর করুন।',
+        btn_backup_save: 'ব্যাকআপ সেভ (.json)', btn_backup_restore: 'ব্যাকআপ রিস্টোর',
+        btn_err_log: 'এরর লগ এক্সপোর্ট', btn_clear_storage: 'সব ডেটা মুছুন',
+        bijoy_title: 'বিজয় → ইউনিকোড বাংলা কনভার্টার', bijoy_badge: 'বাক্স ফন্ট ফিক্স',
+        bijoy_desc: 'পুরনো বিজয় (SutonnyMJ) ফন্টে লেখা প্রশ্ন এখানে পেস্ট করে ১ ক্লিকে পরিষ্কার বাংলা করুন।',
+        bijoy_in_ph: 'বিজয় ফন্টের হিজিবিজি টেক্সট এখানে পেস্ট করুন...', bijoy_conv_btn: 'ইউনিকোড বাংলা করুন',
+        btn_clear: 'মুছুন', bijoy_out_title: 'পরিষ্কার ইউনিকোড বাংলা আউটপুট',
+        bijoy_out_ph: 'রূপান্তরিত বাংলা লেখা এখানে দেখাবে...', btn_copy: 'কপি করুন', btn_to_editor: 'এডিটরে নিয়ে PDF বানান',
+        tool_read: 'পড়া', tool_hl: 'হাইলাইট', tool_pen: 'কলম', tool_note: 'নোট',
+        tool_undo: 'আনডু', tool_png: 'পেজ PNG', tool_save_pdf: 'দাগানো PDF সেভ',
+        sound_on: 'পাতা উল্টানোর শব্দ চালু', sound_off: 'পাতা উল্টানোর শব্দ বন্ধ',
+        print_hint: 'প্রিন্ট স্ক্রিন থেকে "Save as PDF" সিলেক্ট করে সেভ করুন',
+        docx_saved: 'আসল DOCX ফাইল তৈরি হয়েছে!'
+      },
+      en: {
+        subtitle: '100% Offline & Secure • v3.2',
+        owner_sub: 'AetherX PDF Reader • Official Owner',
+        splash_sub: '100% Offline • Starting Glass Engine...',
+        loading: 'Loading...', opening_pdf: 'Opening PDF...', exporting_pdf: 'Generating PDF...',
+        perm_title: 'Storage Permission Required',
+        perm_desc: 'Allow storage access to automatically list all PDF, DOCX, RTF, and documents on your device. No files ever leave your phone.',
+        perm_allow: 'Allow Access', perm_skip: 'Later • Pick File Manually',
+        tab_reader: 'Library', tab_editor: 'Editor', tab_tools: 'PDF Tools', tab_bijoy: 'Bijoy Fix',
+        lib_title: 'My File Library', pick_file: 'Pick File',
+        scanning_bg: 'Scanning documents in background...',
+        search_ph: 'Search PDF, DOCX, RTF or any file...',
+        chip_all: 'All Files', chip_other: 'TXT / Other',
+        load_more: 'Load More Files',
+        no_match: 'No files match your search.',
+        no_files: 'No documents found. Tap <b>"Pick File"</b> above to open any file manually.',
+        recovery_found: 'Unsaved editor draft recovery found.',
+        btn_recover: 'Recover', btn_dismiss: 'Dismiss',
+        editor_title: 'Document Editor & PDF Maker', autosave_on: 'Auto-Save ON', autosave_saving: 'Saving...', autosave_done: 'Auto-Saved',
+        doc_name_ph: 'Document title (e.g. Study_Note)',
+        tpl_choose: 'Choose Template...', tpl_mcq: 'MCQ Exam Paper', tpl_assign: 'Assignment Cover', tpl_app: 'Formal Application', tpl_notes: 'Class Notes',
+        ed_list: 'List', ed_num: 'Number', ed_left: 'Left', ed_center: 'Center', ed_table: 'Table', ed_img: 'Image',
+        btn_pdf_vec: 'Searchable PDF', btn_pdf_img: 'Image PDF', btn_docx: 'Real DOCX', btn_draft: 'Save Draft',
+        saved_drafts_title: 'Saved Drafts (IndexedDB)',
+        pm_title: 'PDF Page Manager (Rotate / Reorder / Delete)',
+        pm_desc: 'Rotate tilted pages by 90°, reorder or remove pages, and save a new copy while keeping the original PDF untouched.',
+        pm_pick: 'Select a PDF File', pm_hint: 'Page list will appear here',
+        pm_export: 'Save Modified Copy', pm_reset: 'Reset',
+        img_pdf_title: 'Images to PDF (Auto Portrait/Landscape)',
+        img_pdf_desc: 'Automatically arranges Portrait or Landscape A4 pages per image ratio to build a clean PDF.',
+        img_pdf_pick: 'Select Multiple Images', img_pdf_btn: 'Convert Images to PDF', btn_clear_all: 'Clear All',
+        merge_title: 'Merge Multiple PDFs',
+        merge_desc: 'Reorder and combine multiple PDF files into one document (encrypted PDFs are detected safely).',
+        merge_pick: 'Select PDF Files', merge_hint: 'Use Up/Down buttons to change order',
+        merge_btn: 'Merge & Save PDF', btn_clear_list: 'Clear List',
+        split_title: 'Split PDF Pages',
+        split_desc: 'Enter exact page numbers (e.g. 1-3, 5). Invalid or reversed ranges (e.g. 8-3) are rejected automatically.',
+        split_pick: 'Choose a PDF File', split_hint: 'Total pages will appear here',
+        split_ph: 'Enter pages (e.g. 1-3, 5, 7-8)', split_btn: 'Extract Separate PDF',
+        settings_title: 'Settings, Language & Offline Backup', lang_label: 'App Language',
+        backup_desc: 'Back up and restore all your drafts, sticky notes, and PDF annotations 100% offline on your device.',
+        btn_backup_save: 'Save Backup (.json)', btn_backup_restore: 'Restore Backup',
+        btn_err_log: 'Export Error Log', btn_clear_storage: 'Clear All Data',
+        bijoy_title: 'Bijoy → Unicode Bangla Converter', bijoy_badge: 'Legacy Font Fix',
+        bijoy_desc: 'Paste legacy Bijoy (SutonnyMJ) text here to convert into clean Unicode Bangla in 1 tap.',
+        bijoy_in_ph: 'Paste legacy Bijoy text here...', bijoy_conv_btn: 'Convert to Unicode Bangla',
+        btn_clear: 'Clear', bijoy_out_title: 'Clean Unicode Bangla Output',
+        bijoy_out_ph: 'Converted Bangla text appears here...', btn_copy: 'Copy Text', btn_to_editor: 'Open in Editor & Make PDF',
+        tool_read: 'Read', tool_hl: 'Highlight', tool_pen: 'Pen', tool_note: 'Note',
+        tool_undo: 'Undo', tool_png: 'Page PNG', tool_save_pdf: 'Save Annotated PDF',
+        sound_on: 'Page turn sound ON', sound_off: 'Page turn sound OFF',
+        print_hint: 'Choose "Save as PDF" in the Android print screen',
+        docx_saved: 'Genuine DOCX file created!'
+      }
+    };
+
+    let currentLang = localStorage.getItem('ax_lang') || 'bn';
+    function t(key) { return (I18N[currentLang] && I18N[currentLang][key]) || I18N.bn[key] || key; }
+
+    function applyLanguage(lang) {
+      currentLang = (lang === 'en') ? 'en' : 'bn';
+      localStorage.setItem('ax_lang', currentLang);
+      document.documentElement.lang = currentLang;
+      if ($('langToggleBtn')) $('langToggleBtn').textContent = currentLang === 'bn' ? 'EN' : 'বাংলা';
+      if ($('settingsLangSelect')) $('settingsLangSelect').value = currentLang;
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (k && I18N[currentLang][k]) el.textContent = I18N[currentLang][k];
+      });
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        const k = el.getAttribute('data-i18n-ph');
+        if (k && I18N[currentLang][k]) el.setAttribute('placeholder', I18N[currentLang][k]);
+      });
+      if ($('brandSubtitle')) {
+        $('brandSubtitle').textContent = getStoredOwner() ? t('owner_sub') : t('subtitle');
+      }
+    }
+
+    function showAxLoader(title, sub) {
+      $('axLoaderTitle').textContent = title || 'AetherX PDF Reader';
+      $('axLoaderSub').textContent = sub || t('loading');
+      $('axLoader').classList.add('open');
+    }
+    function hideAxLoader() {
+      $('axLoader').classList.remove('open');
+    }
+
 
     function recordLocalError(context, err) {
       try {
@@ -1330,25 +1649,52 @@
       renderFileLibrary();
     };
 
+    function revealVisibleRowsFallback() {
+      const vh = window.innerHeight || 800;
+      document.querySelectorAll('#autoFileList .file-row:not(.in-view)').forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.top < vh + 60 && r.bottom > -40) el.classList.add('in-view');
+      });
+    }
+    window.addEventListener('scroll', revealVisibleRowsFallback, { passive: true });
+
     function attachScrollReveal(container) {
       if (listObserver) listObserver.disconnect();
-      const rows = container.querySelectorAll('.file-row:not(.in-view)');
+      const rows = Array.from(container.querySelectorAll('.file-row:not(.in-view)'));
       if (!rows.length) return;
+
+      const vh = window.innerHeight || 800;
+      let initialIdx = 0;
       if ('IntersectionObserver' in window) {
         listObserver = new IntersectionObserver((entries) => {
           let batch = 0;
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               const el = entry.target;
-              el.style.transitionDelay = Math.min(batch * 28, 140) + 'ms';
+              const d = Math.min(batch * 36, 180);
+              el.style.transitionDelay = d + 'ms';
               el.classList.add('in-view');
               batch++;
               listObserver.unobserve(el);
-              setTimeout(() => { el.style.transitionDelay = '0ms'; }, 380);
+              setTimeout(() => { el.style.transitionDelay = '0ms'; }, d + 400);
             }
           });
-        }, { threshold: 0.04 });
-        rows.forEach(r => listObserver.observe(r));
+        }, { threshold: 0.01, rootMargin: '50px 0px 50px 0px' });
+
+        rows.forEach((row) => {
+          const rect = row.getBoundingClientRect();
+          if (rect.top < vh + 30) {
+            const d = Math.min(initialIdx * 28, 160);
+            initialIdx++;
+            requestAnimationFrame(() => {
+              row.style.transitionDelay = d + 'ms';
+              row.classList.add('in-view');
+              setTimeout(() => { row.style.transitionDelay = '0ms'; }, d + 400);
+            });
+          } else {
+            listObserver.observe(row);
+          }
+        });
       } else {
         rows.forEach(r => r.classList.add('in-view'));
       }
@@ -1378,7 +1724,7 @@
       if (!filtered.length) {
         loadWrap.style.display = 'none';
         container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:28px 12px; color:var(--text-muted); font-size:13px; line-height:1.6;">
-          ${deviceFiles.length ? 'খোঁজার সাথে মিলে এমন কোনো ফাইল পাওয়া যায়নি।' : 'কোনো ফাইল পাওয়া যায়নি। উপরের <b>"ফাইল বাছুন"</b> বাটনে ট্যাপ করে যেকোনো ফাইল খুলতে পারেন।'}
+          ${deviceFiles.length ? t('no_match') : t('no_files')}
         </div>`;
         return;
       }
@@ -1410,7 +1756,7 @@
 
       if (filtered.length > visibleLimit) {
         loadWrap.style.display = 'block';
-        $('loadMoreBtn').textContent = `আরো ফাইল দেখুন (${slice.length} / ${filtered.length})`;
+        $('loadMoreBtn').textContent = `${t('load_more')} (${slice.length} / ${filtered.length})`;
       } else loadWrap.style.display = 'none';
       attachScrollReveal(container);
     }
@@ -1502,14 +1848,14 @@
       const { path, name, ext, size, modified } = fileObj;
       if (ext === 'doc') { showToast('পুরোনো বাইনারি .doc ফরম্যাট অফলাইনে সমর্থিত নয় — .docx বা .pdf করে খুলুন।'); return; }
 
-      showToast('ফাইল খোলা হচ্ছে...');
+      showAxLoader(name, ext === 'pdf' ? t('opening_pdf') : t('loading'));
       try {
         if (ext === 'pdf' && window.GlassNative && typeof window.GlassNative.openPdfSession === 'function') {
           // CRITICAL FIX: Clean up previous PDF BEFORE opening the new session!
           await destroyCurrentPdfResources();
           const raw = window.GlassNative.openPdfSession(path);
           const info = JSON.parse(raw || '{}');
-          if (!info.ok) { showToast('PDF খোলা যায়নি: ' + (info.error || 'অনুমতি যাচাই করুন')); return; }
+          if (!info.ok) { hideAxLoader(); showToast('PDF খোলা যায়নি: ' + (info.error || 'অনুমতি যাচাই করুন')); return; }
 
           activeNativePdfSession = info.sessionId;
           const docId = computeDocId({ path, name, size: info.size || size, modified: info.modified || modified, headHash: info.headHash });
@@ -1535,7 +1881,7 @@
             if (!activeNativePdfSession) {
               const raw2 = window.GlassNative.openPdfSession(path);
               const info2 = JSON.parse(raw2 || '{}');
-              if (!info2.ok) { showToast('PDF খোলা যায়নি: ' + (info2.error || 'ফাইল পড়া যাচ্ছে না')); return; }
+              if (!info2.ok) { hideAxLoader(); showToast('PDF খোলা যায়নি: ' + (info2.error || 'ফাইল পড়া যাচ্ছে না')); return; }
               activeNativePdfSession = info2.sessionId;
             }
             const transport = createNativePdfRangeTransport(activeNativePdfSession, info.length);
@@ -1555,9 +1901,11 @@
           const b64 = window.GlassNative.readSmallDocBase64(path);
           if (b64) buffer = base64ToUint8Array(b64).buffer;
         }
-        if (!buffer) { showToast('ফাইলটি পড়া যায়নি (সাইজ ৩০ MB-এর বেশি অথবা অনুমতি নেই)'); return; }
+        if (!buffer) { hideAxLoader(); showToast('ফাইলটি পড়া যায়নি (সাইজ ৫৫ MB-এর বেশি অথবা অনুমতি নেই)'); return; }
         await openNonPdfBuffer(buffer, name, ext);
+        hideAxLoader();
       } catch (err) {
+        hideAxLoader();
         recordLocalError('openDeviceFile', err);
         showToast('ফাইল খুলতে সমস্যা হয়েছে');
       }
@@ -1572,7 +1920,7 @@
           const url = URL.createObjectURL(file);
           openFsHtml(`<img src="${url}" style="max-width:100%;border-radius:10px;display:block;margin:auto;"/>`, file.name, false);
         } else if (ext === 'pdf') {
-          showToast('PDF লোড হচ্ছে...');
+          showAxLoader(file.name, t('opening_pdf'));
           const blobUrl = URL.createObjectURL(file);
           const docId = computeDocId({ name: file.name, size: file.size, modified: file.lastModified });
           await openPdfFromSource({ url: blobUrl, disableAutoFetch: true }, file.name, docId, { name: file.name, size: file.size, modified: file.lastModified }, blobUrl, false);
@@ -1673,7 +2021,7 @@
     function openFsHtml(safeHtml, title, editable) {
       openFsOverlay(title); fsViewport.classList.add('doc-scroll-mode');
       pdfPageBox.style.display = 'none'; $('sideFabWrap').style.display = 'none'; $('fsBottomHud').style.display = 'none';
-      $('fsFitToggleBtn').style.display = 'none'; $('fsSandboxFrame').style.display = 'none';
+      $('fsFitToggleBtn').style.display = 'none'; $('fsSoundBtn').style.display = 'none'; $('fsSandboxFrame').style.display = 'none';
       $('fsDocBox').style.display = 'block'; $('fsDocBox').innerHTML = safeHtml;
       $('fsEditDocBtn').style.display = editable ? 'grid' : 'none';
       $('fsBijoyFixBtn').style.display = isLikelyBijoy($('fsDocBox').innerText || '') ? 'grid' : 'none';
@@ -1682,7 +2030,7 @@
     function openFsSandboxedHtml(safeBodyHtml, title) {
       openFsOverlay(title); fsViewport.classList.add('doc-scroll-mode');
       pdfPageBox.style.display = 'none'; $('sideFabWrap').style.display = 'none'; $('fsBottomHud').style.display = 'none';
-      $('fsFitToggleBtn').style.display = 'none'; $('fsDocBox').style.display = 'none'; $('fsEditDocBtn').style.display = 'none'; $('fsBijoyFixBtn').style.display = 'none';
+      $('fsFitToggleBtn').style.display = 'none'; $('fsSoundBtn').style.display = 'none'; $('fsDocBox').style.display = 'none'; $('fsEditDocBtn').style.display = 'none'; $('fsBijoyFixBtn').style.display = 'none';
       const frame = $('fsSandboxFrame'); frame.style.display = 'block';
       frame.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline';"><style>body{font-family:sans-serif;line-height:1.75;padding:18px;color:#0f172a;background:#fff;margin:0;word-wrap:break-word;}img{max-width:100%;}table{width:100%;border-collapse:collapse;}td,th{border:1px solid #cbd5e1;padding:6px;}</style></head><body>${safeBodyHtml}</body></html>`;
     }
@@ -1690,7 +2038,7 @@
     async function openPdfFromSource(sourceConfig, name, docId, meta, blobUrlToCleanup = null, skipPreDestroy = false) {
       if (!skipPreDestroy) await destroyCurrentPdfResources();
       activeBlobUrlToRevoke = blobUrlToCleanup;
-      if (!window.pdfjsLib) { showToast('PDF ইঞ্জিন লোড হয়নি'); return false; }
+      if (!window.pdfjsLib) { hideAxLoader(); showToast('PDF ইঞ্জিন লোড হয়নি'); return false; }
       window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdf.worker.min.js';
 
       const loadingTask = window.pdfjsLib.getDocument(sourceConfig);
@@ -1702,13 +2050,14 @@
       loadingTask.onPassword = async (updatePassword, reason) => {
         const msg = reason === 2 ? 'ভুল পাসওয়ার্ড! অনুগ্রহ করে সঠিক পাসওয়ার্ড দিন।' : 'এই PDF ফাইলটি পাসওয়ার্ড-সুরক্ষিত। খুলতে পাসওয়ার্ড দিন:';
         const pw = await promptPdfPassword(msg);
-        if (pw === null) { loadingTask.destroy(); showToast('পাসওয়ার্ড দেওয়া বাতিল হয়েছে'); }
+        if (pw === null) { hideAxLoader(); loadingTask.destroy(); showToast('পাসওয়ার্ড দেওয়া বাতিল হয়েছে'); }
         else updatePassword(pw);
       };
 
       try {
         pdfDoc = await loadingTask.promise;
       } catch (err) {
+        hideAxLoader();
         await destroyCurrentPdfResources();
         if (err && err.name !== 'PasswordException') {
           recordLocalError('pdf_load', err);
@@ -1720,7 +2069,7 @@
       openFsOverlay(name); fsViewport.classList.remove('doc-scroll-mode');
       $('fsDocBox').style.display = 'none'; $('fsSandboxFrame').style.display = 'none';
       $('fsEditDocBtn').style.display = 'none'; $('fsBijoyFixBtn').style.display = 'none';
-      $('fsFitToggleBtn').style.display = 'grid'; pdfPageBox.style.display = 'block';
+      $('fsFitToggleBtn').style.display = 'grid'; $('fsSoundBtn').style.display = 'grid'; pdfPageBox.style.display = 'block';
       $('sideFabWrap').style.display = 'flex'; $('fsBottomHud').style.display = 'flex';
 
       currentDocId = docId; currentDocMeta = meta; currentPage = 1; fitMode = 'width'; setActiveTool('read');
@@ -1732,7 +2081,8 @@
       pageNotesCache = (savedNotes && savedNotes.notesByPage) ? savedNotes.notesByPage : {};
 
       $('pageSlider').max = pdfDoc.numPages; $('pageSlider').value = 1;
-      setTimeout(() => loadPdfPage(currentPage, false), 45);
+      await loadPdfPage(currentPage, false);
+      hideAxLoader();
       return true;
     }
 
@@ -1843,9 +2193,15 @@
     $('zoomInBtn').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(scale + 0.5, vw / 2, vh / 2, true); });
     $('zoomOutBtn').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(scale - 0.5, vw / 2, vh / 2, true); });
     $('zoomLabel').addEventListener('click', () => { const { vw, vh } = getViewportSize(); zoomAroundPoint(1.0, vw / 2, vh / 2, true); });
-    $('prevPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage > 1) { currentPage--; loadPdfPage(currentPage, false); } });
-    $('nextPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage < pdfDoc.numPages) { currentPage++; loadPdfPage(currentPage, false); } });
-    $('pageSlider').addEventListener('change', (e) => { const p = parseInt(e.target.value, 10); if (pdfDoc && p >= 1 && p <= pdfDoc.numPages) { currentPage = p; loadPdfPage(currentPage, false); } });
+    function triggerPageFlip(dir) {
+      pdfPageBox.classList.remove('flip-next', 'flip-prev');
+      void pdfPageBox.offsetWidth;
+      pdfPageBox.classList.add(dir === 'prev' ? 'flip-prev' : 'flip-next');
+      playPageTurnSound();
+    }
+    $('prevPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage > 1) { currentPage--; triggerPageFlip('prev'); loadPdfPage(currentPage, false); } });
+    $('nextPageBtn').addEventListener('click', () => { if (pdfDoc && currentPage < pdfDoc.numPages) { currentPage++; triggerPageFlip('next'); loadPdfPage(currentPage, false); } });
+    $('pageSlider').addEventListener('change', (e) => { const p = parseInt(e.target.value, 10); if (pdfDoc && p >= 1 && p <= pdfDoc.numPages && p !== currentPage) { const dir = p > currentPage ? 'next' : 'prev'; currentPage = p; triggerPageFlip(dir); loadPdfPage(currentPage, false); } });
     $('fsNightBtn').addEventListener('click', () => { pdfPageBox.classList.toggle('night-invert'); $('fsDocBox').classList.toggle('night-invert'); $('fsNightBtn').classList.toggle('active'); });
     $('fsEditDocBtn').addEventListener('click', () => {
       $('editorPaper').innerHTML = sanitizeHtml($('fsDocBox').innerHTML); normalizeEditablePaper();
@@ -2123,7 +2479,18 @@
         await saveOutputFile(pdf.output('blob'), safeName + '.pdf');
       } catch (err) { recordLocalError('export_pdf', err); showToast('PDF তৈরিতে সমস্যা হয়েছে'); }
     });
-    $('exportWordBtn').addEventListener('click', async () => { const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_'); await saveOutputFile(new Blob(['\ufeff', `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${sanitizeHtml($('editorPaper').innerHTML)}</body></html>`], { type: 'application/msword' }), safeName + '.doc'); });
+    $('exportSearchablePdfBtn').addEventListener('click', () => {
+      const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
+      const cleanHtml = sanitizeHtml($('editorPaper').innerHTML);
+      if (window.GlassNative && typeof window.GlassNative.printHtmlToPdf === 'function') {
+        if (window.GlassNative.printHtmlToPdf(safeName, cleanHtml)) {
+          showToast(t('print_hint'));
+          return;
+        }
+      }
+      window.print();
+    });
+    $('exportWordBtn').addEventListener('click', exportGenuineDocx);
     $('exportTxtBtn').addEventListener('click', async () => { const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_'); await saveOutputFile(new Blob([$('editorPaper').innerText], { type: 'text/plain;charset=utf-8' }), safeName + '.txt'); });
 
     async function renderDrafts() {
@@ -2235,7 +2602,7 @@
     $('exportBackupBtn').addEventListener('click', async () => {
       try {
         const [drafts, notes, annotations] = await Promise.all([dbGetAll('drafts'), dbGetAll('notes'), dbGetAll('annotations')]);
-        const payload = { app: 'AetherX PDF Reader', version: '3.1.1', exportedAt: new Date().toISOString(), drafts, notes, annotations };
+        const payload = { app: 'AetherX PDF Reader', version: '3.2.0', exportedAt: new Date().toISOString(), drafts, notes, annotations };
         await saveOutputFile(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }), `AetherX_Backup_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.json`);
       } catch (e) { recordLocalError('backup_export', e); showToast('ব্যাকআপ তৈরি করা যায়নি'); }
     });
@@ -2262,7 +2629,7 @@
     });
     $('exportErrorLogBtn').addEventListener('click', async () => {
       const logs = JSON.parse(localStorage.getItem('ax_error_log') || '[]');
-      const text = logs.length ? logs.map(l => `[${l.time}] (${l.ctx}) ${l.err}`).join('\n') : 'No errors recorded. AetherX PDF Reader v3.1.1 is running cleanly.';
+      const text = logs.length ? logs.map(l => `[${l.time}] (${l.ctx}) ${l.err}`).join('\n') : 'No errors recorded. AetherX PDF Reader v3.2 is running cleanly.';
       await saveOutputFile(new Blob([text], { type: 'text/plain;charset=utf-8' }), 'AetherX_ErrorLog.txt');
     });
     $('clearAllStorageBtn').addEventListener('click', async () => { await Promise.all([dbClearStore('drafts'), dbClearStore('notes'), dbClearStore('annotations'), dbClearStore('recovery')]); await renderDrafts(); await updateStorageStats(); showToast('সব ড্রাফট, নোট ও হাইলাইট পরিষ্কার হয়েছে!'); });
@@ -2298,6 +2665,329 @@
     $('clearBijoyBtn').addEventListener('click', () => { $('bijoyInput').value = ''; $('unicodeOutput').value = ''; });
     $('copyUnicodeBtn').addEventListener('click', async () => { const t = $('unicodeOutput').value; if (!t) return showToast('কপি করার মতো লেখা নেই'); try { await navigator.clipboard.writeText(t); } catch { $('unicodeOutput').select(); document.execCommand('copy'); } showToast('কপি করা হয়েছে!'); });
     $('unicodeToEditorBtn').addEventListener('click', () => { const t = $('unicodeOutput').value.trim(); if (!t) return showToast('আউটপুটে কোনো লেখা নেই'); $('editorPaper').innerHTML = t.split('\n').map(l => `<p>${escapeHtml(l) || '<br>'}</p>`).join(''); normalizeEditablePaper(); $('docTitleInput').value = 'Converted_Bangla_Doc'; switchTab('editor'); showToast('এডিটরে লোড হয়েছে!'); });
+  
+    // ==================== 12. v3.2 LANGUAGE, FONT SELECTOR, SOUND, ANNOTATED PDF, REAL DOCX & PAGE MANAGER ====================
+    $('langToggleBtn').addEventListener('click', () => {
+      applyLanguage(currentLang === 'bn' ? 'en' : 'bn');
+      renderFileLibrary();
+      showToast(currentLang === 'en' ? 'Switched to English' : 'বাংলা ভাষা চালু হয়েছে');
+    });
+    $('settingsLangSelect').addEventListener('change', (e) => {
+      applyLanguage(e.target.value);
+      renderFileLibrary();
+      showToast(currentLang === 'en' ? 'Switched to English' : 'বাংলা ভাষা চালু হয়েছে');
+    });
+    window.addEventListener('DOMContentLoaded', () => applyLanguage(currentLang));
+
+    // Editor Font Selector (Offline Bundled Fonts)
+    const fontFamilyMap = {
+      noto: "'Noto Sans Bengali', sans-serif",
+      hind: "'Hind Siliguri', sans-serif",
+      system: "system-ui, -apple-system, sans-serif"
+    };
+    const savedFontKey = localStorage.getItem('ax_editor_font') || 'noto';
+    $('editorFontSelect').value = savedFontKey;
+    $('editorPaper').style.fontFamily = fontFamilyMap[savedFontKey] || fontFamilyMap.noto;
+    $('editorFontSelect').addEventListener('change', (e) => {
+      const k = e.target.value;
+      localStorage.setItem('ax_editor_font', k);
+      $('editorPaper').style.fontFamily = fontFamilyMap[k] || fontFamilyMap.noto;
+    });
+
+    // Page-Turn Sound (Web Audio API — 0 KB offline, Default OFF)
+    let pageTurnSoundOn = localStorage.getItem('ax_sound') === 'on';
+    let audioCtx = null;
+    function syncSoundBtn() { $('fsSoundBtn').classList.toggle('active', pageTurnSoundOn); }
+    syncSoundBtn();
+
+    $('fsSoundBtn').addEventListener('click', () => {
+      pageTurnSoundOn = !pageTurnSoundOn;
+      localStorage.setItem('ax_sound', pageTurnSoundOn ? 'on' : 'off');
+      syncSoundBtn();
+      if (pageTurnSoundOn) playPageTurnSound();
+      showToast(pageTurnSoundOn ? t('sound_on') : t('sound_off'));
+    });
+
+    function playPageTurnSound() {
+      if (!pageTurnSoundOn) return;
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        if (!audioCtx) audioCtx = new AC();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const dur = 0.13, sr = audioCtx.sampleRate;
+        const buf = audioCtx.createBuffer(1, Math.floor(sr * dur), sr);
+        const ch = buf.getChannelData(0);
+        for (let i = 0; i < ch.length; i++) {
+          ch[i] = (Math.random() * 2 - 1) * Math.sin((i / ch.length) * Math.PI) * 0.28;
+        }
+        const src = audioCtx.createBufferSource();
+        src.buffer = buf;
+        const flt = audioCtx.createBiquadFilter();
+        flt.type = 'bandpass';
+        flt.frequency.setValueAtTime(1650, audioCtx.currentTime);
+        flt.frequency.exponentialRampToValueAtTime(620, audioCtx.currentTime + dur);
+        flt.Q.value = 1.1;
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.32, audioCtx.currentTime + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+        src.connect(flt); flt.connect(gain); gain.connect(audioCtx.destination);
+        src.start();
+      } catch (e) {}
+    }
+
+    // Permanent Annotated PDF Export (Original PDF stays untouched!)
+    $('toolSaveAnnotatedPdfBtn').addEventListener('click', async () => {
+      $('sideDock').classList.remove('open');
+      if (!pdfDoc || !currentDocMeta || !window.PDFLib) return showToast('PDF ইঞ্জিন প্রস্তুত নয়');
+      showAxLoader('Annotated PDF', t('exporting_pdf'));
+      try {
+        let rawBytes = null;
+        if (currentDocMeta.path && window.GlassNative && typeof window.GlassNative.readSmallDocBase64 === 'function') {
+          const b64 = window.GlassNative.readSmallDocBase64(currentDocMeta.path);
+          if (b64) rawBytes = base64ToUint8Array(b64);
+        }
+        if (!rawBytes && typeof pdfDoc.getData === 'function') {
+          rawBytes = await pdfDoc.getData();
+        }
+        if (!rawBytes) {
+          hideAxLoader();
+          return showToast(currentLang === 'en'
+            ? 'Files over 55MB cannot be rewritten in browser RAM — use Page PNG instead.'
+            : '৫৫ MB-এর বড় PDF-এ সম্পূর্ণ দাগানো এক্সপোর্ট RAM সীমায় পড়ে—পেজ PNG সেভ করুন।');
+        }
+        const { PDFDocument, rgb } = window.PDFLib;
+        const doc = await PDFDocument.load(rawBytes, { ignoreEncryption: false });
+        const pages = doc.getPages();
+        const rgbMap = {
+          yellow: rgb(0.98, 0.85, 0.15),
+          green:  rgb(0.20, 0.83, 0.60),
+          pink:   rgb(0.96, 0.44, 0.56),
+          blue:   rgb(0.22, 0.74, 0.97)
+        };
+        for (const [pageStr, strokes] of Object.entries(pageStrokes)) {
+          const idx = parseInt(pageStr, 10) - 1;
+          if (idx < 0 || idx >= pages.length || !Array.isArray(strokes)) continue;
+          const page = pages[idx];
+          const { width, height } = page.getSize();
+          for (const s of strokes) {
+            if (!s.points || s.points.length < 2) continue;
+            const col = rgbMap[s.color] || rgbMap.yellow;
+            const thick = Math.max(1.2, (s.widthRatio || 0.01) * width);
+            const op = s.tool === 'highlight' ? 0.36 : 0.94;
+            for (let i = 1; i < s.points.length; i++) {
+              page.drawLine({
+                start: { x: s.points[i - 1].x * width, y: height - (s.points[i - 1].y * height) },
+                end:   { x: s.points[i].x * width,     y: height - (s.points[i].y * height) },
+                thickness: thick, color: col, opacity: op
+              });
+            }
+          }
+        }
+        const outBytes = await doc.save();
+        const baseName = (currentDocMeta.name || 'Document').replace(/\.pdf$/i, '');
+        hideAxLoader();
+        await saveOutputFile(new Blob([outBytes], { type: 'application/pdf' }), baseName + '_Annotated.pdf');
+      } catch (err) {
+        hideAxLoader();
+        recordLocalError('annotated_pdf_export', err);
+        showToast(currentLang === 'en' ? 'Cannot export annotated copy for this PDF.' : 'লক করা বা অসমর্থিত PDF-এ Annotated Copy তৈরি করা যায়নি।');
+      }
+    });
+
+    // Genuine 100% Offline OpenXML .docx Export (Pure-JS ZIP + WordprocessingML)
+    function buildMinimalZip(entries) {
+      const crcTable = new Uint32Array(256);
+      for (let n = 0; n < 256; n++) {
+        let c = n;
+        for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        crcTable[n] = c >>> 0;
+      }
+      const crc32 = (u8) => {
+        let c = 0xFFFFFFFF;
+        for (let i = 0; i < u8.length; i++) c = crcTable[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+        return (c ^ 0xFFFFFFFF) >>> 0;
+      };
+      const enc = new TextEncoder(), localParts = [], centralParts = [];
+      let offset = 0;
+      for (const { name, content } of entries) {
+        const nameBytes = enc.encode(name);
+        const dataBytes = typeof content === 'string' ? enc.encode(content) : content;
+        const crc = crc32(dataBytes);
+        const lh = new DataView(new ArrayBuffer(30));
+        lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true);
+        lh.setUint32(14, crc, true); lh.setUint32(18, dataBytes.length, true); lh.setUint32(22, dataBytes.length, true);
+        lh.setUint16(26, nameBytes.length, true);
+        localParts.push(new Uint8Array(lh.buffer), nameBytes, dataBytes);
+
+        const ch = new DataView(new ArrayBuffer(46));
+        ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true);
+        ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true);
+        ch.setUint32(20, dataBytes.length, true); ch.setUint32(24, dataBytes.length, true);
+        ch.setUint16(28, nameBytes.length, true); ch.setUint32(42, offset, true);
+        centralParts.push(new Uint8Array(ch.buffer), nameBytes);
+        offset += 30 + nameBytes.length + dataBytes.length;
+      }
+      const cdSize = centralParts.reduce((a, b) => a + b.length, 0);
+      const eocd = new DataView(new ArrayBuffer(22));
+      eocd.setUint32(0, 0x06054b50, true);
+      eocd.setUint16(8, entries.length, true); eocd.setUint16(10, entries.length, true);
+      eocd.setUint32(12, cdSize, true); eocd.setUint32(16, offset, true);
+      return new Blob([...localParts, ...centralParts, new Uint8Array(eocd.buffer)], {
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      });
+    }
+
+    async function exportGenuineDocx() {
+      showAxLoader('DOCX', t('loading'));
+      try {
+        const xmlEsc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const root = document.createElement('div');
+        root.innerHTML = sanitizeHtml($('editorPaper').innerHTML);
+        let bodyXml = '';
+        const makePara = (text, bold = false, sz = 24) =>
+          `<w:p><w:r><w:rPr><w:rFonts w:ascii="Noto Sans Bengali" w:hAnsi="Noto Sans Bengali" w:cs="Noto Sans Bengali"/>${bold ? '<w:b/>' : ''}<w:sz w:val="${sz}"/></w:rPr><w:t xml:space="preserve">${xmlEsc(text)}</w:t></w:r></w:p>`;
+
+        Array.from(root.children).forEach(el => {
+          const tag = el.tagName;
+          if (tag === 'TABLE') {
+            bodyXml += '<w:tbl><w:tblPr><w:tblBorders><w:top w:val="single" w:sz="4"/><w:bottom w:val="single" w:sz="4"/><w:left w:val="single" w:sz="4"/><w:right w:val="single" w:sz="4"/><w:insideH w:val="single" w:sz="4"/><w:insideV w:val="single" w:sz="4"/></w:tblBorders></w:tblPr>';
+            el.querySelectorAll('tr').forEach(tr => {
+              bodyXml += '<w:tr>';
+              tr.querySelectorAll('th,td').forEach(c => { bodyXml += `<w:tc>${makePara(c.textContent.trim(), c.tagName === 'TH', 22)}</w:tc>`; });
+              bodyXml += '</w:tr>';
+            });
+            bodyXml += '</w:tbl>';
+          } else if (/^H[1-3]$/.test(tag)) {
+            bodyXml += makePara(el.textContent.trim(), true, tag === 'H1' ? 36 : 30);
+          } else if (tag === 'UL' || tag === 'OL') {
+            el.querySelectorAll('li').forEach((li, i) => {
+              bodyXml += makePara((tag === 'OL' ? `${i + 1}. ` : '• ') + li.textContent.trim(), false, 24);
+            });
+          } else {
+            const txt = el.textContent.trim();
+            if (txt) bodyXml += makePara(txt, !!el.querySelector('b,strong'), 24);
+          }
+        });
+        if (!bodyXml) bodyXml = makePara($('editorPaper').innerText || '', false, 24);
+
+        const nsTypes = 'http://schemas.openxmlformats.org/package/2006/content-types';
+        const nsRels  = 'http://schemas.openxmlformats.org/package/2006/relationships';
+        const nsDoc   = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument';
+        const nsWord  = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+
+        const docxBlob = buildMinimalZip([
+          { name: '[Content_Types].xml', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="${nsTypes}"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>` },
+          { name: '_rels/.rels', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="${nsRels}"><Relationship Id="rId1" Type="${nsDoc}" Target="word/document.xml"/></Relationships>` },
+          { name: 'word/document.xml', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="${nsWord}"><w:body>${bodyXml}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/></w:sectPr></w:body></w:document>` }
+        ]);
+        const safeName = ($('docTitleInput').value.trim() || 'AetherX_Note').replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_');
+        hideAxLoader();
+        await saveOutputFile(docxBlob, safeName + '.docx');
+      } catch (e) {
+        hideAxLoader();
+        recordLocalError('docx_export', e);
+        showToast('DOCX তৈরি করা যায়নি');
+      }
+    }
+
+    // PDF Page Manager (Rotate / Reorder / Delete — Original PDF Untouched!)
+    let pmSrcBytes = null, pmFileName = '', pmOps = [], pmTotalOriginal = 0;
+
+    function renderPmList() {
+      const box = $('pmPageList');
+      if (!pmOps.length) { box.innerHTML = ''; return; }
+      const pageWord = currentLang === 'en' ? 'Page' : 'পেজ';
+      box.innerHTML = pmOps.map((op, i) => `
+        <div class="pm-row">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <b>#${i + 1}</b>
+            <span>(${pageWord} ${op.origIdx + 1})</span>
+            ${op.rotate ? `<span class="pm-rot-badge">${op.rotate}°</span>` : ''}
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button class="btn btn-sm" data-pm-rot="${i}" title="Rotate 90°">↻ 90°</button>
+            ${i > 0 ? `<button class="btn btn-sm" data-pm-up="${i}">↑</button>` : ''}
+            ${i < pmOps.length - 1 ? `<button class="btn btn-sm" data-pm-dn="${i}">↓</button>` : ''}
+            <button class="btn btn-sm btn-danger" data-pm-del="${i}">×</button>
+          </div>
+        </div>`).join('');
+
+      box.querySelectorAll('[data-pm-rot]').forEach(b => b.addEventListener('click', () => {
+        const i = parseInt(b.dataset.pmRot, 10);
+        pmOps[i].rotate = (pmOps[i].rotate + 90) % 360;
+        renderPmList();
+      }));
+      box.querySelectorAll('[data-pm-up]').forEach(b => b.addEventListener('click', () => {
+        const i = parseInt(b.dataset.pmUp, 10);
+        [pmOps[i - 1], pmOps[i]] = [pmOps[i], pmOps[i - 1]];
+        renderPmList();
+      }));
+      box.querySelectorAll('[data-pm-dn]').forEach(b => b.addEventListener('click', () => {
+        const i = parseInt(b.dataset.pmDn, 10);
+        [pmOps[i + 1], pmOps[i]] = [pmOps[i], pmOps[i + 1]];
+        renderPmList();
+      }));
+      box.querySelectorAll('[data-pm-del]').forEach(b => b.addEventListener('click', () => {
+        if (pmOps.length <= 1) return showToast(currentLang === 'en' ? 'Keep at least 1 page' : 'অন্তত ১টি পেজ রাখতে হবে');
+        pmOps.splice(parseInt(b.dataset.pmDel, 10), 1);
+        renderPmList();
+      }));
+    }
+
+    $('pmPdfInput').addEventListener('change', async (e) => {
+      const f = e.target.files[0]; if (!f) return; e.target.value = '';
+      showAxLoader(f.name, t('loading'));
+      try {
+        pmSrcBytes = await f.arrayBuffer();
+        const doc = await window.PDFLib.PDFDocument.load(pmSrcBytes);
+        pmTotalOriginal = doc.getPageCount();
+        pmFileName = f.name.replace(/\.pdf$/i, '');
+        pmOps = Array.from({ length: pmTotalOriginal }, (_, i) => ({ origIdx: i, rotate: 0 }));
+        $('pmFileLabel').textContent = f.name;
+        $('pmPageInfo').textContent = currentLang === 'en' ? `${pmTotalOriginal} pages loaded` : `মোট ${pmTotalOriginal}টি পেজ লোড হয়েছে`;
+        renderPmList();
+        hideAxLoader();
+      } catch (err) {
+        hideAxLoader();
+        pmSrcBytes = null; pmOps = []; renderPmList();
+        showToast(String(err).toLowerCase().includes('encrypt') ? 'লক করা PDF এডিট করা যাবে না' : 'PDF লোড করা যায়নি');
+      }
+    });
+
+    $('pmResetBtn').addEventListener('click', () => {
+      if (!pmTotalOriginal) return;
+      pmOps = Array.from({ length: pmTotalOriginal }, (_, i) => ({ origIdx: i, rotate: 0 }));
+      renderPmList();
+      showToast(currentLang === 'en' ? 'Pages reset to original order' : 'সব পেজ আগের অবস্থায় রিসেট হয়েছে');
+    });
+
+    $('pmExportBtn').addEventListener('click', async () => {
+      if (!pmSrcBytes || !pmOps.length) return showToast(currentLang === 'en' ? 'Select a PDF first' : 'আগে একটি PDF সিলেক্ট করুন');
+      showAxLoader('PDF Page Manager', t('exporting_pdf'));
+      try {
+        const { PDFDocument, degrees } = window.PDFLib;
+        const srcDoc = await PDFDocument.load(pmSrcBytes);
+        const outDoc = await PDFDocument.create();
+        for (const op of pmOps) {
+          const [copied] = await outDoc.copyPages(srcDoc, [op.origIdx]);
+          if (op.rotate) {
+            const cur = copied.getRotation().angle || 0;
+            copied.setRotation(degrees((cur + op.rotate) % 360));
+          }
+          outDoc.addPage(copied);
+        }
+        const outBytes = await outDoc.save();
+        hideAxLoader();
+        await saveOutputFile(new Blob([outBytes], { type: 'application/pdf' }), (pmFileName || 'AetherX') + '_Managed.pdf');
+      } catch (err) {
+        hideAxLoader();
+        recordLocalError('pm_export', err);
+        showToast('পরিবর্তিত PDF সেভ করা যায়নি');
+      }
+    });
+
   </script>
 </body>
 </html>
