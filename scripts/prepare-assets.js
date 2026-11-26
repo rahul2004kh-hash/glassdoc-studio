@@ -77,7 +77,6 @@ function patchAndroidNative() {
     throw new Error('Android package path not found: ' + pkgPath);
   }
 
-  // 1. High-Speed Hardened NativeStorageBridge.java
   const nativeBridgeJava = `package com.aetherx.pdfreader;
 
 import android.Manifest;
@@ -89,11 +88,15 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import org.json.JSONArray;
@@ -126,6 +129,7 @@ public class NativeStorageBridge {
     private final AtomicInteger scanGeneration = new AtomicInteger(0);
     private final ConcurrentHashMap<String, RandomAccessFile> pdfSessions = new ConcurrentHashMap<>();
     private volatile String lastScanJson = "[]";
+    private WebView activePrintWebView = null;
 
     private static final Set<String> SKIP_DIRS = new HashSet<>(Arrays.asList(
         "dcim", "pictures", "movies", "music", "ringtones", "alarms",
@@ -225,6 +229,55 @@ public class NativeStorageBridge {
     }
 
     @JavascriptInterface
+    public boolean printHtmlToPdf(final String jobTitle, final String sanitizedBodyHtml) {
+        try {
+            final String safeTitle = sanitizeFilename(jobTitle != null ? jobTitle : "AetherX_Document");
+            final String fullDoc = "<!DOCTYPE html><html lang=\\"bn\\"><head><meta charset=\\"UTF-8\\"/>"
+                + "<link rel=\\"stylesheet\\" href=\\"file:///android_asset/public/fonts/noto-sans-bengali/400.css\\"/>"
+                + "<link rel=\\"stylesheet\\" href=\\"file:///android_asset/public/fonts/noto-sans-bengali/700.css\\"/>"
+                + "<link rel=\\"stylesheet\\" href=\\"file:///android_asset/public/fonts/hind-siliguri/400.css\\"/>"
+                + "<link rel=\\"stylesheet\\" href=\\"file:///android_asset/public/fonts/hind-siliguri/700.css\\"/>"
+                + "<style>@page{size:A4;margin:14mm;}body{font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif;font-size:13pt;line-height:1.72;color:#111827;margin:0;padding:0;}"
+                + "img{max-width:100%;height:auto;border-radius:6px;}table{width:100%;border-collapse:collapse;margin:10px 0;}"
+                + "th,td{border:1px solid #64748b;padding:6px 8px;text-align:left;}h1,h2,h3{color:#0f172a;}</style>"
+                + "</head><body>" + (sanitizedBodyHtml != null ? sanitizedBodyHtml : "") + "</body></html>";
+
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        WebView printWv = new WebView(activity);
+                        printWv.getSettings().setJavaScriptEnabled(false);
+                        printWv.getSettings().setAllowFileAccess(true);
+                        printWv.setWebViewClient(new WebViewClient() {
+                            @Override
+                            public void onPageFinished(WebView view, String url) {
+                                try {
+                                    PrintManager pm = (PrintManager) activity.getSystemService(Context.PRINT_SERVICE);
+                                    if (pm != null) {
+                                        PrintDocumentAdapter adapter = view.createPrintDocumentAdapter(safeTitle);
+                                        PrintAttributes attrs = new PrintAttributes.Builder()
+                                            .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                                            .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                                            .build();
+                                        pm.print(safeTitle, adapter, attrs);
+                                    }
+                                } catch (Exception ignored) {}
+                                activePrintWebView = null;
+                            }
+                        });
+                        activePrintWebView = printWv;
+                        printWv.loadDataWithBaseURL("file:///android_asset/public/", fullDoc, "text/html", "UTF-8", null);
+                    } catch (Exception ignored) {}
+                }
+            });
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @JavascriptInterface
     public boolean hasStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             return Environment.isExternalStorageManager();
@@ -275,7 +328,6 @@ public class NativeStorageBridge {
             || lowerName.endsWith(".rtf");
     }
 
-    // ==================== HIGH-SPEED BACKGROUND SCANNER ====================
     @JavascriptInterface
     public void startBackgroundScan() {
         final int myGen = scanGeneration.incrementAndGet();
@@ -321,7 +373,6 @@ public class NativeStorageBridge {
         List<File> found = new ArrayList<>();
         Set<String> seen = new HashSet<>();
 
-        // Fast recursive scan skipping heavy media-only folders (no slow getCanonicalPath per file!)
         try {
             File root = Environment.getExternalStorageDirectory();
             if (root != null && root.exists() && root.canRead()) {
@@ -331,7 +382,6 @@ public class NativeStorageBridge {
 
         if (myGen != scanGeneration.get()) return "[]";
 
-        // Fast MediaStore backup for any missed documents (including .rtf)
         try {
             Uri uri = MediaStore.Files.getContentUri("external");
             String[] projection = new String[]{ MediaStore.Files.FileColumns.DATA };
@@ -347,7 +397,7 @@ public class NativeStorageBridge {
             Cursor cursor = activity.getContentResolver().query(uri, projection, selection, null, null);
             if (cursor != null) {
                 int dataIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
-                while (cursor.moveToNext() && found.size() < 1200) {
+                while (cursor.moveToNext() && found.size() < 2000) {
                     if (myGen != scanGeneration.get()) break;
                     if (dataIdx >= 0) {
                         String p = cursor.getString(dataIdx);
@@ -393,7 +443,7 @@ public class NativeStorageBridge {
     }
 
     private void scanDirRecursive(File dir, List<File> out, Set<String> seen, int depth, int myGen) {
-        if (depth > 5 || out.size() >= 1200 || myGen != scanGeneration.get()) return;
+        if (depth > 5 || out.size() >= 2000 || myGen != scanGeneration.get()) return;
         String dirName = dir.getName();
         String lowerDir = dirName.toLowerCase(Locale.ROOT);
         if (depth > 0) {
@@ -409,7 +459,7 @@ public class NativeStorageBridge {
         File[] children = dir.listFiles();
         if (children == null) return;
         for (File child : children) {
-            if (out.size() >= 1200 || myGen != scanGeneration.get()) break;
+            if (out.size() >= 2000 || myGen != scanGeneration.get()) break;
             if (child.isDirectory()) {
                 scanDirRecursive(child, out, seen, depth + 1, myGen);
             } else if (child.isFile() && child.length() > 0) {
@@ -425,7 +475,6 @@ public class NativeStorageBridge {
         }
     }
 
-    // ==================== UNLIMITED LARGE PDF BYTE-RANGE STREAMING ENGINE ====================
     @JavascriptInterface
     public String openPdfSession(String filePath) {
         JSONObject res = new JSONObject();
@@ -475,7 +524,6 @@ public class NativeStorageBridge {
         }
     }
 
-    // Uses double parameters so Android WebView JS->Java bridge ALWAYS matches cleanly!
     @JavascriptInterface
     public String readPdfChunk(String sessionId, double beginD, double endD) {
         try {
@@ -528,7 +576,7 @@ public class NativeStorageBridge {
         try {
             if (!hasStoragePermission()) return "";
             File file = validateExternalFile(filePath, true);
-            if (file == null || file.length() > 30 * 1024 * 1024) return "";
+            if (file == null || file.length() > 55 * 1024 * 1024) return "";
             String lower = file.getName().toLowerCase(Locale.ROOT);
             if (!isSupportedDoc(lower)) return "";
             FileInputStream fis = new FileInputStream(file);
@@ -597,9 +645,7 @@ public class NativeStorageBridge {
 }
 `;
   fs.writeFileSync(path.join(pkgPath, 'NativeStorageBridge.java'), nativeBridgeJava, 'utf8');
-  console.log('Created fast hardened NativeStorageBridge.java');
 
-  // 2. MainActivity.java
   const mainActivityJava = `package com.aetherx.pdfreader;
 
 import android.graphics.Color;
@@ -636,6 +682,7 @@ public class MainActivity extends BridgeActivity {
 
         if (this.getBridge() != null && this.getBridge().getWebView() != null) {
             WebView webView = this.getBridge().getWebView();
+            webView.setBackgroundColor(Color.parseColor("#050812"));
             storageBridge = new NativeStorageBridge(this);
             webView.addJavascriptInterface(storageBridge, "GlassNative");
             WebSettings settings = webView.getSettings();
@@ -695,9 +742,7 @@ public class MainActivity extends BridgeActivity {
 }
 `;
   fs.writeFileSync(path.join(pkgPath, 'MainActivity.java'), mainActivityJava, 'utf8');
-  console.log('Patched MainActivity.java');
 
-  // 3. Patch AndroidManifest.xml
   const manifestPath = 'android/app/src/main/AndroidManifest.xml';
   let manifest = fs.readFileSync(manifestPath, 'utf8');
   if (!manifest.includes('xmlns:tools=')) {
@@ -718,20 +763,62 @@ public class MainActivity extends BridgeActivity {
     manifest = manifest.replace('<activity', '<activity android:windowSoftInputMode="adjustResize"');
   }
   fs.writeFileSync(manifestPath, manifest, 'utf8');
-  console.log('Patched AndroidManifest.xml');
 
-  // 4. Adaptive Icon Background color
   const bgColorXmlPath = 'android/app/src/main/res/values/ic_launcher_background.xml';
   fs.mkdirSync(path.dirname(bgColorXmlPath), { recursive: true });
   fs.writeFileSync(
     bgColorXmlPath,
-    '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#050812</color>\n</resources>\n',
+    '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#050812</color>\n    <color name="aetherx_splash_bg">#050812</color>\n</resources>\n',
     'utf8'
   );
 
-  // 5. Env-based Release Signing (Zero Hardcoded Passwords)
+  const stylesXml = `<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/aetherx_splash_bg</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:background">@color/aetherx_splash_bg</item>
+        <item name="android:windowBackground">@color/aetherx_splash_bg</item>
+    </style>
+
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="android:background">@color/aetherx_splash_bg</item>
+        <item name="android:windowBackground">@color/aetherx_splash_bg</item>
+        <item name="windowSplashScreenBackground">@color/aetherx_splash_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+    </style>
+</resources>
+`;
+  fs.writeFileSync('android/app/src/main/res/values/styles.xml', stylesXml, 'utf8');
+
+  const v31Dir = 'android/app/src/main/res/values-v31';
+  fs.mkdirSync(v31Dir, { recursive: true });
+  const stylesV31Xml = `<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="android:windowSplashScreenBackground">@color/aetherx_splash_bg</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="windowSplashScreenBackground">@color/aetherx_splash_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+    </style>
+</resources>
+`;
+  fs.writeFileSync(path.join(v31Dir, 'styles.xml'), stylesV31Xml, 'utf8');
+
   const gradlePath = 'android/app/build.gradle';
   let gradle = fs.readFileSync(gradlePath, 'utf8');
+  gradle = gradle.replace(/versionCode\s+\d+/, 'versionCode 32');
+  gradle = gradle.replace(/versionName\s+"[^"]+"/, 'versionName "3.2.0"');
+
   if (!gradle.includes('System.getenv("KEYSTORE_PASS")')) {
     gradle = gradle.replace(
       /buildTypes\s*\{\s*release\s*\{/,
@@ -755,9 +842,9 @@ public class MainActivity extends BridgeActivity {
     }
     buildTypes {`;
     gradle = gradle.replace('buildTypes {', signingBlock);
-    fs.writeFileSync(gradlePath, gradle, 'utf8');
-    console.log('Patched android/app/build.gradle');
   }
+  fs.writeFileSync(gradlePath, gradle, 'utf8');
+  console.log('Patched Android v3.2 native bridge, Print-to-PDF, custom splash & env signing!');
 }
 
 if (process.argv.includes('--patch-android')) {
